@@ -2,21 +2,71 @@
 #define STEPPER_PIN_2 10
 #define STEPPER_PIN_3 11
 #define STEPPER_PIN_4 12
+
 int step_number = 0;
+
+// 0 = nonstop
+// 1 = fast speed
+// 2 = medium speed
+// 3 = slow speed
+int modeNum = 2;
+
+int spinTime = 3000;
+int photoDelay = 2000;
+bool stopMotor = false;
+int oldtime = 0;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(STEPPER_PIN_1, OUTPUT);
   pinMode(STEPPER_PIN_2, OUTPUT);
   pinMode(STEPPER_PIN_3, OUTPUT);
   pinMode(STEPPER_PIN_4, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
+//main loop for the program
 void loop() {
-  // put your main code here, to run repeatedly:
+  // put your main code here, to run repeatedly
+  //make sure to add however much time is needed for the photo delay to the spin buffer
+ if ((millis()-oldtime) > (spinTime+photoDelay)) 
+ {
+  oldtime = millis();
+  LED();
+ }
+ else
+ {
+  nonStop(4);
+ }
+}
+void LED()
+{
+ digitalWrite(LED_BUILTIN, HIGH);
+ delay(photoDelay);
+ digitalWrite(LED_BUILTIN, LOW);
+}
+void speedFast()
+{
   OneStep(false);
-  
   delay(2);
-  
+}
+
+void speedMedium()
+{
+  OneStep(false);
+  delay(4);
+}
+
+void speedSlow()
+{
+  OneStep(false);
+  delay(8);
+}
+
+void nonStop(int delaytime)
+{
+  OneStep(false);
+  delay(delaytime);
 }
 
 void OneStep(bool dir)
