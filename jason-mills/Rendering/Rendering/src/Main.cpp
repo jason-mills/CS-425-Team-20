@@ -13,89 +13,97 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 #include "Shader.h"
+#include "STL.h"
+#include "STL_Struct.h"
 
 int main(void)
 {
-    GLFWwindow* window;
+    STL stlfile("res/stl/SampleCube.stl");
+    std::cout << "Header: " << stlfile.getName() << std::endl;
+    std::cout << "Number of triangles: " << stlfile.getTriangleCount() << std::endl;
 
-    if (!glfwInit())
-        return -1;
+    std::vector<stlTriangles>
 
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //GLFWwindow* window;
 
-    window = glfwCreateWindow(640, 480, "File Name Here", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
+    //if (!glfwInit())
+    //    return -1;
 
-    glfwMakeContextCurrent(window);
+    ////glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    ////glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    ////glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwSwapInterval(1);
+    //window = glfwCreateWindow(640, 480, "File Name Here", NULL, NULL);
+    //if (!window)
+    //{
+    //    glfwTerminate();
+    //    return -1;
+    //}
 
-    if (glewInit() != GLEW_OK)
-        return -1;
+    //glfwMakeContextCurrent(window);
 
-    float positions[] = {
-        -0.5f, -0.5f,
-        0.5f, -0.5f,
-        0.5f, 0.5f,
-        -0.5f, 0.5f,
-    };
+    //glfwSwapInterval(1);
 
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
+    //if (glewInit() != GLEW_OK)
+    //    return -1;
 
-    VertexArray va;
-    VertexBuffer vb(positions, 4 * 2 * sizeof(float) * 2);
-    VertexBufferLayout layout;
-    layout.Push<float>(2);
-    va.AddBuffer(vb, layout);
+    //float positions[] = {
+    //    -0.5f, -0.5f,
+    //    0.5f, -0.5f,
+    //    0.5f, 0.5f,
+    //    -0.5f, 0.5f,
+    //};
 
-    IndexBuffer ib(indices, 6);
+    //unsigned int indices[] = {
+    //    0, 1, 2,
+    //    2, 3, 0
+    //};
 
-    Shader shader("res/shaders/Basic.shader");
-    shader.Bind();
-    shader.SetUniform4f("uniformColor", 0.0f, 0.0f, 0.0f, 0.0f);
+    //VertexArray va;
+    //VertexBuffer vb(positions, 4 * 2 * sizeof(float) * 2);
+    //VertexBufferLayout layout;
+    //layout.Push<float>(2);
+    //va.AddBuffer(vb, layout);
 
-    va.Unbind();
-    vb.Unbind();
-    ib.Unbind();
-    shader.Unbind();
+    //IndexBuffer ib(indices, 6);
 
-    Renderer renderer;
+    //Shader shader("res/shaders/Basic.shader");
+    //shader.Bind();
+    //shader.SetUniform4f("uniformColor", 0.0f, 0.0f, 0.0f, 0.0f);
 
-    float r = 0.0f;
-    float increment = 0.05f;
+    //va.Unbind();
+    //vb.Unbind();
+    //ib.Unbind();
+    //shader.Unbind();
 
-    while (!glfwWindowShouldClose(window))
-    {
+    //Renderer renderer;
 
-        renderer.Clear();
+    //float r = 0.0f;
+    //float increment = 0.05f;
 
-        shader.Bind();
-        shader.SetUniform4f("uniformColor", r, 0.0f, 0.0f, 0.0f);
+    //while (!glfwWindowShouldClose(window))
+    //{
 
-        renderer.Draw(va, ib, shader);
+    //    renderer.Clear();
 
-        if (r > 1.0f)
-            increment = -0.01f;
-        else if (r < 0.0f)
-            increment = 0.01f;
+    //    shader.Bind();
+    //    shader.SetUniform4f("uniformColor", r, 0.0f, 0.0f, 0.0f);
 
-        r += increment;
+    //    renderer.Draw(va, ib, shader);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+    //    if (r > 1.0f)
+    //        increment = -0.01f;
+    //    else if (r < 0.0f)
+    //        increment = 0.01f;
+
+    //    r += increment;
+
+    //    glfwSwapBuffers(window);
+    //    glfwPollEvents();
+    //}
 
 
-    glfwTerminate();
+    //glfwTerminate();
 
-    return 0;
+    //return 0;
 }

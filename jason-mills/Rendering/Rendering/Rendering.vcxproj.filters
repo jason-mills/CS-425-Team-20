@@ -9,6 +9,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\STL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
@@ -19,6 +20,8 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexBufferLayout.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\STL.h" />
+    <ClInclude Include="src\STL_Struct.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
