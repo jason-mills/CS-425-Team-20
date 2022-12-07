@@ -1,2 +1,2 @@
-﻿LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  Rendering.vcxproj -> C:\dev\CS 425 Project\jason-mills\Rendering\bin\x64\Debug\Rendering.exe
+﻿  Main.cpp
+  Rendering.vcxproj -> C:\dev\CS 425 C3P0\CS-425-Team-20\jason-mills\Rendering\bin\x64\Debug\Rendering.exe
