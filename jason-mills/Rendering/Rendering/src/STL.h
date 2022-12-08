@@ -12,6 +12,8 @@ private:
 	uint32_t triangleCount;
 	std::vector<stlTriangle> triangles;
 	void readFile();
+	float xMax, yMax, zMax;
+	float xMin, yMin, zMin;
 public:
 	STL(std::string filepath);
 
