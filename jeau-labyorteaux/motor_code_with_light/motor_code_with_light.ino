@@ -2,6 +2,7 @@
 #define STEPPER_PIN_2 10
 #define STEPPER_PIN_3 11
 #define STEPPER_PIN_4 12
+#define LED_PIN 13
 
 int step_number = 0;
 
@@ -14,7 +15,7 @@ int modeNum = 2;
 int spinTime = 3000;
 int photoDelay = 2000;
 bool stopMotor = false;
-int oldtime = 0;
+float oldtime = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -22,7 +23,7 @@ void setup() {
   pinMode(STEPPER_PIN_2, OUTPUT);
   pinMode(STEPPER_PIN_3, OUTPUT);
   pinMode(STEPPER_PIN_4, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
 }
 
 //main loop for the program
@@ -41,9 +42,9 @@ void loop() {
 }
 void LED()
 {
- digitalWrite(LED_BUILTIN, HIGH);
+ digitalWrite(LED_PIN, HIGH);
  delay(photoDelay);
- digitalWrite(LED_BUILTIN, LOW);
+ digitalWrite(LED_PIN, LOW);
 }
 void speedFast()
 {
