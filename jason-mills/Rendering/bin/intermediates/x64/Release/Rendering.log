@@ -1,0 +1,11 @@
+﻿  STL.cpp
+C:\dev\CS 425 C3P0\CS-425-Team-20\jason-mills\Rendering\Rendering\src\STL.cpp(13,1): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\dev\CS 425 C3P0\CS-425-Team-20\jason-mills\Rendering\Rendering\src\STL.cpp(35,20): warning C4018: '<': signed/unsigned mismatch
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  3 of 264 functions ( 1.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
+  Rendering.vcxproj -> C:\dev\CS 425 C3P0\CS-425-Team-20\jason-mills\Rendering\bin\x64\Release\Rendering.exe
