@@ -22,8 +22,15 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\STL.h" />
     <ClInclude Include="src\STL_Struct.h" />
+    <ClInclude Include="src\vendor\shaders\shader_m.h" />
+    <ClInclude Include="src\vendor\camera\camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\Advanced.shader" />
+    <None Include="src\vendor\shaders\2.2.basic_lighting.vs" />
+    <None Include="src\vendor\shaders\2.2.basic_lighting.shader" />
+    <None Include="src\vendor\shaders\2.2.light_cube.vs" />
+    <None Include="src\vendor\shaders\2.2.light_cube.shader" />
   </ItemGroup>
 </Project>

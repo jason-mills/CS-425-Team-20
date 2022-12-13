@@ -1,0 +1,10 @@
+I think that ideally I don't want to deal with any of this.
+I want to pass this information to my renderer and then in a loop just call draw on it
+I want everything else to be handled by the thing itself
+That said it will have to know that the input that it is getting is good to go.
+
+Steps to rendering
+1. enable depth testing
+2. set depth function to less
+3. create vertex buffer, bind buffer, add data to that buffer
+4. create vertex array object, bind vertex array, enable

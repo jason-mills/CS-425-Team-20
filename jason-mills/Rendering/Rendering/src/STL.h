@@ -20,4 +20,5 @@ public:
 	std::string getName() {return reinterpret_cast<char*>(header);}
 	uint32_t getTriangleCount() { return triangleCount; }
 	std::vector<stlTriangle> getTriangles() { return triangles; }
+	void normalize();
 };

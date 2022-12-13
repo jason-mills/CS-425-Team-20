@@ -19,7 +19,9 @@ class Renderer
 private:
 
 public:
+    Renderer();
     void Clear() const;
-    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+    //void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+    void Draw(const VertexArray& va, const Shader& shader, GLsizei count);
     void Draw3D(const VertexArray& va, const Shader& shader);
 };

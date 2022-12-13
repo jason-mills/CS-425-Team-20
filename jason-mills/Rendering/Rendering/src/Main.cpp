@@ -10,264 +10,270 @@
 #include<string>
 #include<sstream>
 
-#include "Renderer.h"
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBufferLayout.h"
-#include "Shader.h"
+//#include "Renderer.h"
+//#include "IndexBuffer.h"
+//#include "VertexBuffer.h"
+//#include "VertexArray.h"
+//#include "VertexBufferLayout.h"
+//#include "Shader.h"
 #include "STL.h"
 #include "STL_Struct.h"
+#include "vendor/shaders/shader_m.h"
+#include "vendor/camera/camera.h"
 
-float angle = 0.0f;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow* window);
 
-float vertexColors[3][3] = { {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f} };
-std::vector<stlTriangle> triangles;
-int triangleCount = 0;
+const unsigned int SCREEN_WIDTH = 800;
+const unsigned int SCREEN_HEIGHT = 600;
 
-void initGL() 
-{
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClearDepth(1.0f);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glShadeModel(GL_SMOOTH);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-}
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = SCREEN_WIDTH / 2.0f;
+float lastY = SCREEN_HEIGHT / 2.0f;
+bool firstMouse = true;
 
-void display() 
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
-    glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
-    //// Render a color-cube consisting of 6 quads with different colors
-    //glLoadIdentity();                 // Reset the model-view matrix
-    //glTranslatef(1.5f, 0.0f, -7.0f);  // Move right and into the screen
-
-    //glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
-    //// Top face (y = 1.0f)
-    //// Define vertices in counter-clockwise (CCW) order with normal pointing out
-    //glColor3f(0.0f, 1.0f, 0.0f);     // Green
-    //glVertex3f(1.0f, 1.0f, -1.0f);
-    //glVertex3f(-1.0f, 1.0f, -1.0f);
-    //glVertex3f(-1.0f, 1.0f, 1.0f);
-    //glVertex3f(1.0f, 1.0f, 1.0f);
-
-    //// Bottom face (y = -1.0f)
-    //glColor3f(1.0f, 0.5f, 0.0f);     // Orange
-    //glVertex3f(1.0f, -1.0f, 1.0f);
-    //glVertex3f(-1.0f, -1.0f, 1.0f);
-    //glVertex3f(-1.0f, -1.0f, -1.0f);
-    //glVertex3f(1.0f, -1.0f, -1.0f);
-
-    //// Front face  (z = 1.0f)
-    //glColor3f(1.0f, 0.0f, 0.0f);     // Red
-    //glVertex3f(1.0f, 1.0f, 1.0f);
-    //glVertex3f(-1.0f, 1.0f, 1.0f);
-    //glVertex3f(-1.0f, -1.0f, 1.0f);
-    //glVertex3f(1.0f, -1.0f, 1.0f);
-
-    //// Back face (z = -1.0f)
-    //glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
-    //glVertex3f(1.0f, -1.0f, -1.0f);
-    //glVertex3f(-1.0f, -1.0f, -1.0f);
-    //glVertex3f(-1.0f, 1.0f, -1.0f);
-    //glVertex3f(1.0f, 1.0f, -1.0f);
-
-    //// Left face (x = -1.0f)
-    //glColor3f(0.0f, 0.0f, 1.0f);     // Blue
-    //glVertex3f(-1.0f, 1.0f, 1.0f);
-    //glVertex3f(-1.0f, 1.0f, -1.0f);
-    //glVertex3f(-1.0f, -1.0f, -1.0f);
-    //glVertex3f(-1.0f, -1.0f, 1.0f);
-
-    //// Right face (x = 1.0f)
-    //glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-    //glVertex3f(1.0f, 1.0f, -1.0f);
-    //glVertex3f(1.0f, 1.0f, 1.0f);
-    //glVertex3f(1.0f, -1.0f, 1.0f);
-    //glVertex3f(1.0f, -1.0f, -1.0f);
-    //glEnd();  // End of drawing color-cube
-
-    // Render a pyramid consists of 4 triangles
-    //glLoadIdentity();                  // Reset the model-view matrix
-    //glTranslatef(-1.5f, 0.0f, -6.0f);  // Move left and into the screen
-
-    //glBegin(GL_TRIANGLES);           // Begin drawing the pyramid with 4 triangles
-
-    //for (int i = 0; i < triangleCount; i++)
-    //{
-    //    //glColor3f(vertexColors[i % 3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);     // Red
-    //    glVertex3f(triangles[i].vertex1[0], triangles[i].vertex1[1], triangles[i].vertex1[2]);
-    //    //glColor3f(vertexColors[i % 3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);     // Green
-    //    glVertex3f(triangles[i].vertex2[0], triangles[i].vertex2[1], triangles[i].vertex2[2]);
-    //    //glColor3f(vertexColors[i % 3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);
-    //    glVertex3f(triangles[i].vertex3[0], triangles[i].vertex3[1], triangles[i].vertex3[2]);
-    //}
-
-    //glEnd();
-
-    glutSwapBuffers();  // Swap the front and back frame buffers (double buffering)
-}
-
-void idleRender() 
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    gluLookAt(0.0f, 0.0f, 10.0f,
-        0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f);
-    glRotatef(angle, 0.0f, 1.0f, 0.0f);
-
-    glBegin(GL_TRIANGLES);           // Begin drawing the pyramid with 4 triangles
-    
-    for (int i = 0; i < triangleCount; i++) 
-    {
-        glColor3f(vertexColors[i%3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);     // Red
-        glVertex3f(triangles[i].vertex1[0], triangles[i].vertex1[1], triangles[i].vertex1[2]);
-        glColor3f(vertexColors[i % 3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);     // Green
-        glVertex3f(triangles[i].vertex2[0], triangles[i].vertex2[1], triangles[i].vertex2[2]);
-        glColor3f(vertexColors[i % 3][0], vertexColors[i % 3][1], vertexColors[i % 3][2]);
-        glVertex3f(triangles[i].vertex3[0], triangles[i].vertex3[1], triangles[i].vertex3[2]);
-    }
-
-    glEnd();   // Done drawing the pyramid
-
-    angle += 0.3f;
-
-    glutSwapBuffers();
-}
-
-void reshape(GLsizei width, GLsizei height) 
-{
-    if (height == 0)
-        height = 1;
-    GLfloat aspect = (GLfloat)width / (GLfloat)height;
-    
-    glViewport(0, 0, width, height);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(20.0f, aspect, 1.0f, 1000.0f);
-}
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main(int argc, char** argv)
 {
-    STL file("res/stl/Coral.stl");
-    triangleCount = file.getTriangleCount();
-    std::cout << triangleCount << std::endl;
-    triangles = file.getTriangles();
-    for (int i = 0; i < 10; i++) {
-        std::cout << "Triangle #" << i + 1 << std::endl;
-        std::cout << triangles[i].vertex1[0] << " " << triangles[i].vertex1[1] << " " << triangles[i].vertex1[2] << std::endl;
-        std::cout << triangles[i].vertex2[0] << " " << triangles[i].vertex2[1] << " " << triangles[i].vertex2[2] << std::endl;
-        std::cout << triangles[i].vertex3[0] << " " << triangles[i].vertex3[1] << " " << triangles[i].vertex3[2] << std::endl;
+    STL file("res/stl/coral.stl");
+    unsigned int triangleCount = file.getTriangleCount();
+    std::vector<stlTriangle> triangles = file.getTriangles();
 
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "File name here", NULL, NULL);
+    if (window == NULL) 
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
     }
 
-    /*glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE);
-    glutInitWindowSize(640, 480);
-    glutInitWindowPosition(50, 50);
-    glutCreateWindow("Shape test");
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutIdleFunc(idleRender);
-    initGL();
-    glutMainLoop();*/
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (glewInit() != GLEW_OK) 
+    {
+        std::cout << "Failed to initialized GLEW" << std::endl;
+        return -1;
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    Shader lightingShader("src/vendor/shaders/2.2.basic_lighting.vs", "src/vendor/shaders/2.2.basic_lighting.shader");
+    Shader lightCubeShader("src/vendor/shaders/2.2.light_cube.vs", "src/vendor/shaders/2.2.light_cube.shader");
+
+    std::vector<float> vertices = 
+    {
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    std::vector<float> positions;
+    for (int i = 0; i < triangleCount; i++) {
+        positions.push_back(triangles[i].vertex1[0]);
+        positions.push_back(triangles[i].vertex1[1]);
+        positions.push_back(triangles[i].vertex1[2]);
+        positions.push_back(triangles[i].normalVector[0]);
+        positions.push_back(triangles[i].normalVector[1]);
+        positions.push_back(triangles[i].normalVector[2]);
+        positions.push_back(triangles[i].vertex2[0]);
+        positions.push_back(triangles[i].vertex2[1]);
+        positions.push_back(triangles[i].vertex2[2]);
+        positions.push_back(triangles[i].normalVector[0]);
+        positions.push_back(triangles[i].normalVector[1]);
+        positions.push_back(triangles[i].normalVector[2]);
+        positions.push_back(triangles[i].vertex3[0]);
+        positions.push_back(triangles[i].vertex3[1]);
+        positions.push_back(triangles[i].vertex3[2]);
+        positions.push_back(triangles[i].normalVector[0]);
+        positions.push_back(triangles[i].normalVector[1]);
+        positions.push_back(triangles[i].normalVector[2]);
+    }
+
+    unsigned int VBO, cubeVAO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &VBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(cubeVAO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    unsigned int lightCubeVAO, lightCubeVBO;
+    glGenVertexArrays(1, &lightCubeVAO);
+    glBindVertexArray(lightCubeVAO);
+
+    glGenBuffers(1, &lightCubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    while (!glfwWindowShouldClose(window))
+    {
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window);
+
+        glClearColor(0.1f, 0.1f, 0.1f, 0.1f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        lightingShader.use();
+        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lightingShader.setVec3("lightPos", lightPos);
+        lightingShader.setVec3("viewPos", camera.Position);
+
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        lightingShader.setMat4("projection", projection);
+        lightingShader.setMat4("view", view);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        lightingShader.setMat4("model", model);
+
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, triangleCount * 3);
+
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        lightCubeShader.setMat4("model", model);
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, triangleCount * 3);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteVertexArrays(1, &lightCubeVAO);
+    glDeleteBuffers(1, &VBO);
+
+    glfwTerminate();
+
+    return 0;
+}
 
 
-    //GLFWwindow* window;
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 
-    //if (!glfwInit())
-    //    return -1;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+}
 
-    ////glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    ////glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    ////glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    //window = glfwCreateWindow(640, 480, "File Name Here", NULL, NULL);
-    //if (!window)
-    //{
-    //    glfwTerminate();
-    //    return -1;
-    //}
-
-    //glfwMakeContextCurrent(window);
-
-    //glfwSwapInterval(1);
-
-    //if (glewInit() != GLEW_OK)
-    //    return -1;
-
-    //float positions[] = {
-    //    -0.5f, -0.5f,
-    //    0.5f, -0.5f,
-    //    0.5f, 0.5f,
-    //    -0.5f, 0.5f,
-    //};
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
 
 
-    //unsigned int indices[] = {
-    //    0, 1, 2,
-    //    2, 3, 0
-    //};
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
 
-    ////For stl example
-    ///*
-    // VertexArray va;
-    // VertexBuffer vb(positions, triangleCount * 3 * sizeof(vertex));
-    // VertexBufferLayout layout;
-    // layout.Push<float>(3)
-    // va.AddBuffer(bv, layout);
-    // 
-    //*/
-    //
-    //VertexArray va;
-    //VertexBuffer vb(positions, 4 * 2 * sizeof(float));
-    //VertexBufferLayout layout;
-    //layout.Push<float>(2);
-    //va.AddBuffer(vb, layout);
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    //IndexBuffer ib(indices, 6);
+    lastX = xpos;
+    lastY = ypos;
 
-    //Shader shader("res/shaders/Basic.shader");
-    //shader.Bind();
-    //shader.SetUniform4f("uniformColor", 0.0f, 0.0f, 0.0f, 0.0f);
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
 
-    //va.Unbind();
-    //vb.Unbind();
-    //ib.Unbind();
-    //shader.Unbind();
-
-    //Renderer renderer;
-
-    //float r = 0.0f;
-    //float increment = 0.05f;
-
-    //while (!glfwWindowShouldClose(window))
-    //{
-
-    //    renderer.Clear();
-
-    //    shader.Bind();
-    //    shader.SetUniform4f("uniformColor", r, 0.0f, 0.0f, 0.0f);
-
-    //    renderer.Draw(va, ib, shader);
-
-    //    if (r > 1.0f)
-    //        increment = -0.01f;
-    //    else if (r < 0.0f)
-    //        increment = 0.01f;
-
-    //    r += increment;
-
-    //    glfwSwapBuffers(window);
-    //    glfwPollEvents();
-    //}
-
-
-    //glfwTerminate();
-
-    //return 0;
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
