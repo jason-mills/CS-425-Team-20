@@ -1,0 +1,9 @@
+
+*.vsidx
+jason-mills/Rendering/.vs/Rendering/v17/.suo
+jason-mills/Rendering/.vs/Rendering/v17/Browse.VC.db
+*.ipch
+*.obj
+*.exe
+*.iobj
+*.pdb
