@@ -41,7 +41,7 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main(int argc, char** argv)
 {
-    STL file("res/stl/BallCoral.stl");
+    STL file("res/stl/coral.stl");
     unsigned int triangleCount = file.getTriangleCount();
     std::vector<stlTriangle> triangles = file.getTriangles();
 
