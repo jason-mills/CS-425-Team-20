@@ -4,7 +4,26 @@ I want everything else to be handled by the thing itself
 That said it will have to know that the input that it is getting is good to go.
 
 Steps to rendering
-1. enable depth testing
-2. set depth function to less
-3. create vertex buffer, bind buffer, add data to that buffer
-4. create vertex array object, bind vertex array, enable
+Things that the renderer is going to need to have
+1. Objects/files to render
+2. Camera
+3. Window
+4. Vertex buffer object for each object to render
+5. Vertex array object for each object to render
+6. shaders
+
+Things that the renderer needs to do
+1. Make a window when drawing
+2. Accept files to draw
+3. Manage, window, buffers, camera, and controls
+
+Steps to rendering
+1. Place position and normal vector information into vector
+2. Create unsigned ints for Vertex Buffer Object and Vertex Array Object for each object to draw
+3. glGenVertexArrays and glGenBuffers for Vertex buffer array and vertex buffer array respectively
+4. glBindBuffer and glBufferData
+5. glBindVertexArray, glVertexAttribPointer, glEnableVertexAttribArray
+7. Do the above for each object
+8. make the draw call
+	1. update information for deltaTime based on currentFrame - lastFrame (do this for movement/input controls)
+	2. processInput(window
