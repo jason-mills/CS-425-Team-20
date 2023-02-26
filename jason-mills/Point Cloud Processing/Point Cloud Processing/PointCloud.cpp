@@ -22,6 +22,11 @@ void PointCloud::addPoint(Eigen::Matrix<float, 4, 1> aPoint)
 	points.push_back(aPoint);
 }
 
+void PointCloud::addPointCloud(std::vector<Eigen::Matrix<float, 4, 1>> aPointCloud)
+{
+	points = aPointCloud;
+}
+
 void PointCloud::rotatePoints(char axis, int degrees)
 {
 	Eigen::Matrix<float, 4, 4> rotator;
@@ -39,9 +44,9 @@ void PointCloud::rotatePoints(char axis, int degrees)
 		break;
 	case('y'):
 		rotator <<
-			(float)((radianConverter) * (cos(rotationAngle * radianConverter))), 0, (float)((radianConverter) * -(sin(rotationAngle * radianConverter))), 0,
+			(cos(rotationAngle * radianConverter)), 0, -(sin(rotationAngle * radianConverter)), 0,
 			0, 1, 0, 0,
-			(float)((radianConverter) * (sin(rotationAngle * radianConverter))), 0, (float)((radianConverter) * (cos(rotationAngle * radianConverter))), 0,
+			(sin(rotationAngle * radianConverter)), 0, (cos(rotationAngle * radianConverter)), 0,
 			0, 0, 0, 1;
 		break;
 	case('z'):

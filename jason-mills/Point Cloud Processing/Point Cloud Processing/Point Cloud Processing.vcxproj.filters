@@ -4,10 +4,12 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PointCloud.cpp" />
     <ClCompile Include="STL.cpp" />
+    <ClCompile Include="Voter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PointCloud.h" />
     <ClInclude Include="STL.h" />
     <ClInclude Include="STL_Struct.h" />
+    <ClInclude Include="Voter.h" />
   </ItemGroup>
 </Project>

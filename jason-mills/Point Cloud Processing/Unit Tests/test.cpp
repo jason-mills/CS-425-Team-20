@@ -15,9 +15,9 @@ TEST(MatrixMultiplicationTest, TranslateX90Degrees)
 	aPointCloud.rotatePoints('x', 90);
 	std::vector<Eigen::Matrix<float, 4, 1>> points = aPointCloud.getPoints();
 	
-	EXPECT_TRUE(points[0][0] < TOLERANCE);
-	EXPECT_TRUE(points[0][1] < TOLERANCE);
-	EXPECT_TRUE(points[0][2] < -1 + TOLERANCE);
+	EXPECT_TRUE(points[0][0] == 0);
+	EXPECT_TRUE(points[0][1] < 0 + TOLERANCE);
+	EXPECT_TRUE(points[0][2] == -1);
 }
 
 TEST(MatrixMultiplicationTest, TranslateY90Degrees)
@@ -28,8 +28,8 @@ TEST(MatrixMultiplicationTest, TranslateY90Degrees)
 	std::vector<Eigen::Matrix<float, 4, 1>> points = aPointCloud.getPoints();
 
 	EXPECT_TRUE(points[0][0] < TOLERANCE);
-	EXPECT_TRUE(points[0][1] < -1 + TOLERANCE);
-	EXPECT_TRUE(points[0][2] < TOLERANCE);
+	EXPECT_TRUE(points[0][1] == 0);
+	EXPECT_TRUE(points[0][2] == 1);
 }
 
 TEST(MatrixMultiplicationTest, TranslateZ90Degrees)
@@ -39,9 +39,9 @@ TEST(MatrixMultiplicationTest, TranslateZ90Degrees)
 	aPointCloud.rotatePoints('z', 90);
 	std::vector<Eigen::Matrix<float, 4, 1>> points = aPointCloud.getPoints();
 
-	EXPECT_TRUE(points[0][0] < TOLERANCE);
-	EXPECT_TRUE(points[0][1] < -1 + TOLERANCE);
-	EXPECT_TRUE(points[0][2] < TOLERANCE);
+	EXPECT_TRUE(points[0][0] < 0 + TOLERANCE);
+	EXPECT_TRUE(points[0][1] == -1);
+	EXPECT_TRUE(points[0][2] == 0);
 }
 
 int main(int argc, char* argv[]) 

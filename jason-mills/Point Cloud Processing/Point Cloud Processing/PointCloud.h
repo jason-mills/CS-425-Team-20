@@ -23,6 +23,7 @@ public:
 	std::vector< Eigen::Matrix<float, 4, 1>> getPoints();
 
 	void addPoint(Eigen::Matrix<float, 4, 1> aPoint);
+	void addPointCloud(std::vector<Eigen::Matrix<float, 4, 1>> aPointCloud);
 
 	void rotatePoints(char axis, int degrees);
 
