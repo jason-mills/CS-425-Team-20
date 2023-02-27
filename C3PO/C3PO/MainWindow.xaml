@@ -1,0 +1,32 @@
+﻿<!-- MainWindow.xaml:
+        Parent window responsible for holding the contents
+        of all windows to display.
+    authors:
+        Froilan Luna-Lopez
+            University of Nevada, Reno
+    date: February 02, 2023
+    -->
+    
+<Window x:Class="C3PO.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:C3PO"
+        xmlns:views="clr-namespace:C3PO.View"
+        xmlns:vms="clr-namespace:C3PO.ViewModel"
+        mc:Ignorable="d"
+        Title="MainWindowView" Height="450" Width="800">
+    <Grid>
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type vms:StartWindowViewModel}">
+                <views:StartWindow/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vms:SettingsViewModel}">
+                <views:SettingsWindow/>
+            </DataTemplate>
+        </Grid.Resources>
+
+        <ContentControl Content="{Binding CurrentViewModel}"/>
+    </Grid>
+</Window>
