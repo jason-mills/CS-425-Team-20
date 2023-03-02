@@ -5,6 +5,8 @@
 #include <Eigen/Dense>
 #include <math.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 
 
 class PointCloud
@@ -14,6 +16,8 @@ private:
 	double radianConverter = M_PI / 180;
 
 	std::vector< Eigen::Matrix<float, 4, 1>> points;
+
+	std::vector<std::string> split(std::string line);
 
 public:
 	PointCloud();
@@ -29,6 +33,9 @@ public:
 
 	void readPCDFile();
 	void writePCDFile();
+
+	void readXYZFile(std::string filePath);
+	void writeXYZFile(std::string filePath);
 
 	void print();
 };
