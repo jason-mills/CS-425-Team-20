@@ -120,12 +120,8 @@ void PointCloud::readXYZFile(std::string filePath)
 		{
 			continue;
 		}
-		//std::cout << values[0] << ' ' << values[1] << ' ' << values[2] << std::endl;
+
 		addPoint({ std::stof(values[0]), std::stof(values[1]), std::stof(values[2]), 0 });
-			
-		if (i > 1)
-			break;
-		i++;
 	}
 
 	file.close();

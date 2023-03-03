@@ -7,15 +7,11 @@ int main()
 {
 	PointCloud aPointCloud;
 
-	//aPointCloud.readXYZFile("res/data.xyz");
+	aPointCloud.readXYZFile("res/data.xyz");
 
-	aPointCloud.addPoint({ 1, 0, 0, 0 });
-	aPointCloud.addPoint({ 1, 0, 0, 0 });
-	aPointCloud.addPoint({ 1, 0, 0, 0 });
+	aPointCloud.rotatePoints('x', -180);
 
-	aPointCloud.rotatePoints('z', -90);
-
-	aPointCloud.writeXYZFile("res/test.xyz");
+	aPointCloud.writeXYZFile("res/dataXRotation.xyz");
 
 	return 0;
 }
