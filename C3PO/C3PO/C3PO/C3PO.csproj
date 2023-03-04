@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\cat_fixed.png" />
+    <None Remove="Resources\Images\computer_desktop_inverse.png" />
+    <None Remove="Resources\Images\motion_sensor_inverse.png" />
+    <None Remove="Resources\Images\right_arrow_inverse.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Utilities" Version="17.4.33103.184" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\cat_fixed.png" />
+    <Resource Include="Resources\Images\computer_desktop_inverse.png" />
+    <Resource Include="Resources\Images\motion_sensor_inverse.png" />
+    <Resource Include="Resources\Images\right_arrow_inverse.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Output\" />
+  </ItemGroup>
+
+</Project>
