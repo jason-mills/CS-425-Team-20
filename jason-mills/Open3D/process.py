@@ -19,11 +19,11 @@ class XYZReader:
 
 
 def main():
-    # myReader = XYZReader()
-    # pcd = o3d.geometry.PointCloud()
+    myReader = XYZReader()
+    pcd = o3d.geometry.PointCloud()
 
-    # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test.xyz'))
-    # pcd.points.extend(points)
+    points = np.asarray(myReader.readFile('XYZ/megamind.xyz'))
+    pcd.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test2.xyz'))
     # pcd.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test3.xyz')) 
@@ -47,7 +47,7 @@ def main():
     # points = o3d.io.read_point_cloud(filePath + 'bun315.ply', format='ply')
     # pcd.points.extend(np.asarray(points.points))
 
-    pcd = o3d.io.read_point_cloud('something.ply')
+    # pcd = o3d.io.read_point_cloud('something.ply')
 
     
     # pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
