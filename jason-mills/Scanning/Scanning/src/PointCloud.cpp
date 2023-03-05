@@ -176,27 +176,25 @@ void PointCloud::writeXYZFile(std::string filePath)
 
 void PointCloud::moveOrigin(char axis, float moveFactor)
 {
-	calcAverages();
-	float amountToMoveBy;
+	float amountToMoveBy = 0.14;
 
 	int indexToAlter = -1;
 	switch (axis)
 	{
 	case('x'):
 		indexToAlter = 0;
-		amountToMoveBy = moveFactor * xAvg;
 		break;
 	case('y'):
 		indexToAlter = 1;
-		amountToMoveBy = moveFactor * yAvg;
 		break;
 	case('z'):
 		indexToAlter = 2;
-		amountToMoveBy = moveFactor * zAvg;
 		break;
 	default:
 		throw std::invalid_argument("Must use x, y, or z to define axis");
 	}
+
+	std::cout << "Amount to move by: " << amountToMoveBy << std::endl;
 
 	for (int i = 0; i < points.size(); i++)
 	{

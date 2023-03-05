@@ -12,7 +12,7 @@
 
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
-void save_vertices(PointCloud cummulativePointCloud, rs2::points points, int degrees, float translationFactor);
+void save_vertices(std::string filename, rs2::points points, int degrees, float translationFactor);
 
 
 int main(int argc, char* argv[]) try
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) try
 
     auto advanced_mode_dev = dev.as<rs400::advanced_mode>();
     // Select the custom configuration file
-    std::string json_file_name = "JSON/test.json";
+    std::string json_file_name = "C:\\dev\\CS-425-Team-20\\jason-mills\\Scanning\\Scanning\\src\\test.json";
     std::ifstream t(json_file_name);
     std::string preset_json((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
     advanced_mode_dev.load_json(preset_json);
@@ -110,7 +110,6 @@ int main(int argc, char* argv[]) try
     auto frames = pipe.wait_for_frames();
     auto depth = frames.get_depth_frame();
     points = pc.calculate(depth);
-    PointCloud cummulativePointCloud;
 
     for (int index = 0; index * user_degrees != 360; index++)
     {
@@ -118,13 +117,11 @@ int main(int argc, char* argv[]) try
         depth = frames.get_depth_frame();
         points = pc.calculate(depth);
 
-        save_vertices(cummulativePointCloud, points, index * user_degrees, 2);
+        save_vertices(("temp" + std::to_string(index)), points, index * user_degrees, 2);
         std::cout << "Scanned!" << std::endl;
 
         Sleep(5000);
     }
-
-    cummulativePointCloud.writeXYZFile("combinedData.xyz");
 
     return EXIT_SUCCESS;
 }
@@ -142,7 +139,7 @@ catch (const std::exception& e)
 }
 
 
-void save_vertices(PointCloud cummulativePointCloud, rs2::points points, int degrees, float translationFactor)
+void save_vertices(std::string filename, rs2::points points, int degrees, float translationFactor)
 {
     PointCloud aPointCloud;
 
@@ -158,8 +155,6 @@ void save_vertices(PointCloud cummulativePointCloud, rs2::points points, int deg
     aPointCloud.moveOrigin('z', translationFactor);
     aPointCloud.rotatePoints('y', degrees);
 
-    cummulativePointCloud.addPointCloud(aPointCloud.getPoints());
-
-    return;
+    aPointCloud.writeXYZFile(filename + ".xyz");
 }
 

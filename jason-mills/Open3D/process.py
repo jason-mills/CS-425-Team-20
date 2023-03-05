@@ -22,7 +22,7 @@ def main():
     myReader = XYZReader()
     pcd = o3d.geometry.PointCloud()
 
-    points = np.asarray(myReader.readFile('XYZ/combinedData.xyz'))
+    points = np.asarray(myReader.readFile('combinedData.xyz'))
     pcd.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test2.xyz'))
     # pcd.points.extend(points)

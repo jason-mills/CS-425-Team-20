@@ -20,32 +20,43 @@ class XYZReader:
 
         return points
 
-    def createPly(self, filePath, plyFilepath):
-        if not (filePath.endswith('.xyz')):
-            return 1
+    def createPly(self, inputDir, xyzBaseName, outputDir, plyBaseName):
+        files = os.listdir(inputDir)
+        filesToConvert = []
 
-        pcd = o3d.geometry.PointCloud()
-        points = np.asarray(self.readFile(filePath))
-        pcd.points.extend(points)
-        o3d.io.write_point_cloud(plyFilepath, pcd)
+        for file in files: 
+            if(file.startswith(xyzBaseName) and file.endswith(".xyz")):
+                filesToConvert.append(file)
+
+        for i in range(len(filesToConvert)):
+            pcd = o3d.geometry.PointCloud()
+            points = np.asarray(self.readFile(inputDir + '/' + filesToConvert[i]))
+            pcd.points.extend(points)
+            o3d.io.write_point_cloud(outputDir + '/' + plyBaseName + str(i) + ".ply", pcd)
         
         return 0
 
 # this script takes command line arguments so it can be called by other programs
 def main():
-    if (len(sys.argv) - 1) != 2:
-        print("Please provide command line arguments when running.\nExample: python xyzToPly.py filepath filepathForNewPly.ply")
+    if (len(sys.argv) - 1) != 4:
+        print("Please provide command line arguments when running.\nExample: python xyzToPly.py inputDir xyzBaseName outputDirectory plyBaseName")
         return 1
 
-    filePath = sys.argv[1]
-    plyFilepath = sys.argv[2]
+    inputDir = sys.argv[1]
+    xyzBaseName = sys.argv[2]
+    outputDir = sys.argv[3]
+    plyBaseName = sys.argv[4]
 
-    if not os.path.isfile(filePath):
-        print("Not a valid file")
+    if not os.path.isdir(inputDir):
+        print("Input direcory is not valid")
         return 1
     
+    if not os.path.isdir(outputDir):
+        print("Output directory is not valid")
+        return 1
+
     myReader = XYZReader()
-    return myReader.createPly(filePath, plyFilepath)
+    return myReader.createPly(inputDir, xyzBaseName, outputDir, plyBaseName)
 
 if __name__ == '__main__':
     main()
