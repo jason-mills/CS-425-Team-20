@@ -42,6 +42,12 @@
 
         <StackPanel Orientation="Vertical"
                     Grid.Column="1">
+            <Viewbox StretchDirection="DownOnly">
+                <TextBlock FontSize="36"
+                           Foreground="Red">
+                    NOTE: Settings are currently not supported for this version of C3PO.
+                </TextBlock>
+            </Viewbox>
             <Label Content="Select USB Port:"
                    Height="30"
                    FontSize="18"

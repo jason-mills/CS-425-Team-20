@@ -113,6 +113,7 @@ namespace C3PO.ViewModel
         public ICommand ScannerBtnCommand { get; }
         public ICommand SettingsBtnCommand { get; }
         public ICommand SaveBtnCommand { get; }
+        public ICommand ViewResultsBtnCommand { get; }
 
         /*
          * Constructors
@@ -133,6 +134,7 @@ namespace C3PO.ViewModel
             SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore);
             NavigateStore.PreviousViewModel = this;
             SaveBtnCommand = new SaveFileCommand();
+            ViewResultsBtnCommand = new ViewResultsCommand();
 
             componentLinker = new ComponentLinker();
         }
@@ -182,7 +184,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Reconstruct;
             }));
-            componentLinker.StartReconstruction();
+            //componentLinker.StartReconstruction();
             FinishReconstruct();
         }
 

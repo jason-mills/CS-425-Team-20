@@ -29,8 +29,17 @@
                     MinWidth="50"
                     MinHeight="30"
                     FontSize="16"
+                    Margin="5"
                     Padding="5"
                     Command="{Binding SaveBtnCommand}"/>
+            <Button HorizontalAlignment="Center"
+                    Content="View 3D"
+                    MinWidth="50"
+                    MinHeight="30"
+                    FontSize="16"
+                    Margin="5"
+                    Padding="5"
+                    Command="{Binding ViewResultsBtnCommand}"/>
         </StackPanel>
 
         <!-- Right panel for results -->
