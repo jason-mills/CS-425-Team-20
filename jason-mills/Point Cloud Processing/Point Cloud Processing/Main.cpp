@@ -7,11 +7,7 @@ int main()
 {
 	PointCloud aPointCloud;
 
-	aPointCloud.readXYZFile("res/data.xyz");
-
-	aPointCloud.rotatePoints('x', -180);
-
-	aPointCloud.writeXYZFile("res/dataXRotation.xyz");
+	
 
 	return 0;
 }
