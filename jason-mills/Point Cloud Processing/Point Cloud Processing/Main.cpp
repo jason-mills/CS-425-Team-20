@@ -3,27 +3,38 @@
 #include "PointCloud.h"
 #include "Voter.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-	PointCloud bigPointCloud;
-	int degree = 90;
-
-	for (int i = 0; i < 4; i++) {
-		PointCloud aPointCloud;
-		std::string temp = "res/data" + std::to_string(i) + (std::string)".xyz";
-		aPointCloud.readXYZFile(temp);
-		aPointCloud.moveOrigin('z');
-		aPointCloud.rotatePoints('y', i * 90);
-		temp = "res/test" + std::to_string(i) + (std::string)".xyz";
-		aPointCloud.writeXYZFile(temp);
+	if (argc != 6)
+	{
+		std::cout << "Incorrect number of arguments.\n" << "Example Usage: ./processXyzFiles.exe translationFactor degreesToRotate numberOfFiles baseFilename newFilename.xyz" << std::endl;
+		return 1;
 	}
 
-	bigPointCloud.readXYZFile("res/test0.xyz");
-	bigPointCloud.readXYZFile("res/test1.xyz");
-	bigPointCloud.readXYZFile("res/test2.xyz");
-	bigPointCloud.readXYZFile("res/test3.xyz");
+	PointCloud bigPointCloud;
+	float translationFactor = atof(argv[1]);
+	int degreesToRotate = std::stoi(argv[2]);
+	int numberOfFiles = std::stoi(argv[3]);
+	std::string baseFilename = argv[4];
+	std::string newFilename = argv[5];
 
-	bigPointCloud.writeXYZFile("res/megamind.xyz");
+	for (int i = 0; i < numberOfFiles; i++) {
+		PointCloud aPointCloud;
+
+		aPointCloud.readXYZFile(baseFilename + std::to_string(i) + (std::string)".xyz");
+
+		aPointCloud.moveOrigin('z', translationFactor);
+		aPointCloud.rotatePoints('y', i * degreesToRotate);
+
+		bigPointCloud.addPointCloud(aPointCloud.getPoints());
+	}
+
+	/*for (int i = 0; i < numberOfFiles; i++) 
+	{
+		bigPointCloud.readXYZFile("temp" + std::to_string(i) + (std::string)".xyz");
+	}*/
+
+	bigPointCloud.writeXYZFile(newFilename);
 
 	return 0;
 }
