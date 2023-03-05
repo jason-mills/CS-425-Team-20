@@ -28,66 +28,79 @@
                 BorderBrush="LightGray"
                 BorderThickness="2,2,2,2"
                 CornerRadius="2,2,2,2">
-            <StackPanel Orientation="Vertical"
-                        Background="Gray"
-                        x:Name="leftSideBarPanel">
-                <Label Content="3CPO"
+            <Grid Background="Gray"
+                  x:Name="leftSideBarPanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Vertical"
+                            Grid.Row="0">
+                    <Label Content="3CPO"
                        FontSize="48"
                        HorizontalAlignment="Center"/>
-                
-                <ComboBox Name="comboBox1"
+
+                    <ComboBox Name="comboBox1"
                           Height="30"
                           FontSize="16"
                           SelectedIndex="0">
-                    <ComboBox.Resources>
-                        <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
-                    </ComboBox.Resources>
-                    <ComboBox.ItemsSource>
-                        <CompositeCollection>
-                            <ListBoxItem Content="Select Device"/>
-                            <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
-                        </CompositeCollection>
-                    </ComboBox.ItemsSource>
-                </ComboBox>
-                
-                <Button Content="Settings"
+                        <ComboBox.Resources>
+                            <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
+                        </ComboBox.Resources>
+                        <ComboBox.ItemsSource>
+                            <CompositeCollection>
+                                <ListBoxItem Content="Select Device"/>
+                                <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
+                            </CompositeCollection>
+                        </ComboBox.ItemsSource>
+                    </ComboBox>
+
+                    <Button Content="Settings"
                         HorizontalContentAlignment="Center"
                         Height="30"
                         FontSize="16"
                         Command="{Binding SettingsBtnCommand}"/>
-                
-                <Rectangle HorizontalAlignment="Stretch"
+
+                    <Rectangle HorizontalAlignment="Stretch"
                            Fill="LightGray"
                            Height="2"
                            Margin="0,5,0,5"/>
-                
-                <Rectangle HorizontalAlignment="Stretch"
+
+                    <Rectangle HorizontalAlignment="Stretch"
                            Fill="LightGray"
                            Height="2"
                            Margin="0,5,0,5"/>
-                
-                <ItemsControl x:Name="sbButtonViews"
+
+                    <ItemsControl x:Name="sbButtonViews"
                               ItemsSource="{Binding ScannerButtons}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Content="{Binding .}"
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding .}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Height="30"
                                     FontSize="16"
                                     Command="{Binding DataContext.ScannerBtnCommand, ElementName=sbButtonViews}"
                                     CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=Self}}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                
-            </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical"
+                            Grid.Row="1">
+                    <Label FontSize="18">Website</Label>
+                    <Label FontSize="12">Froilan Luna-Lopez</Label>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Main Panel -->
         <Grid Grid.Column="1"
               ClipToBounds="True">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -143,7 +156,7 @@
             </StackPanel>
 
             <!-- Scanned Content -->
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="2">
                 <ContentControl Name="ResultsPanel"
                             Content="{Binding ResultsUC}"/>
             </ScrollViewer>
