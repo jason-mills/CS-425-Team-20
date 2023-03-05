@@ -40,7 +40,7 @@ public:
 	void readXYZFile(std::string filePath);
 	void writeXYZFile(std::string filePath);
 
-	void moveOrigin(char axis);
+	void moveOrigin(char axis, float moveFactor);
 
 	void print();
 };
