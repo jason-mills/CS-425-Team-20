@@ -82,6 +82,14 @@
     <Import Project="..\..\..\..\..\Program Files (x86)\Intel RealSense SDK 2.0\opencv.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -116,7 +124,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(librealsenseSDK)\include\hpp;$(librealsenseSDK)\include;$(librealsenseSDK)\samples;$(librealsenseSDK)\third-party\;$(librealsenseSDK)\third-party\glfw-imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(librealsenseSDK)\include\hpp;$(librealsenseSDK)\include;$(librealsenseSDK)\samples;$(librealsenseSDK)\third-party\;$(librealsenseSDK)\third-party\glfw-imgui\include;$(SolutionDir)Dependencies\EIGEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,7 +141,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(librealsenseSDK)\include\hpp;$(librealsenseSDK)\include;$(librealsenseSDK)\samples;$(librealsenseSDK)\third-party\;$(librealsenseSDK)\third-party\glfw-imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(librealsenseSDK)\include\hpp;$(librealsenseSDK)\include;$(librealsenseSDK)\samples;$(librealsenseSDK)\third-party\;$(librealsenseSDK)\third-party\glfw-imgui\include;$(SolutionDir)Dependencies\EIGEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,10 +153,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\PointCloud.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\test.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\PointCloud.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

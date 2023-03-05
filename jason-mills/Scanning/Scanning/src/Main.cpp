@@ -6,20 +6,19 @@
 #include <fstream>
 #include <windows.h>
 #include <iostream>
+#include <Eigen/Dense>
+#include "PointCloud.h"
 
 
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
-void save_vertices(const std::string& filename, rs2::points points);
+void save_vertices(PointCloud cummulativePointCloud, rs2::points points, int degrees, float translationFactor);
 
-void unit_test();
 
 int main(int argc, char* argv[]) try
 {
-    //unit_test();
     //Opening Serial Communication Port For Arduino Communication
     HANDLE hComm;
-    int data[] = { 30 };// {'1'};
     DWORD dNoOFBytestoWrite;         // No of bytes to write into the port
     DWORD dNoOfBytesWritten = 0;     // No of bytes written to the port
     DWORD bytes_read = 0;
@@ -32,7 +31,7 @@ int main(int argc, char* argv[]) try
         return -1;
     }
     else
-        std::cerr << "opening serial port successful";
+        std::cerr << "opening serial port successful\n";
 
 
     //window app(1280, 720, "RealSense Pointcloud Example");
@@ -45,7 +44,7 @@ int main(int argc, char* argv[]) try
 
     auto advanced_mode_dev = dev.as<rs400::advanced_mode>();
     // Select the custom configuration file
-    std::string json_file_name = "C:\\dev\\CS-425-Team-20\\jeau-labyorteaux\\test.json";
+    std::string json_file_name = "JSON/test.json";
     std::ifstream t(json_file_name);
     std::string preset_json((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
     advanced_mode_dev.load_json(preset_json);
@@ -54,61 +53,78 @@ int main(int argc, char* argv[]) try
     rs2::points points;
     rs2::pipeline pipe;
 
+
+    bool loop = true;
+    char user_choice;
+    int user_degrees = 0;
+    char data[] = { 'X' };
+
+    while (loop)
+    {
+        std::cout << "Enter Degree Option: " << std::endl;
+        std::cout << "A: 30" << std::endl;
+        std::cout << "B: 45" << std::endl;
+        std::cout << "C: 60" << std::endl;
+        std::cout << "D: 90" << std::endl;
+        std::cout << "E: 180" << std::endl;
+        std::cin >> user_choice;
+        if (user_choice == 'A')
+        {
+            data[0] = 'A';
+            user_degrees = 30;
+            loop = false;
+        }
+        else if (user_choice == 'B')
+        {
+            data[0] = 'B';
+            user_degrees = 45;
+            loop = false;
+        }
+        else if (user_choice == 'C')
+        {
+            data[0] = 'C';
+            user_degrees = 60;
+            loop = false;
+        }
+        else if (user_choice == 'D')
+        {
+            data[0] = 'D';
+            user_degrees = 90;
+            loop = false;
+        }
+        else if (user_choice == 'E')
+        {
+            data[0] = 'E';
+            user_degrees = 180;
+            loop = false;
+        }
+        else
+        {
+            std::cout << "Please enter one of the letter options" << std::endl;
+        }
+    }
+
+
     pipe.start();
 
-
-    //Scan 1
     auto frames = pipe.wait_for_frames();
     auto depth = frames.get_depth_frame();
     points = pc.calculate(depth);
+    PointCloud cummulativePointCloud;
 
-    save_vertices("scans/data.txt", points);
-
-    /*
-    std::cout<< points.get_data() << std::endl;
-    points.export_to_ply("scans/1.ply", points);
-    save_frame_raw_data("scans/frame2.txt", depth);
-    if (save_frame_raw_data("scans/frame.txt", frames))
+    for (int index = 0; index * user_degrees != 360; index++)
     {
-        std::cout << "Frame Data Exported!" << std::endl;
+        frames = pipe.wait_for_frames();
+        depth = frames.get_depth_frame();
+        points = pc.calculate(depth);
+
+        save_vertices(cummulativePointCloud, points, index * user_degrees, 2);
+        std::cout << "Scanned!" << std::endl;
+
+        Sleep(5000);
     }
-    */
-    std::cout << "Scanned!" << std::endl;
 
-    WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
-    Sleep(5000);
-
-    //Scan 2
-    frames = pipe.wait_for_frames();
-    depth = frames.get_depth_frame();
-    points = pc.calculate(depth);
-
-    save_vertices("C:\\dev\\CS-425-Team-20\\jason-mills\\Scanning\\Scanning\\src\\scans\\data2.txt", points);
-    std::cout << "Scanned!" << std::endl;
-
-    WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
-    Sleep(5000);
-
-    //Scan 3
-    frames = pipe.wait_for_frames();
-    depth = frames.get_depth_frame();
-    points = pc.calculate(depth);
-
-    save_vertices("scans/data3.txt", points);
-    std::cout << "Scanned!" << std::endl;
-
-    WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
-    Sleep(5000);
-
-    //Scan 4
-    frames = pipe.wait_for_frames();
-    depth = frames.get_depth_frame();
-    points = pc.calculate(depth);
-
-    save_vertices("scans/data4.txt", points);
-
-    std::cout << "Scanned!" << std::endl;
-
+    cummulativePointCloud.writeXYZFile("combinedData.xyz");
 
     return EXIT_SUCCESS;
 }
@@ -126,60 +142,24 @@ catch (const std::exception& e)
 }
 
 
-void save_vertices(const std::string& filename, rs2::points points)
+void save_vertices(PointCloud cummulativePointCloud, rs2::points points, int degrees, float translationFactor)
 {
+    PointCloud aPointCloud;
+
     const rs2::vertex* vertices = points.get_vertices();
     const rs2_intrinsics depth_intrinsics;
 
     size_t sz = points.size();
 
-    std::ofstream out(filename, std::ofstream::binary);
-
-
     for (int l = 0; l < sz; ++l) {
-        float point[3];
-        point[0] = vertices[l].x;
-        point[1] = vertices[l].y;
-        point[2] = vertices[l].z;
-
-        out << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
+        aPointCloud.addPoint({ vertices[l].x, vertices[l].y, vertices[l].z, 0 });
     }
 
-    out.close();
+    aPointCloud.moveOrigin('z', translationFactor);
+    aPointCloud.rotatePoints('y', degrees);
+
+    cummulativePointCloud.addPointCloud(aPointCloud.getPoints());
+
     return;
 }
 
-
-void unit_test()
-{
-    glfw_state app_state;
-    rs2::context ctx;
-    auto device = ctx.query_devices();
-    auto dev = device[0];
-
-    rs2::pointcloud pc;
-    rs2::points points;
-    rs2::pipeline pipe;
-
-    pipe.start();
-
-    auto frames = pipe.wait_for_frames();
-    auto depth = frames.get_depth_frame();
-    points = pc.calculate(depth);
-
-    save_vertices("unitTest/data.txt", points);
-
-    std::ifstream check("unitTest/data.txt");
-
-    if (check.good())
-    {
-        std::cout << "Unit Test Passed!" << std::endl;
-    }
-    else
-    {
-        std::cout << "Unit Test Failed...." << std::endl;
-    }
-
-
-    return;
-}
