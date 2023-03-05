@@ -5,13 +5,25 @@
 
 int main()
 {
-	PointCloud aPointCloud;
+	PointCloud bigPointCloud;
+	int degree = 90;
 
-	aPointCloud.readXYZFile("res/data.xyz");
+	for (int i = 0; i < 4; i++) {
+		PointCloud aPointCloud;
+		std::string temp = "res/data" + std::to_string(i) + (std::string)".xyz";
+		aPointCloud.readXYZFile(temp);
+		aPointCloud.moveOrigin('z');
+		aPointCloud.rotatePoints('y', i * 90);
+		temp = "res/test" + std::to_string(i) + (std::string)".xyz";
+		aPointCloud.writeXYZFile(temp);
+	}
 
-	aPointCloud.rotatePoints('x', -180);
+	bigPointCloud.readXYZFile("res/test0.xyz");
+	bigPointCloud.readXYZFile("res/test1.xyz");
+	bigPointCloud.readXYZFile("res/test2.xyz");
+	bigPointCloud.readXYZFile("res/test3.xyz");
 
-	aPointCloud.writeXYZFile("res/dataXRotation.xyz");
+	bigPointCloud.writeXYZFile("res/megamind.xyz");
 
 	return 0;
 }

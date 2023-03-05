@@ -4,9 +4,8 @@ import numpy as np
 class XYZReader:
     def readFile(self, filePath):
         points = []
-        print("reading")
-        i = 0
         fileStream = open(filePath, 'r')
+
         firstLine = fileStream.readline()
         if(firstLine == 'X Y Z\n'):
             for line in fileStream:
@@ -14,39 +13,29 @@ class XYZReader:
                 x, y, z = line.split(' ')
                 if x == '-0' or y == '-0' or z == '-0':
                     continue
-                # print(x, y, z)
                 points.append([x, y, z])
 
         return points
-            
 
-def main():    
-    # myReader = XYZReader()
 
-    # points = np.asarray(myReader.readFile('XYZ/Z Rotation/test.xyz'))
-    # pcd.points.extend(points)
-    # points = np.asarray(myReader.readFile('XYZ/Z Rotation/test2.xyz'))
-    # pcd.points.extend(points)
-    # points = np.asarray(myReader.readFile('XYZ/Z Rotation/test3.xyz')) 
-    # pcd.points.extend(points)
-    # points = np.asarray(myReader.readFile('XYZ/Z Rotation/test4.xyz'))
-    # pcd.points.extend(points)
-    # for i in range(0, len(points)):
-    #     points[i] = zRotator * points
-        
-    filePath = 'PLY Files/Stanford Bunny/'
-
+def main():
+    myReader = XYZReader()
     pcd = o3d.geometry.PointCloud()
 
-    trans_init = np.asarray([[0.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 0.0],
-                             [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
+    points = np.asarray(myReader.readFile('XYZ/megamind.xyz'))
+    pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test2.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test3.xyz')) 
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test4.xyz'))
+    # pcd.points.extend(points)
+    
 
-    points = o3d.io.read_point_cloud(filePath + 'bun000.ply', format='ply')
+    
+    # filePath = 'PLY Files/Stanford Bunny/'
     # pcd.points.extend(np.asarray(points.points))
 
-    points.transform(trans_init)
-
-    print(trans_init)
     # points = o3d.io.read_point_cloud(filePath + 'bun045.ply', format='ply')
     # pcd.points.extend(np.asarray(points.points))
     # points = o3d.io.read_point_cloud(filePath + 'bun090.ply', format='ply')
@@ -58,7 +47,7 @@ def main():
     # points = o3d.io.read_point_cloud(filePath + 'bun315.ply', format='ply')
     # pcd.points.extend(np.asarray(points.points))
 
-    
+    # pcd = o3d.io.read_point_cloud('something.ply')
 
     
     # pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
@@ -79,6 +68,7 @@ def main():
 
     # o3d.visualization.draw_geometries([mesh])
 
+    # o3d.io.write_point_cloud("")
     o3d.visualization.draw_geometries([pcd])
 
     # o3d.io.write_triangle_mesh("test.off", mesh)

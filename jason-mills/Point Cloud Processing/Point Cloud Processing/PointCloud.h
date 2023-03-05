@@ -14,10 +14,13 @@ class PointCloud
 private: 
 	int rotationAngle = 0;
 	double radianConverter = M_PI / 180;
+	float xAvg = 0, yAvg = 0, zAvg = 0;
 
 	std::vector< Eigen::Matrix<float, 4, 1>> points;
 
 	std::vector<std::string> split(std::string line);
+
+	void calcAverages();
 
 public:
 	PointCloud();
@@ -36,6 +39,8 @@ public:
 
 	void readXYZFile(std::string filePath);
 	void writeXYZFile(std::string filePath);
+
+	void moveOrigin(char axis);
 
 	void print();
 };

@@ -14,6 +14,26 @@ std::vector<std::string> PointCloud::split(std::string line)
 	return words;
 }
 
+void PointCloud::calcAverages()
+{
+	float xSum = 0;
+	float ySum = 0;
+	float zSum = 0;
+
+	for (int i = 0; i < points.size(); i++)
+	{
+		xSum += points[i][0];
+		ySum += points[i][1];
+		zSum += points[i][2];
+	}
+
+	xAvg = xSum / points.size();
+	yAvg = ySum / points.size();
+	zAvg = zSum / points.size();
+
+	return;
+}
+
 PointCloud::PointCloud() {}
 
 PointCloud::PointCloud(std::vector<Eigen::Matrix<float, 4, 1>> newPoints) 
@@ -34,11 +54,15 @@ std::vector< Eigen::Matrix<float, 4, 1>> PointCloud::getPoints()
 void PointCloud::addPoint(Eigen::Matrix<float, 4, 1> aPoint)
 {
 	points.push_back(aPoint);
+
+	return;
 }
 
 void PointCloud::addPointCloud(std::vector<Eigen::Matrix<float, 4, 1>> aPointCloud)
 {
-	points = aPointCloud;
+	points.insert(points.end(), aPointCloud.begin(), aPointCloud.end());
+
+	return;
 }
 
 void PointCloud::rotatePoints(char axis, int degrees)
@@ -87,16 +111,22 @@ void PointCloud::print()
 	{
 		std::cout << "{\n" << points[i] << "\n}" << std::endl;
 	}
+
+	return;
 }
 
 void PointCloud::readPCDFile()
 {
 	//implement read here
+
+	return;
 }
 
 void PointCloud::writePCDFile()
 {
 	//implement read here
+
+	return;
 }
 
 void PointCloud::readXYZFile(std::string filePath)
@@ -108,9 +138,9 @@ void PointCloud::readXYZFile(std::string filePath)
 	int i = 0;
 
 	getline(file, line);
-	if (line == "X Y Z")
+	if (line != "X Y Z")
 	{
-		std::cout << line << std::endl;
+		throw std::invalid_argument("File is not of type X Y Z");
 	}
 
 	while (getline(file, line))
@@ -140,4 +170,38 @@ void PointCloud::writeXYZFile(std::string filePath)
 	}
 
 	file.close();
+
+	return;
+}
+
+void PointCloud::moveOrigin(char axis, float moveFactor)
+{
+	calcAverages();
+	float amountToMoveBy;
+
+	int indexToAlter = -1;
+	switch (axis)
+	{
+	case('x'):
+		indexToAlter = 0;
+		amountToMoveBy = moveFactor * xAvg;
+		break;
+	case('y'):
+		indexToAlter = 1;
+		amountToMoveBy = moveFactor * yAvg;
+		break;
+	case('z'):
+		indexToAlter = 2;
+		amountToMoveBy = moveFactor * zAvg;
+		break;
+	default:
+		throw std::invalid_argument("Must use x, y, or z to define axis");
+	}
+
+	for (int i = 0; i < points.size(); i++)
+	{
+		points[i][indexToAlter] -= amountToMoveBy;
+	}
+
+	return;
 }
