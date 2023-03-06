@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) try
 
     auto advanced_mode_dev = dev.as<rs400::advanced_mode>();
     // Select the custom configuration file
-    std::string json_file_name = "C:\\dev\\CS-425-Team-20\\jason-mills\\Scanning\\Scanning\\src\\test.json";
+    std::string json_file_name = "C:\\dev\\CS-425-Team-20\\app\\C3PO\\bin\\test.json";
     std::ifstream t(json_file_name);
     std::string preset_json((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
     advanced_mode_dev.load_json(preset_json);
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) try
         depth = frames.get_depth_frame();
         points = pc.calculate(depth);
 
-        save_vertices(("temp" + std::to_string(index)), points, index * user_degrees, 2);
+        save_vertices(("C:\\dev\\CS-425-Team-20\\app\\C3PO\\output\\temp" + std::to_string(index)), points, index * user_degrees, 2);
         std::cout << "Scanned!" << std::endl;
 
         Sleep(5000);
