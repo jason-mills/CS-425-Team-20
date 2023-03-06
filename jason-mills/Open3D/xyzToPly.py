@@ -35,6 +35,15 @@ class XYZReader:
             downpcd = pcd.voxel_down_sample(voxel_size=0.0005)
 
             o3d.io.write_point_cloud(outputDir + '/' + plyBaseName + str(i) + ".ply", downpcd, write_ascii=True)
+
+            output = open(outputDir + '/' + plyBaseName + str(i) + ".ply", "r")
+            content = output.read()
+            content = content.replace("double", "float")
+            output.close()
+
+            output = open(outputDir + '/' + plyBaseName + str(i) + ".ply", "w")
+            output.write(content)
+            output.close()
         
         return 0
 
@@ -58,6 +67,7 @@ def main():
         return 1
 
     myReader = XYZReader()
+
     return myReader.createPly(inputDir, xyzBaseName, outputDir, plyBaseName)
 
 if __name__ == '__main__':
