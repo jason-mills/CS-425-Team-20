@@ -42,6 +42,7 @@ namespace C3PO.Model
 
         public bool StartScan()
         {
+            _startTime = DateTime.Now;
             // Declaring and configuring process-running object
             string path = System.IO.Directory.GetCurrentDirectory();
             var p = new Process()
@@ -55,7 +56,20 @@ namespace C3PO.Model
             //// Start process
             p.Start();
             p.WaitForExit();
-            _startTime = DateTime.Now;
+
+            p = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = "python.exe",
+                    Arguments = path + "\\bin\\xyzToPly.py " + path + "\\output " + " temp " + path + "\\output out"
+                }
+            };
+
+            //// Start process
+            p.Start();
+            p.WaitForExit();
+
             return true;
         }
 

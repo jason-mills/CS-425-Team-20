@@ -155,6 +155,9 @@ void save_vertices(std::string filename, rs2::points points, int degrees, float 
     aPointCloud.moveOrigin('z', translationFactor);
     aPointCloud.rotatePoints('y', degrees);
 
+
+    std::cout << filename + ".xyz" << std::endl;
+
     aPointCloud.writeXYZFile(filename + ".xyz");
 }
 
