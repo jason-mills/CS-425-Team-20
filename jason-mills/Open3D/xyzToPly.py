@@ -32,7 +32,9 @@ class XYZReader:
             pcd = o3d.geometry.PointCloud()
             points = np.asarray(self.readFile(inputDir + '/' + filesToConvert[i]))
             pcd.points.extend(points)
-            o3d.io.write_point_cloud(outputDir + '/' + plyBaseName + str(i) + ".ply", pcd)
+            downpcd = pcd.voxel_down_sample(voxel_size=0.0005)
+
+            o3d.io.write_point_cloud(outputDir + '/' + plyBaseName + str(i) + ".ply", downpcd, write_ascii=True)
         
         return 0
 

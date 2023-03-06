@@ -174,7 +174,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Scan;
             }));
-            componentLinker.StartScan();
+            //componentLinker.StartScan();
             FinishScan();
         }
 

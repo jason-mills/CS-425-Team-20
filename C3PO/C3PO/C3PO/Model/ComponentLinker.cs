@@ -81,7 +81,7 @@ namespace C3PO.Model
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "\\bin\\reconstruct.exe",
+                    FileName = path + "\\bin\\reconstruct.exe",
                     Arguments = "--dir=" + path + "\\output --prefix=out --out=" + path + "\\output\\final.ply"
                 }
             };
