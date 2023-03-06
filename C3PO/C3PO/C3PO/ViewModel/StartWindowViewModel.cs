@@ -184,7 +184,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Reconstruct;
             }));
-            //componentLinker.StartReconstruction();
+            componentLinker.StartReconstruction();
             FinishReconstruct();
         }
 

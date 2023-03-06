@@ -42,41 +42,43 @@ namespace C3PO.Model
 
         public bool StartScan()
         {
-            //// Declaring and configuring process-running object
-            //var p = new Process()
-            //{
-            //    StartInfo = new ProcessStartInfo()
-            //    {
-            //        FileName = "C:\\dev\\CS-425-Team-20\\jason-mills\\Scanning\\x64\\Debug\\Scanning.exe"
-            //    }
-            //};
+            // Declaring and configuring process-running object
+            string path = System.IO.Directory.GetCurrentDirectory();
+            var p = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = path + "\\bin\\Scanning.exe"
+                }
+            };
 
             //// Start process
-            //p.Start();
-            //p.WaitForExit();
+            p.Start();
+            p.WaitForExit();
             _startTime = DateTime.Now;
             return true;
         }
 
         public bool StartReconstruction()
         {
-            //// Declaring and configuring process-running object
-            //var p = new Process()
-            //{
-            //    StartInfo = new ProcessStartInfo()
-            //    {
-            //        FileName = "C:\\dev\\CS-425-Team-20\\jason-mills\\reconstruct.exe",
-            //        Arguments = "--dir=C:\\dev\\CS-425-Team-20\\jason-mills\\Scanning\\Scanning\\src\\scans\\ --prefix=bun --out=C:\\Users\\froil\\Downloads\\bunny\\data\\out.ply"
-            //    }
-            //};
+            // Declaring and configuring process-running object
+            string path = System.IO.Directory.GetCurrentDirectory();
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "C:\\Users\\froil\\source\\repos\\PointCloudReconstruction\\Debug\\reconstruct.exe",
-                    Arguments = "--dir=C:\\Users\\froil\\Downloads\\bunny\\data --prefix=bun --out=C:\\Users\\froil\\Downloads\\bunny\\data\\out.ply"
+                    FileName = "\\bin\\reconstruct.exe",
+                    Arguments = "--dir=" + path + "\\output --prefix=out --out=" + path + "\\output\\final.ply"
                 }
             };
+            //var p = new Process()
+            //{
+            //    StartInfo = new ProcessStartInfo()
+            //    {
+            //        FileName = "C:\\Users\\froil\\source\\repos\\PointCloudReconstruction\\Debug\\reconstruct.exe",
+            //        Arguments = "--dir=C:\\Users\\froil\\Downloads\\bunny\\data --prefix=bun --out=C:\\Users\\froil\\Downloads\\bunny\\data\\out.ply"
+            //    }
+            //};
 
             // Start process
             p.Start();
