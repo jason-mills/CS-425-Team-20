@@ -14,12 +14,13 @@ namespace C3PO.ViewModel.Commands
         public override void Execute(object? parameter)
         {
             // Declaring and configuring process-running object
+            string path = System.IO.Directory.GetCurrentDirectory();
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = "C:\\dev\\vcpkg\\packages\\python3_x64-windows\\tools\\python3\\python.exe ",
-                    Arguments = "C:\\Users\\froil\\source\\repos\\CS-425-Team-20\\jason-mills\\Open3D\\render.py " + @"""C:\\Users\\froil\\source\\repos\\CS-425-Team-20\\jason-mills\\Open3D\\PLY Files\\bowl_1_0.ply""",
+                    Arguments = path + "\\render.py " + path + "\\Final.ply",
                 }
             };
 
