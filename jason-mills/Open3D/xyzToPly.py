@@ -67,6 +67,7 @@ def main():
         return 1
 
     myReader = XYZReader()
+
     return myReader.createPly(inputDir, xyzBaseName, outputDir, plyBaseName)
 
 if __name__ == '__main__':
