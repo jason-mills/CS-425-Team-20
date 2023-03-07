@@ -20,10 +20,12 @@ class XYZReader:
 
 def main():
     myReader = XYZReader()
-    pcd = o3d.geometry.PointCloud()
-
-    points = np.asarray(myReader.readFile('combinedData.xyz'))
-    pcd.points.extend(points)
+    # pcd = o3d.geometry.PointCloud()
+    
+    # points = np.asarray(myReader.readFile('combinedData.xyz'))
+    # pcd.points.extend(points)
+    ply_point_cloud = o3d.data.PLYPointCloud()
+    pcd = o3d.io.read_point_cloud("final.ply")
     # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test2.xyz'))
     # pcd.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/Y Rotation/test3.xyz')) 

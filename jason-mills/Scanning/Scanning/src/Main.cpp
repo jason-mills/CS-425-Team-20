@@ -119,6 +119,7 @@ int main(int argc, char* argv[]) try
 
         save_vertices(("C:\\dev\\CS-425-Team-20\\app\\C3PO\\output\\temp" + std::to_string(index)), points, index * user_degrees, 2);
         std::cout << "Scanned!" << std::endl;
+        WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
 
         Sleep(5000);
     }

@@ -19,8 +19,8 @@ namespace C3PO.ViewModel.Commands
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "C:\\dev\\vcpkg\\packages\\python3_x64-windows\\tools\\python3\\python.exe ",
-                    Arguments = path + "\\render.py " + path + "\\Final.ply",
+                    FileName = "python.exe",
+                    Arguments = path + "\\bin\\render.py " + path + "\\output\\Final.ply",
                 }
             };
 
