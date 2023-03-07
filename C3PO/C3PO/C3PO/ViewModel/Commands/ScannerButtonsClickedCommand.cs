@@ -7,10 +7,14 @@
  * date: February 1, 2023
  */
 
+using MessagePack.Formatters;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Management.Automation.Language;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,15 +25,30 @@ namespace C3PO.ViewModel.Commands
     internal class ScannerButtonsClickedCommand : CommandBase
     {
         private StartWindowViewModel vm;
+        private CancellationTokenSource cts;
+        private CancellationToken cancelToken;
         public ScannerButtonsClickedCommand(StartWindowViewModel vm)
         {
             this.vm = vm;
+            
+            cts = new CancellationTokenSource();
+            cancelToken = cts.Token;
         }
 
         private void ScanBtnClicked()
         {
-            Thread thread = new Thread(() => vm.StartScan());
-            thread.Start();
+            //Thread thread = new Thread(() => vm.StartScan());
+            //thread.Start();
+
+            Task t1 = Task.Factory.StartNew(() =>
+            {
+                vm.StartScan(cancelToken);
+            }, cancelToken);
+        }
+
+        private void CancelBtnClicked()
+        {
+            cts.Cancel();
         }
 
         public override void Execute(object? sender)
@@ -39,7 +58,7 @@ namespace C3PO.ViewModel.Commands
             ObservableCollection<string> newButtons = new ObservableCollection<string>();
             if (sender.Equals("Scan") || sender.Equals("Resume"))
             {
-                newButtons.Add("Pause");
+                //newButtons.Add("Pause");
                 newButtons.Add("Cancel");
                 ScanBtnClicked();
             }
@@ -50,6 +69,7 @@ namespace C3PO.ViewModel.Commands
             }
             else if (sender.Equals("Cancel"))
             {
+                CancelBtnClicked();
                 newButtons.Add("Scan");
             }
 

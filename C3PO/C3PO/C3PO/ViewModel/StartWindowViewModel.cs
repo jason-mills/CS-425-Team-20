@@ -16,12 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace C3PO.ViewModel
 {
@@ -31,7 +35,8 @@ namespace C3PO.ViewModel
         Scan,
         Reconstruct,
         Finish,
-        Display
+        Display,
+        Empty
     }
 
     public class StartWindowViewModel : ViewModelBase
@@ -39,6 +44,7 @@ namespace C3PO.ViewModel
         /*
          * Attributes
          */
+        private ViewModelBase settingsVM;
         private ComponentLinker componentLinker;
         private ObservableCollection<string> _scannerButtons;
         public ObservableCollection<string> ScannerButtons { 
@@ -114,6 +120,7 @@ namespace C3PO.ViewModel
         public ICommand SettingsBtnCommand { get; }
         public ICommand SaveBtnCommand { get; }
         public ICommand ViewResultsBtnCommand { get; }
+        public ICommand GoToHomePageCommand { get; }
 
         /*
          * Constructors
@@ -121,6 +128,7 @@ namespace C3PO.ViewModel
         public StartWindowViewModel(NavigationStore navigateStore)
         {
             _navigateStore = navigateStore;
+            settingsVM = new SettingsViewModel(navigateStore);
 
             _resultsUC = new C3PO.View.ScanResultsEmpty();
             _resultsUC.DataContext = new ScanResultsEmptyViewModel();
@@ -131,10 +139,11 @@ namespace C3PO.ViewModel
             _resultPanelHeader = "No Scanned Content Available";
 
             ScannerBtnCommand = new ScannerButtonsClickedCommand(this);
-            SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore);
+            SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore, settingsVM);
             NavigateStore.PreviousViewModel = this;
             SaveBtnCommand = new SaveFileCommand();
             ViewResultsBtnCommand = new ViewResultsCommand();
+            GoToHomePageCommand = new NavigateUriCommand("https://sites.google.com/nevada.unr.edu/team-20-c3po/home?authuser=1");
 
             componentLinker = new ComponentLinker();
         }
@@ -166,26 +175,44 @@ namespace C3PO.ViewModel
             {
                 ResultPanelHeader = "Displaying Model";
             }
+            else if(_linkerState == ScanStates.Empty)
+            {
+                ResultPanelHeader = "No Scanned Content Available";
+            }
         }
 
-        public void StartScan()
+        public void StartScan(CancellationToken ct)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 LinkerState = ScanStates.Scan;
             }));
-            componentLinker.StartScan();
-            FinishScan();
+            bool result = componentLinker.StartScan(ct);
+            if (result)
+            {
+                FinishScan(ct);
+            }
+            else
+            {
+                LinkerState = ScanStates.Empty;
+            }
         }
 
-        public void FinishScan()
+        public void FinishScan(CancellationToken ct)
         {
             Application.Current?.Dispatcher.Invoke(new Action(() =>
             {
                 LinkerState = ScanStates.Reconstruct;
             }));
-            componentLinker.StartReconstruction();
-            FinishReconstruct();
+            bool result = componentLinker.StartReconstruction(ct);
+            if (result)
+            {
+                FinishReconstruct();
+            }
+            else
+            {
+                LinkerState = ScanStates.Empty;
+            }
         }
 
         public void FinishReconstruct()
@@ -197,5 +224,13 @@ namespace C3PO.ViewModel
             }));
             componentLinker.Finish();
         }
+
+        //public void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        //{
+        //    ProcessStartInfo uriStartInfo = new ProcessStartInfo(e.Uri.AbsoluteUri);
+        //    uriStartInfo.UseShellExecute = true;
+        //    Process.Start(uriStartInfo);
+        //    e.Handled = true;
+        //}
     }
 }

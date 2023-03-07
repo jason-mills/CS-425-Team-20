@@ -90,8 +90,19 @@
 
                 <StackPanel Orientation="Vertical"
                             Grid.Row="1">
-                    <Label FontSize="18">Website</Label>
-                    <Label FontSize="12">Froilan Luna-Lopez</Label>
+                    <TextBlock HorizontalAlignment="Center">
+                        <Hyperlink Command="{Binding GoToHomePageCommand}">
+                            HomePage
+                        </Hyperlink>
+                    </TextBlock>
+                    <Label HorizontalAlignment="Center" 
+                           FontSize="12">@authors</Label>
+                    <Label HorizontalAlignment="Center" 
+                           FontSize="12">Froilan Luna-Lopez</Label>
+                    <Label HorizontalAlignment="Center" 
+                           FontSize="12">Jason Mills</Label>
+                    <Label HorizontalAlignment="Center" 
+                           FontSize="12">Jeau Labyorteaux</Label>
                 </StackPanel>
             </Grid>
         </Border>

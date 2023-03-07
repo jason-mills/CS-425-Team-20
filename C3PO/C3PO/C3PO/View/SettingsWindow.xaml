@@ -14,6 +14,7 @@
             <ColumnDefinition Width=".2*"/>
         </Grid.ColumnDefinitions>
 
+        <!--Side border walls-->
         <Rectangle Grid.Column="0">
             <Rectangle.Fill>
                 <LinearGradientBrush EndPoint="0,0" StartPoint=".5,0">
@@ -33,6 +34,7 @@
             </Rectangle.Fill>
         </Rectangle>
 
+        <!--Return to main menu button-->
         <Button Content="Back"
                 Margin="10"
                 MaxWidth="200"
@@ -40,14 +42,18 @@
                 VerticalAlignment="Top"
                 Command="{Binding BackBtnCommand}"/>
 
+        <!--Main settings panel-->
         <StackPanel Orientation="Vertical"
                     Grid.Column="1">
+            <!--Warning: settings not integrated message-->
             <Viewbox StretchDirection="DownOnly">
                 <TextBlock FontSize="36"
                            Foreground="Red">
                     NOTE: Settings are currently not supported for this version of C3PO.
                 </TextBlock>
             </Viewbox>
+            
+            <!--USB Device selction-->
             <Label Content="Select USB Port:"
                    Height="30"
                    FontSize="18"
@@ -72,27 +78,54 @@
                 </ComboBox.ItemsSource>
             </ComboBox>
 
+            <!--Number of rotations input-->
             <Label Content="No. of Rotations:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <TextBox Text="1, 2, ..."
-                       Height="30"
-                       Width="60"
+            <TextBox Text="{Binding NoOfRotations}"
+                     x:Name="RotationsTextBox"
+                     Height="30"
+                     Width="60"
                      FontSize="18"
-                       HorizontalAlignment="Left"
-                       Foreground="LightGray"
-                       Background="DarkGray"
-                     Margin="10,0,10,10"/>
+                     HorizontalAlignment="Left"
+                     Foreground="LightGray"
+                     Background="DarkGray"
+                     Margin="10,0,10,10">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter"
+                                Command="{Binding InputRotationsCommand}"
+                                CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
+                </TextBox.InputBindings>
+            </TextBox>
 
+            <!--Number of partitions input-->
             <Label Content="No. of Partitions:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Margin="10,10,10,0"
                    Foreground="White"/>
+            <ComboBox Name="NoOfPartitionsList"
+                      Height="30"
+                      Width="400"
+                      FontSize="16"
+                      HorizontalAlignment="Left"
+                      Margin="10,0,10,10"
+                      SelectedIndex="{Binding SelectionPartitionIndex}"
+                      SelectedItem="{Binding Partitions}">
+                <ComboBox.Resources>
+                    <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
+                </ComboBox.Resources>
+                <ComboBox.ItemsSource>
+                    <CompositeCollection>
+                        <CollectionContainer Collection="{Binding Source={StaticResource NoOfPartitionsOpt}}"/>
+                    </CompositeCollection>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+            <!--
             <TextBox Text="1, 2, ..."
                        Height="30"
                        Width="60"
@@ -100,7 +133,7 @@
                        HorizontalAlignment="Left"
                        Foreground="LightGray"
                        Background="DarkGray"
-                     Margin="10,0,10,10"/>
+                     Margin="10,0,10,10"/>-->
 
             <Button Content="Export Settings"
                 Margin="10"
@@ -114,7 +147,8 @@
                 Width="100"
                 Height="30"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"/>
+                    VerticalAlignment="Bottom"
+                    Command="{Binding ImportSettingsCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>
