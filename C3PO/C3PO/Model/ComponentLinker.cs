@@ -1,12 +1,14 @@
 ﻿using C3PO.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Management.Automation.Language;
 using System.Security.Policy;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -40,7 +42,7 @@ namespace C3PO.Model
             _endTimeStr = "";
         }
 
-        public bool StartScan()
+        public bool StartScan(CancellationToken ct)
         {
             _startTime = DateTime.Now;
             // Declaring and configuring process-running object
@@ -55,7 +57,14 @@ namespace C3PO.Model
 
             //// Start process
             p.Start();
-            p.WaitForExit();
+            while (!p.HasExited)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    p.Kill();
+                    return false;
+                }
+            }
 
             p = new Process()
             {
@@ -68,12 +77,20 @@ namespace C3PO.Model
 
             //// Start process
             p.Start();
-            p.WaitForExit();
+
+            while (!p.HasExited)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    p.Kill();
+                    return false;
+                }
+            }
 
             return true;
         }
 
-        public bool StartReconstruction()
+        public bool StartReconstruction(CancellationToken ct)
         {
             // Declaring and configuring process-running object
             string path = System.IO.Directory.GetCurrentDirectory();
@@ -96,7 +113,15 @@ namespace C3PO.Model
 
             // Start process
             p.Start();
-            p.WaitForExit();
+            //p.WaitForExit();
+            while(!p.HasExited)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    p.Kill();
+                    return false;
+                }
+            }
 
             return true;
         }
