@@ -10,6 +10,12 @@
 #include "PointCloud.h"
 
 
+char translation_array[] = { 'a','b','c','d','e','f','g','h','i','j','k' };
+
+char data[] = { 'X' };
+
+int scans_per_rotation;
+
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
 void save_vertices(std::string filename, rs2::points points, int degrees, float translationFactor);
@@ -17,6 +23,7 @@ void save_vertices(std::string filename, rs2::points points, int degrees, float 
 
 int main(int argc, char* argv[]) try
 {
+    scans_per_rotation = std::stoi(argv[1]);
     //Opening Serial Communication Port For Arduino Communication
     HANDLE hComm;
     DWORD dNoOFBytestoWrite;         // No of bytes to write into the port
@@ -55,53 +62,17 @@ int main(int argc, char* argv[]) try
 
 
     bool loop = true;
-    char user_choice;
-    int user_degrees = 0;
-    char data[] = { 'X' };
+    int userInput = std::stoi(argv[2]);
+    int degreesToRotate = userInput;
+    int user_input_divided[4];
+    int rotations = 360 / userInput;
+    user_input_divided[3] = 10;
 
-    while (loop)
+
+    for (int i = 0; i < 3; i++)
     {
-        std::cout << "Enter Degree Option: " << std::endl;
-        std::cout << "A: 30" << std::endl;
-        std::cout << "B: 45" << std::endl;
-        std::cout << "C: 60" << std::endl;
-        std::cout << "D: 90" << std::endl;
-        std::cout << "E: 180" << std::endl;
-        std::cin >> user_choice;
-        if (user_choice == 'A')
-        {
-            data[0] = 'A';
-            user_degrees = 30;
-            loop = false;
-        }
-        else if (user_choice == 'B')
-        {
-            data[0] = 'B';
-            user_degrees = 45;
-            loop = false;
-        }
-        else if (user_choice == 'C')
-        {
-            data[0] = 'C';
-            user_degrees = 60;
-            loop = false;
-        }
-        else if (user_choice == 'D')
-        {
-            data[0] = 'D';
-            user_degrees = 90;
-            loop = false;
-        }
-        else if (user_choice == 'E')
-        {
-            data[0] = 'E';
-            user_degrees = 180;
-            loop = false;
-        }
-        else
-        {
-            std::cout << "Please enter one of the letter options" << std::endl;
-        }
+        user_input_divided[2 - i] = userInput % 10;
+        userInput = userInput / 10;
     }
 
 
@@ -111,15 +82,28 @@ int main(int argc, char* argv[]) try
     auto depth = frames.get_depth_frame();
     points = pc.calculate(depth);
 
-    for (int index = 0; index * user_degrees != 360; index++)
+    for (int index = 0; index < rotations; index++)
     {
         frames = pipe.wait_for_frames();
         depth = frames.get_depth_frame();
         points = pc.calculate(depth);
+        std::stringstream filename;
 
-        save_vertices(("C:\\dev\\CS-425-Team-20\\app\\C3PO\\output\\temp" + std::to_string(index)), points, index * user_degrees, 2);
-        std::cout << "Scanned!" << std::endl;
-        WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
+        for (int voting = 0; voting < scans_per_rotation; voting++)
+        {
+            filename << "data_" << std::setw(2) << std::setfill('0') << index << "." << voting << ".txt";
+            save_vertices(("C:\\dev\\CS-425-Team-20\\app\\C3PO\\output\\temp" + std::to_string(index)), points, index * degreesToRotate, 2);
+            std::cout << "Scanned!" << std::endl;
+        }
+
+
+        // Send degree data to the arduino
+        for (int i = 0; i < 4; i++)
+        {
+            data[0] = translation_array[user_input_divided[i]];
+            WriteFile(hComm, data, sizeof(data), &dNoOfBytesWritten, NULL);
+            std::cout << translation_array[user_input_divided[i]];
+        }
 
         Sleep(5000);
     }
@@ -143,6 +127,7 @@ catch (const std::exception& e)
 void save_vertices(std::string filename, rs2::points points, int degrees, float translationFactor)
 {
     PointCloud aPointCloud;
+    std::cout << "Degrees to rotate: " << degrees << std::endl;
 
     const rs2::vertex* vertices = points.get_vertices();
     const rs2_intrinsics depth_intrinsics;
@@ -161,4 +146,3 @@ void save_vertices(std::string filename, rs2::points points, int degrees, float 
 
     aPointCloud.writeXYZFile(filename + ".xyz");
 }
-

@@ -8,48 +8,64 @@ class XYZReader:
 
         firstLine = fileStream.readline()
         if(firstLine == 'X Y Z\n'):
+            ytotal = 0
             for line in fileStream:
                 line = line.rstrip('\n')
                 x, y, z = line.split(' ')
                 if x == '-0' or y == '-0' or z == '-0':
                     continue
+                # 0.047155059153702286
+                if(float(y) > 0.044):
+                    continue
                 points.append([x, y, z])
+                # if(i > 10):
+                #     break
+
+                # i += 1
 
         return points
 
 
 def main():
     myReader = XYZReader()
-    pcd = o3d.geometry.PointCloud()
+    pcd1 = o3d.geometry.PointCloud()
+    pcd2 = o3d.geometry.PointCloud()
     
-    # points = np.asarray(myReader.readFile('combinedData.xyz'))
+    # points = np.asarray(myReader.readFile('data0.xyz'))
     # pcd.points.extend(points)
     # ply_point_cloud = o3d.data.PLYPointCloud()
     # pcd = o3d.io.read_point_cloud("final.ply")
-    points = np.asarray(myReader.readFile('XYZ/temp0.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp1.xyz')) 
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp2.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp3.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp4.xyz')) 
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp5.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp6.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp7.xyz')) 
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp8.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp9.xyz'))
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp10.xyz')) 
-    pcd.points.extend(points)
-    points = np.asarray(myReader.readFile('XYZ/temp11.xyz'))
-    pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp0.xyz'))
+    points = np.asarray(myReader.readFile('blank.xyz'))
+    # print(points)
+    pcd1.points.extend(points)
+    
+
+    points = np.asarray(myReader.readFile('temp0.xyz'))
+    # print(points)
+    pcd2.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp1.xyz')) 
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp2.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp3.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp4.xyz')) 
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp5.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp6.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp7.xyz')) 
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp8.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp9.xyz'))
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp10.xyz')) 
+    # pcd.points.extend(points)
+    # points = np.asarray(myReader.readFile('XYZ/temp11.xyz'))
+    # pcd.points.extend(points)
     
 
     
@@ -89,7 +105,9 @@ def main():
     # o3d.visualization.draw_geometries([mesh])
 
     # o3d.io.write_point_cloud("")
-    o3d.visualization.draw_geometries([pcd])
+    o3d.visualization.draw_geometries([pcd1, pcd2])
+    # o3d.visualization.draw_geometries([pcd1])
+
 
     # o3d.io.write_triangle_mesh("test.off", mesh)
 
