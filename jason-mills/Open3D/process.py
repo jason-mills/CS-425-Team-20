@@ -35,15 +35,8 @@ def main():
     # pcd.points.extend(points)
     # ply_point_cloud = o3d.data.PLYPointCloud()
     # pcd = o3d.io.read_point_cloud("final.ply")
-    # points = np.asarray(myReader.readFile('XYZ/temp0.xyz'))
-    points = np.asarray(myReader.readFile('blank.xyz'))
-    # print(points)
+    points = np.asarray(myReader.readFile('XYZ/temp0.xyz'))
     pcd1.points.extend(points)
-    
-
-    points = np.asarray(myReader.readFile('temp0.xyz'))
-    # print(points)
-    pcd2.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/temp1.xyz')) 
     # pcd.points.extend(points)
     # points = np.asarray(myReader.readFile('XYZ/temp2.xyz'))
