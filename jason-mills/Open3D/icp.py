@@ -42,7 +42,7 @@ def pointToPointMerge(cloudsAndSamples, voxelSize):
 
             # o3d.visualization.draw_geometries([downSampleTotal])
             # o3d.visualization.draw_geometries([totalCloud])
-            sleep(3)
+            sleep(5)
             downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
             # downSampleTotal = totalCloud
             # thing = input("Stop here if you want traveller")
@@ -76,8 +76,8 @@ def pointToPlaneMerge(cloudsAndSamples, voxelSize):
             cloudSamplePair[0].transform(reg_p2p.transformation)
             totalCloud.points.extend(cloudSamplePair[0].points)
 
-            o3d.visualization.draw_geometries([downSampleTotal])
-            o3d.visualization.draw_geometries([totalCloud])
+            # o3d.visualization.draw_geometries([downSampleTotal])
+            # o3d.visualization.draw_geometries([totalCloud])
             downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
             # downSampleTotal = totalCloud
             # thing = input("Stop here if you want traveller")
@@ -153,66 +153,79 @@ def display_point_cloud(pcd):
     o3d.visualization.draw_geometries([pcd])
 
 def main():
-    cloudsToCombine = []
-    names = []
+    # cloudsToCombine = []
+    # names = []
     
-    for i in range(4):
-        print("Reading: " + "In/temp" + str(i) + ".xyz")
-        currentCloud = o3d.geometry.PointCloud()
-        points = readFile("In/temp" + str(i) + ".xyz")
-        names.append("In/temp" + str(i) + ".xyz")
-        points = remove_platform(points)
-        currentCloud.points.extend(points)
-        voxelSize = round(max(currentCloud.get_max_bound()-currentCloud.get_min_bound())*0.01,4)
-        currentCloud = remove_outliers(pcd=currentCloud, voxelSize=voxelSize, iterations=3, numberOfPoints=55, radius=0.004)
-        cloudsToCombine.append(currentCloud)
+    # for i in range(4):
+    #     print("Reading: " + "In/temp" + str(i) + ".xyz")
+    #     currentCloud = o3d.geometry.PointCloud()
+    #     points = readFile("In/temp" + str(i) + ".xyz")
+    #     names.append("In/temp" + str(i) + ".xyz")
+    #     points = remove_platform(points)
+    #     currentCloud.points.extend(points)
+    #     voxelSize = round(max(currentCloud.get_max_bound()-currentCloud.get_min_bound())*0.01,4)
+    #     currentCloud = remove_outliers(pcd=currentCloud, voxelSize=voxelSize, iterations=3, numberOfPoints=55, radius=0.004)
+    #     cloudsToCombine.append(currentCloud)
 
-    voxelSize = round(max(cloudsToCombine[0].get_max_bound()-cloudsToCombine[0].get_min_bound())*0.001, 4)
+    # voxelSize = round(max(cloudsToCombine[0].get_max_bound()-cloudsToCombine[0].get_min_bound())*0.001, 4)
 
-    # bun0 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun000" + ".ply")
-    # bun45 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun045" + ".ply")
-    # bun90 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun090" + ".ply")
-    # bun180 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun180" + ".ply")
-    # bun270 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun270" + ".ply")
-    # bun315 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun315" + ".ply")
-    # chin = o3d.io.read_point_cloud("PLY/Stanford Bunny/chin" + ".ply")
-    # ear_back = o3d.io.read_point_cloud("PLY/Stanford Bunny/ear_back" + ".ply")
-    # top2 = o3d.io.read_point_cloud("PLY/Stanford Bunny/top2" + ".ply")
-    # top3 = o3d.io.read_point_cloud("PLY/Stanford Bunny/top3" + ".ply")
-    # voxelSize=round(max(bun0.get_max_bound()-bun0.get_min_bound())*0.01,4)
-    # print(voxelSize)
-    # stop = input("stop here if you want traveller")
+    bun0 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun000" + ".ply")
+    bun45 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun045" + ".ply")
+    bun90 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun090" + ".ply")
+    bun180 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun180" + ".ply")
+    bun270 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun270" + ".ply")
+    bun315 = o3d.io.read_point_cloud("PLY/Stanford Bunny/bun315" + ".ply")
+    chin = o3d.io.read_point_cloud("PLY/Stanford Bunny/chin" + ".ply")
+    ear_back = o3d.io.read_point_cloud("PLY/Stanford Bunny/ear_back" + ".ply")
+    top2 = o3d.io.read_point_cloud("PLY/Stanford Bunny/top2" + ".ply")
+    top3 = o3d.io.read_point_cloud("PLY/Stanford Bunny/top3" + ".ply")
+    voxelSize=round(max(bun0.get_max_bound()-bun0.get_min_bound())*0.01,4)
+    print(voxelSize)
+    stop = input("stop here if you want traveller")
 
-    # names = [
-    #     "PLY/Stanford Bunny/bun000" + ".ply",
-    #     "PLY/Stanford Bunny/bun045" + ".ply",
-    #     "PLY/Stanford Bunny/bun090" + ".ply",
-    #     "PLY/Stanford Bunny/bun315" + ".ply",
-    #     "PLY/Stanford Bunny/chin" + ".ply",
-    #     "PLY/Stanford Bunny/top2" + ".ply",
-    #     "PLY/Stanford Bunny/top3" + ".ply",
-    #     "PLY/Stanford Bunny/bun270" + ".ply",
-    #     "PLY/Stanford Bunny/bun180" + ".ply",
-    #     "PLY/Stanford Bunny/ear_back" + ".ply"
-    # ]
+    names = [
+        "PLY/Stanford Bunny/bun000" + ".ply",
+        "PLY/Stanford Bunny/bun045" + ".ply",
+        "PLY/Stanford Bunny/bun090" + ".ply",
+        "PLY/Stanford Bunny/bun315" + ".ply",
+        "PLY/Stanford Bunny/chin" + ".ply",
+        "PLY/Stanford Bunny/top2" + ".ply",
+        "PLY/Stanford Bunny/top3" + ".ply",
+        "PLY/Stanford Bunny/bun270" + ".ply",
+        "PLY/Stanford Bunny/bun180" + ".ply",
+        "PLY/Stanford Bunny/ear_back" + ".ply"
+    ]
 
-    # # cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270, bun180, ear_back]
+    # cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270, bun180, ear_back]
+    # cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun180, ear_back]
+    cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270]
     # cloudsToCombine = [bun0, bun45, bun90,  bun315, bun270,  chin,  top2, top3,  ear_back, bun180]
 
     cloudsAndSamples = []
     
-    # i = 0
-    # for cloud in cloudsToCombine:
-    #     # cloudsAndSamples.append((cloud, cloud.voxel_down_sample(voxelSize), names[i]))
-    #     downSample = cloud.voxel_down_sample(voxelSize)
-    #     display_point_cloud(cloud)
-    #     display_point_cloud(downSample)
-    #     # cloudsAndSamples.append((cloud, cloud, names[i]))
+    i = 0
+    for cloud in cloudsToCombine:
+        cloudsAndSamples.append((cloud, cloud.voxel_down_sample(voxelSize), names[i]))
+        # downSample = cloud.voxel_down_sample(voxelSize)
+        # display_point_cloud(cloud)
+        # display_point_cloud(downSample)
+        # cloudsAndSamples.append((cloud, cloud, names[i]))
 
-    #     i += 1
+        i += 1
 
-    # totalCloud = pointToPointMerge(cloudsAndSamples, voxelSize)
+    totalCloud = pointToPointMerge(cloudsAndSamples, voxelSize)
+    display_point_cloud(totalCloud)
     # totalCloud = pointToPlaneMerge(cloudsAndSamples, voxelSize)
+
+    totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    totalCloud.orient_normals_towards_camera_location(totalCloud.get_center())
+    totalCloud.normals = o3d.utility.Vector3dVector( - np.asarray(totalCloud.normals))
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=10, width=0, scale=1.1, linear_fit=False)[0]
+    mesh.compute_vertex_normals()
+    
+    # display_point_cloud(totalCloud)
+    o3d.visualization.draw_geometries([mesh]) 
+    # o3d.io.write_triangle_mesh("test.stl", mesh)
 
     # display_point_cloud(totalCloud)
 
