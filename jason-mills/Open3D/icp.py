@@ -35,7 +35,7 @@ def pointToPointMerge(cloudsAndSamples, voxelSize):
                                                                   totalCloud, 
                                                                   voxelSize * 1.5,
                                                                   ransacResult.transformation,
-                                                                    o3d.pipelines.registration.TransformationEstimationPointToPoint(), o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=60))
+                                                                    o3d.pipelines.registration.TransformationEstimationPointToPoint(), o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
             # reg_p2p = o3d.pipelins.registration.registration_icp(cloudSamplePair[0], totalCloud, voxelSize * 1.5, ransacResult.transformation)
             cloudSamplePair[0].transform(reg_p2p.transformation)
             totalCloud.points.extend(cloudSamplePair[0].points)
@@ -198,7 +198,7 @@ def main():
 
     # cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270, bun180, ear_back]
     # cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun180, ear_back]
-    cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270]
+    cloudsToCombine = [bun0, bun45, bun90, bun315, chin,  top2, top3, bun270, ear_back]
     # cloudsToCombine = [bun0, bun45, bun90,  bun315, bun270,  chin,  top2, top3,  ear_back, bun180]
 
     cloudsAndSamples = []
@@ -215,17 +215,33 @@ def main():
 
     totalCloud = pointToPointMerge(cloudsAndSamples, voxelSize)
     display_point_cloud(totalCloud)
+    something = input("take a rest here if you wish traveler")
+    # totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    totalCloud.estimate_normals()
+    totalCloud.orient_normals_consistent_tangent_plane(100)
+    # totalCloud.orient_normals_towards_camera_location(totalCloud.get_center())
+    # totalCloud.normals = o3d.utility.Vector3dVector( - np.asarray(totalCloud.normals))
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+    o3d.visualization.draw_geometries([mesh]) 
+    mesh.compute_vertex_normals()
+    o3d.io.write_triangle_mesh("test1.stl", mesh)
+
+    # totalCloud = totalCloud.voxel_down_sample(voxelSize)
+    # display_point_cloud(totalCloud)
+    # totalCloud.estimate_normals()
+    # totalCloud.orient_normals_consistent_tangent_plane(100)
+    # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=8, width=0, scale=1.1, linear_fit=False)[0]
+
     # totalCloud = pointToPlaneMerge(cloudsAndSamples, voxelSize)
 
-    totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
-    totalCloud.orient_normals_towards_camera_location(totalCloud.get_center())
-    totalCloud.normals = o3d.utility.Vector3dVector( - np.asarray(totalCloud.normals))
-    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=10, width=0, scale=1.1, linear_fit=False)[0]
-    mesh.compute_vertex_normals()
+    # totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    # totalCloud.orient_normals_towards_camera_location(totalCloud.get_center())
+    # totalCloud.normals = o3d.utility.Vector3dVector( - np.asarray(totalCloud.normals))
+    # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=12, width=0, scale=1.1, linear_fit=False)[0]
     
     # display_point_cloud(totalCloud)
-    o3d.visualization.draw_geometries([mesh]) 
-    # o3d.io.write_triangle_mesh("test.stl", mesh)
+    # o3d.visualization.draw_geometries([mesh]) 
+    # o3d.io.write_triangle_mesh("test1.stl", mesh)
 
     # display_point_cloud(totalCloud)
 
