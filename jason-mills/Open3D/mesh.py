@@ -12,4 +12,4 @@ pcd.normals = o3d.utility.Vector3dVector(point_cloud[:,6:9])
 
 mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=8, width=0, scale=1.1, linear_fit=False)[0]
 
-o3d.visualization.draw_geometries([mesh])
+o3d.visualization.draw_geometries([mesh]) 
