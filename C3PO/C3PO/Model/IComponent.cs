@@ -8,7 +8,7 @@ namespace C3PO.Model
 {
     internal interface IComponent
     {
-        public Task<int> StartOpAsync();
-        public Task<int> StopOpAsync();
+        public bool StartOp();
+        public bool StopOp();
     }
 }

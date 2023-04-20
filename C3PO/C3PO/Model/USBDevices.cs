@@ -16,6 +16,7 @@ namespace C3PO.Model
          */
         public USBDevices()
         {
+            //var hubList = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort");
             var hubList = new ManagementObjectSearcher("SELECT * FROM Win32_USBHub");
             _usbList = hubList.Get();
         }
@@ -24,7 +25,16 @@ namespace C3PO.Model
         {
             List<string> usbNames = new List<string>();
 
-            foreach(var usb in _usbList)
+            //foreach(var usb in _usbList)
+            //{
+            //    string desc = usb.GetPropertyValue("Description")?.ToString() ?? "?";
+
+            //    if (desc.Contains("Arduino"))
+            //    {
+            //        usbNames.Add((string)usb.GetPropertyValue("Name"));
+            //    }
+            //}
+            foreach (var usb in _usbList)
             {
                 usbNames.Add((string)usb.GetPropertyValue("Name"));
             }

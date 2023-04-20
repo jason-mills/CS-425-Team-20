@@ -16,12 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace C3PO.ViewModel
 {
@@ -31,7 +35,8 @@ namespace C3PO.ViewModel
         Scan,
         Reconstruct,
         Finish,
-        Display
+        Display,
+        Empty
     }
 
     public class StartWindowViewModel : ViewModelBase
@@ -39,7 +44,15 @@ namespace C3PO.ViewModel
         /*
          * Attributes
          */
-        private ComponentLinker componentLinker;
+        private SettingsViewModel settingsVM;
+        private ComponentLinker _componentLinker;
+        public ComponentLinker ComponentLinker
+        {
+            get
+            {
+                return _componentLinker;
+            }
+        }
         private ObservableCollection<string> _scannerButtons;
         public ObservableCollection<string> ScannerButtons { 
             get
@@ -106,6 +119,19 @@ namespace C3PO.ViewModel
                 LinkerUpdate();
             }
         }
+        public ObservableCollection<string> _rawResults;
+        public ObservableCollection<string> RawResults
+        {
+            get
+            {
+                return _rawResults;
+            }
+            set
+            {
+                _rawResults = value;
+            }
+        }
+        public ObservableCollection<ScanMetadata> Metadata { get; set; }
 
         /*
          * Commands
@@ -113,28 +139,37 @@ namespace C3PO.ViewModel
         public ICommand ScannerBtnCommand { get; }
         public ICommand SettingsBtnCommand { get; }
         public ICommand SaveBtnCommand { get; }
+        public ICommand ViewResultsBtnCommand { get; }
+        public ICommand GoToHomePageCommand { get; }
+        public ICommand SaveAllResultsBtnCommand { get; }
 
         /*
          * Constructors
          */
         public StartWindowViewModel(NavigationStore navigateStore)
         {
+            _rawResults = new ObservableCollection<string>() { "1", "2", "3" };
             _navigateStore = navigateStore;
+            settingsVM = new SettingsViewModel(navigateStore);
+            _componentLinker = new ComponentLinker(settingsVM.Settings);
+            Metadata = new ObservableCollection<ScanMetadata>();
 
             _resultsUC = new C3PO.View.ScanResultsEmpty();
             _resultsUC.DataContext = new ScanResultsEmptyViewModel();
 
             _scannerButtons = new ObservableCollection<string>();
             ScannerButtons.Add("Scan");
+            ScannerButtons.Add("Load Scans");
 
             _resultPanelHeader = "No Scanned Content Available";
 
-            ScannerBtnCommand = new ScannerButtonsClickedCommand(this);
-            SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore);
+            ScannerBtnCommand = new ScannerButtonsClickedCommand(this, settingsVM.Settings);
+            SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore, settingsVM);
             NavigateStore.PreviousViewModel = this;
             SaveBtnCommand = new SaveFileCommand();
-
-            componentLinker = new ComponentLinker();
+            SaveAllResultsBtnCommand = new CommandSaveAllResults();
+            ViewResultsBtnCommand = new ViewResultsCommand();
+            GoToHomePageCommand = new NavigateUriCommand("https://sites.google.com/nevada.unr.edu/team-20-c3po/home?authuser=1");
         }
 
         /*
@@ -164,16 +199,27 @@ namespace C3PO.ViewModel
             {
                 ResultPanelHeader = "Displaying Model";
             }
+            else if(_linkerState == ScanStates.Empty)
+            {
+                ResultPanelHeader = "No Scanned Content Available";
+            }
         }
 
-        public void StartScan()
+        public void StartScan(CancellationToken ct)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 LinkerState = ScanStates.Scan;
             }));
-            componentLinker.StartScan();
-            FinishScan();
+            bool result = _componentLinker.StartScan();
+            if (result)
+            {
+                FinishScan();
+            }
+            else
+            {
+                LinkerState = ScanStates.Empty;
+            }
         }
 
         public void FinishScan()
@@ -182,18 +228,40 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Reconstruct;
             }));
-            componentLinker.StartReconstruction();
-            FinishReconstruct();
+            bool result = _componentLinker.StartReconstruction();
+            if (result)
+            {
+                FinishReconstruct();
+            }
+            else
+            {
+                LinkerState = ScanStates.Empty;
+            }
         }
 
         public void FinishReconstruct()
         {
+            _componentLinker.Finish();
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 LinkerState = ScanStates.Finish;
                 ResultsUC = new C3PO.View.ScanResults();
+                ObservableCollection<string> newBtns = new ObservableCollection<string>();
+                newBtns.Add("Scan");
+                newBtns.Add("Load Scans");
+                ScanButtonsSet(newBtns);
+                UpdateMetadata();
             }));
-            componentLinker.Finish();
+        }
+
+        public void UpdateMetadata()
+        {
+            Metadata = new ObservableCollection<ScanMetadata>();
+            Metadata.Add(new ScanMetadata("Time Spanned", _componentLinker.TimeSpanned.ToString(@"hh\:mm\:ss")));
+            Metadata.Add(new ScanMetadata("Partitions", "0"));
+            Metadata.Add(new ScanMetadata("Scans Taken", "0"));
+            Metadata.Add(new ScanMetadata("Avg. Fitness Score", "0"));
+            Metadata.Add(new ScanMetadata("Points Captured", "0"));
         }
     }
 }

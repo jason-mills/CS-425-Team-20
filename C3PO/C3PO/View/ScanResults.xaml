@@ -14,6 +14,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -29,60 +30,89 @@
                     MinWidth="50"
                     MinHeight="30"
                     FontSize="16"
+                    Margin="5"
                     Padding="5"
                     Command="{Binding SaveBtnCommand}"/>
+            <Button HorizontalAlignment="Center"
+                    Content="View 3D"
+                    MinWidth="50"
+                    MinHeight="30"
+                    FontSize="16"
+                    Margin="5"
+                    Padding="5"
+                    Command="{Binding ViewResultsBtnCommand}"
+                    CommandParameter="0"/>
         </StackPanel>
 
-        <!-- Right panel for results -->
-        <Grid Grid.Column="1"
-              Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".25*"/>
-                <ColumnDefinition Width=".75*"/>
-            </Grid.ColumnDefinitions>
+        
+        <!--Right panel for results-->
+        <ItemsControl Grid.Row ="1" Grid.Column="1"
+                      ItemsSource="{Binding Metadata}" AlternationCount="2">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <!--Metadata information to display-->
+                    <Grid x:Name="Metadata" Width="350">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width=".5*"/>
+                            <ColumnDefinition Width=".5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" FontSize="18" Content="{Binding DataName}" HorizontalContentAlignment="Right"
+                               Margin="0,0,10,0"/>
+                        <Label Grid.Column="1" FontSize="18" Content="{Binding DataValue}"/>
+                    </Grid>
+                    <DataTemplate.Triggers>
+                        <!--Triggers for alternating the row colors-->
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                            <Setter Property="Background" Value="Gray" TargetName="Metadata"/>
+                        </Trigger>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="DarkGray" TargetName="Metadata"/>
+                        </Trigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-            <StackPanel Grid.Column="0"
-                        Orientation="Vertical">
-                <Label Content="Time Spanned:"
-                       FontSize="18"
-                       HorizontalAlignment="Right"
-                       Foreground="White"/>
-                <Label Content="Scans Taken:"
-                       FontSize="18"
-                       HorizontalAlignment="Right"
-                       Foreground="White"/>
-                <Label Content="Light Level:"
-                       FontSize="18"
-                       HorizontalAlignment="Right"
-                       Foreground="White"/>
-                <Label Content="Avg. Fit Score:"
-                       FontSize="18"
-                       HorizontalAlignment="Right"
-                       Foreground="White"/>
-                <Label Content="Points Registered:"
-                       FontSize="18"
-                       HorizontalAlignment="Right"
-                       Foreground="White"/>
-            </StackPanel>
+        <!--Raw data header-->
+        <StackPanel Grid.Row="2"
+                    Grid.ColumnSpan="2"
+                    VerticalAlignment="Top">
+            <!-- Separator -->
+            <Rectangle Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                       Fill="LightGray"
+                       Height="2"/>
+            <!-- End: Separator -->
+            <Label HorizontalAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Foreground="DarkGray"
+                   FontSize="18"
+                   Content="Raw Data Scanned"/>
+            <!-- Separator -->
+            <Rectangle HorizontalAlignment="Stretch"
+                       Fill="LightGray"
+                       Height="2"/>
+            <!-- End: Separator -->
 
-            <StackPanel Grid.Column="1"
-                        Orientation="Vertical">
-                <Label Content="00:03:46"
-                       FontSize="18"
-                       Foreground="White"/>
-                <Label Content="12"
-                       FontSize="18"
-                       Foreground="White"/>
-                <Label Content=".46"
-                       FontSize="18"
-                       Foreground="White"/>
-                <Label Content=".62"
-                       FontSize="18"
-                       Foreground="White"/>
-                <Label Content="3551"
-                       FontSize="18"
-                       Foreground="White"/>
-            </StackPanel>
-        </Grid>
+            <!--Raw data buttons-->
+            <Button Content="Save All" Margin="20,5,20,5"
+                    Command="{Binding SaveAllResultsBtnCommand}"/>
+            <ItemsControl ItemsSource="{Binding RawResults}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding .}" Margin="20, 5, 20, 5"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.ViewResultsBtnCommand}"
+                                CommandParameter="{Binding .}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"
+                               HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+
+        
     </Grid>
 </UserControl>

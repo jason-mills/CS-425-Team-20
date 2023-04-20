@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace C3PO.View
 {
     /// <summary>
-    /// Interaction logic for ScanInProgress.xaml
+    /// Interaction logic for Tutorial.xaml
     /// </summary>
-    public partial class ScanInProgress : UserControl
+    public partial class Tutorial : UserControl
     {
-        public ScanInProgress()
+        public Tutorial()
         {
             InitializeComponent();
         }

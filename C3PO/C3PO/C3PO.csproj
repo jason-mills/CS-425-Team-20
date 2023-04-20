@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Utilities" Version="17.4.33103.184" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
   </ItemGroup>
 
   <ItemGroup>

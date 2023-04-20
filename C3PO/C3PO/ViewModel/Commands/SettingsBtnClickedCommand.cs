@@ -19,14 +19,17 @@ namespace C3PO.ViewModel.Commands
     public class SettingsBtnClickedCommand : CommandBase
     {
         private NavigationStore _navigationStore;
+        private ViewModelBase _settingsViewModel;
 
-        public SettingsBtnClickedCommand(NavigationStore navigationStore) 
+        public SettingsBtnClickedCommand(NavigationStore navigationStore, ViewModelBase svm) 
         {
             _navigationStore = navigationStore;
+            _settingsViewModel = svm;
         }
         public override void Execute(object? sender)
         {
-            _navigationStore.CurrentViewModel = new SettingsViewModel(_navigationStore);
+            //_navigationStore.CurrentViewModel = new SettingsViewModel(_navigationStore);
+            _navigationStore.CurrentViewModel = _settingsViewModel;
         }
     }
 }
