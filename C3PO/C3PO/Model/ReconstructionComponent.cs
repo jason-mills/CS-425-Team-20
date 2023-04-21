@@ -38,7 +38,7 @@ namespace C3PO.Model
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = "python",
-                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + order + " True"
+                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + "\"" + order + "\"" + " True"
                 }
             };
             //var p = new Process()
