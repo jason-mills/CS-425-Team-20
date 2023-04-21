@@ -33,6 +33,87 @@ def display_inlier_outlier(cloud, ind):
     inlier_cloud.paint_uniform_color([0.8, 0.8, 0.8])
     o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud])
 
+def all_registration(clouds, coarse_dist, fine_dist, voxelSize):
+    pose_graph = o3d.pipelines.registration.PoseGraph()
+    odometry = np.identity(4)
+    pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(odometry))
+    num_clouds = len(clouds)
+    
+    for source_id in range(num_clouds):
+        for target_id in range(source_id + 1, num_clouds):
+            transformation_icp, information_icp = pairwise_registration(
+                clouds[source_id], clouds[target_id],
+                coarse_dist, fine_dist, voxelSize)
+            print("Build o3d.pipelines.registration.PoseGraph")
+            if target_id == source_id + 1:  # odometry case
+                odometry = np.dot(transformation_icp, odometry)
+                pose_graph.nodes.append(
+                    o3d.pipelines.registration.PoseGraphNode(
+                        np.linalg.inv(odometry)))
+                pose_graph.edges.append(
+                    o3d.pipelines.registration.PoseGraphEdge(source_id,
+                                                             target_id,
+                                                             transformation_icp,
+                                                             information_icp,
+                                                             uncertain=False))
+            else:
+                pose_graph.edges.append(
+                    o3d.pipelines.registration.PoseGraphEdge(source_id,
+                                                             target_id,
+                                                             transformation_icp,
+                                                             information_icp,
+                                                             uncertain=True))
+    return pose_graph
+
+def pairwise_registration(source, target, coarse_dist, fine_dist, voxelSize):
+    print("Applying pairwise registration with point to plane icp...")
+    source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    icp_coarse = o3d.pipelines.registration.registration_icp(source,
+                                                             target,
+                                                             coarse_dist,
+                                                             np.identity(4),
+                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    icp_fine = o3d.pipelines.registration.registration_icp(source,
+                                                             target,
+                                                             fine_dist,
+                                                             icp_coarse.transformation,
+                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    trans_icp = icp_fine.transformation
+    info_icp = o3d.pipelines.registration.get_information_matrix_from_point_clouds(source,
+                                                                                   target,
+                                                                                   fine_dist,
+                                                                                   icp_fine.transformation)
+    return trans_icp, info_icp
+
+def multiway_registration(source, downed_source, voxel_size):
+    coarse_dist = voxel_size * 15
+    fine_dist = voxel_size * 1.5
+    pose_graph = all_registration(downed_source, coarse_dist, fine_dist, voxel_size)
+    option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=fine_dist,
+                                                                 edge_prune_threshold=0.25,
+                                                                 reference_node=0)
+    o3d.pipelines.registration.global_optimization(pose_graph,
+                                                   o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(),
+                                                   o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(),
+                                                   option)
+    source[0].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2, max_nn=30))
+    totalCloud = copy.deepcopy(source[0])
+    for source_id in range(1, len(downed_source)):
+        test = pose_graph.nodes[source_id].pose
+        #source[source_id].transform(pose_graph.nodes[source_id].pose)
+        source[source_id].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2, max_nn=30))
+        reg_p2p = o3d.pipelines.registration.registration_icp(source[source_id], 
+                                                                  totalCloud, 
+                                                                  voxel_size * 0.4, 
+                                                                  pose_graph.nodes[source_id].pose, 
+                                                                  o3d.pipelines.registration.TransformationEstimationPointToPlane())
+        source[source_id].transform(reg_p2p.transformation)
+        totalCloud += source[source_id]
+    #totalCloud = remove_outliers(pcd=totalCloud, voxelSize=voxel_size, iterations=3, numberOfPoints=100, radius=.008)
+    # o3d.visualization.draw_geometries([totalCloud])
+    return totalCloud
+
 #may modify in the future to take different icp iterations and different threshold (voxelSize * 1.5)
 def pointToPointMerge(cloudsAndSamples, voxelSize):
     totalCloud = o3d.geometry.PointCloud()
@@ -282,8 +363,8 @@ def remove_outliers(pcd, voxelSize, iterations, numberOfPoints, radius):
     for i in range(iterations):
         cur_cloud, indices = downPcd.remove_radius_outlier(nb_points=numberOfPoints, radius=radius, print_progress=True)
         downPcd = downPcd.select_by_index(indices)
-        cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0)
-        downPcd = downPcd.select_by_index(indices)
+        # cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0)
+        # downPcd = downPcd.select_by_index(indices)
         # display_inlier_outlier(cloud, indices)
     
 
@@ -407,24 +488,48 @@ def main():
         if(is_user_scan):
             remove_platform(current_cloud)
 
+        # voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.01, 4)
         voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.01, 4)
-        down_sample_voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.004, 4)
-        # down_sample_voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.0041, 4)
+
+        down_sample_voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.0041, 4)
         print(voxel_size)
         print(down_sample_voxel_size)
         print(len(current_cloud.points))
         current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 200, voxel_size * 4)
+        # current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 350, 0.008)
         print(len(current_cloud.points))
-        display_point_cloud(current_cloud)
+        # display_point_cloud(current_cloud)
 
         current_cloud_struct = PointCloudStruct(file_path, current_cloud, current_cloud.voxel_down_sample(voxel_size), voxel_size, down_sample_voxel_size)
         cloud_structs.append(current_cloud_struct)
         # display_point_cloud(current_cloud)
 
-    result = point_to_plane_merge(cloud_structs, cloud_structs[0].voxel_size)
+    # result = point_to_plane_merge(cloud_structs, cloud_structs[0].voxel_size)
 
-    result.paint_uniform_color([0.5, 0.5, 0.5])
-    display_point_cloud(result)
+    clouds = []
+    down_sample_clouds = []
+    voxel_size = cloud_structs[0].voxel_size
+
+    for cloud_struct in cloud_structs:
+        clouds.append(cloud_struct.cloud.voxel_down_sample(cloud_struct.down_sample_voxel_size))
+        down_sample_clouds.append(cloud_struct.downsampled_cloud)
+
+    for i in range(len(clouds)):
+        display_point_cloud(clouds[i])
+
+    totalCloud = multiway_registration(clouds, down_sample_clouds, voxel_size)
+    display_point_cloud(totalCloud)
+
+    totalCloud.estimate_normals()
+    totalCloud.orient_normals_consistent_tangent_plane(100)
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+    o3d.visualization.draw_geometries([mesh]) 
+    stop = input("stop here for no file")
+    mesh.compute_vertex_normals()
+    o3d.io.write_triangle_mesh("test.stl", mesh)
+
+    # result.paint_uniform_color([0.5, 0.5, 0.5])
+    # display_point_cloud([clouds])
 
     '''
     cloudsToCombine = []
