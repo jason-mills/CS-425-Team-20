@@ -32,7 +32,7 @@ namespace C3PO.Model
             string path = System.IO.Directory.GetCurrentDirectory();
             string sourcePath = settingsParser.dir;
             string sourcePrefix = settingsParser.inPrefix;
-            string order = "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23";
+            string order = "0 1 2 3 4 5 6 7";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
