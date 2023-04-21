@@ -211,7 +211,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Scan;
             }));
-            bool result = true; // _componentLinker.StartScan();
+            bool result = _componentLinker.StartScan();
             if (result)
             {
                 FinishScan();
@@ -228,7 +228,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Reconstruct;
             }));
-            bool result = true; // _componentLinker.StartReconstruction();
+            bool result = _componentLinker.StartReconstruction();
             if (result)
             {
                 FinishReconstruct();
