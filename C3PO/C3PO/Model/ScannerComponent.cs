@@ -32,7 +32,8 @@ namespace C3PO.Model
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = path + "\\bin\\Scanning.exe"
+                    FileName = path + "\\bin\\Scanning.exe",
+                    Arguments = "1 30"
                 }
             };
 

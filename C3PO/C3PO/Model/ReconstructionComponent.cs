@@ -32,12 +32,13 @@ namespace C3PO.Model
             string path = System.IO.Directory.GetCurrentDirectory();
             string sourcePath = settingsParser.dir;
             string sourcePrefix = settingsParser.inPrefix;
+            string order = "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = path + "\\bin\\reconstruct.exe",
-                    Arguments = "--dir=" + sourcePath + " --prefix=" + sourcePrefix + " --out=" + sourcePath + "\\final.ply"
+                    FileName = path + "python",
+                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + order + " True"
                 }
             };
             //var p = new Process()
