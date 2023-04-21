@@ -65,7 +65,7 @@ namespace C3PO.Model
             }
 
             // Configure process for generating PLY files
-            p = new Process()
+            /*p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -98,7 +98,7 @@ namespace C3PO.Model
                     p.Kill();
                     return false;
                 }
-            }
+            }*/
 
             return true;
         }

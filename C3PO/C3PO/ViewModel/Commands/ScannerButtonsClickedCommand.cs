@@ -69,7 +69,11 @@ namespace C3PO.ViewModel.Commands
             }
 
             settings.dir = fbd.SelectedPath;
-            ScanBtnClicked();
+
+            Task t1 = Task.Factory.StartNew(() =>
+            {
+                vm.FinishScan();
+            }, cancelToken);
 
         }
 

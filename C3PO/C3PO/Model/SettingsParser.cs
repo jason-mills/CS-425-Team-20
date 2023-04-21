@@ -32,7 +32,7 @@ namespace C3PO.Model
             distanceThresh = 0;
             algo = "icp";
             dir = Directory.GetCurrentDirectory() + "\\output";
-            inPrefix = "out";
+            inPrefix = "temp";
             outPrefix = "Final";
         }
 
