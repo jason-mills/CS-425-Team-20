@@ -363,8 +363,8 @@ def remove_outliers(pcd, voxelSize, iterations, numberOfPoints, radius):
     for i in range(iterations):
         cur_cloud, indices = downPcd.remove_radius_outlier(nb_points=numberOfPoints, radius=radius, print_progress=True)
         downPcd = downPcd.select_by_index(indices)
-        # cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0)
-        # downPcd = downPcd.select_by_index(indices)
+        cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0)
+        downPcd = downPcd.select_by_index(indices)
         # display_inlier_outlier(cloud, indices)
     
 
@@ -467,12 +467,17 @@ def main():
         print("Example: python icp.py input_directory_path input_file_base_name input_file_extension output_file_base_name file_order is_user_scan")
         return 1
     
-    input_directory_path = sys.argv[1]
+    input_directory_path = sys.argv[1].replace("\\", "/")
     input_file_base_name = sys.argv[2]
     input_file_extension = sys.argv[3]
     output_file_base_name = sys.argv[4]
-    file_order = sys.argv[5].split(" ")
+    file_order = sys.argv[5].replace("\\", "").split(" ")
     is_user_scan = sys.argv[6]
+
+    print(input_file_base_name)
+
+    if input_file_base_name == " ":
+        files = os.listdir(input_directory_path)
 
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
@@ -480,12 +485,13 @@ def main():
     
     cloud_structs = []
 
-    for i in range(len(file_order)):
-        file_path = input_directory_path + "/" + input_file_base_name + str(file_order[i]) + input_file_extension
+    for i in range(len(files)):
+        file_path = input_directory_path + "/" + files[i]
         print("Reading " + file_path)
         current_cloud = read_file(file_path)
 
-        if(is_user_scan):
+        if(is_user_scan == "True"):
+            print("Removing platform")
             remove_platform(current_cloud)
 
         # voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.01, 4)
@@ -495,38 +501,89 @@ def main():
         print(voxel_size)
         print(down_sample_voxel_size)
         print(len(current_cloud.points))
-        current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 200, voxel_size * 4)
+        # current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 200, voxel_size * 4)
         # current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 350, 0.008)
         print(len(current_cloud.points))
         # display_point_cloud(current_cloud)
 
         current_cloud_struct = PointCloudStruct(file_path, current_cloud, current_cloud.voxel_down_sample(voxel_size), voxel_size, down_sample_voxel_size)
         cloud_structs.append(current_cloud_struct)
+
+    # for i in range(len(file_order)):
+    #     file_path = input_directory_path + "/" + input_file_base_name + str(file_order[i]) + input_file_extension
+    #     print("Reading " + file_path)
+    #     current_cloud = read_file(file_path)
+
+    #     if(is_user_scan == "True"):
+    #         print("Removing platform")
+    #         remove_platform(current_cloud)
+
+    #     # voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.01, 4)
+    #     voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.01, 4)
+
+    #     down_sample_voxel_size = round(max(current_cloud.get_max_bound() - current_cloud.get_min_bound()) * 0.0041, 4)
+    #     print(voxel_size)
+    #     print(down_sample_voxel_size)
+    #     print(len(current_cloud.points))
+    #     # current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 200, voxel_size * 4)
+    #     # current_cloud = remove_outliers(current_cloud, down_sample_voxel_size, 3, 350, 0.008)
+    #     print(len(current_cloud.points))
+    #     # display_point_cloud(current_cloud)
+
+    #     current_cloud_struct = PointCloudStruct(file_path, current_cloud, current_cloud.voxel_down_sample(voxel_size), voxel_size, down_sample_voxel_size)
+    #     cloud_structs.append(current_cloud_struct)
         # display_point_cloud(current_cloud)
 
-    # result = point_to_plane_merge(cloud_structs, cloud_structs[0].voxel_size)
+    totalCloud = point_to_plane_merge(cloud_structs, cloud_structs[0].voxel_size)
 
-    clouds = []
-    down_sample_clouds = []
-    voxel_size = cloud_structs[0].voxel_size
+    # clouds = []
+    # down_sample_clouds = []
+    # voxel_size = cloud_structs[0].voxel_size
 
-    for cloud_struct in cloud_structs:
-        clouds.append(cloud_struct.cloud.voxel_down_sample(cloud_struct.down_sample_voxel_size))
-        down_sample_clouds.append(cloud_struct.downsampled_cloud)
+    # for cloud_struct in cloud_structs:
+    #     clouds.append(cloud_struct.cloud.voxel_down_sample(cloud_struct.down_sample_voxel_size))
+    #     down_sample_clouds.append(cloud_struct.downsampled_cloud)
 
-    for i in range(len(clouds)):
-        display_point_cloud(clouds[i])
+    # for i in range(len(clouds)):
+    #     display_point_cloud(clouds[i])
 
-    totalCloud = multiway_registration(clouds, down_sample_clouds, voxel_size)
+    # totalCloud = multiway_registration(clouds, down_sample_clouds, voxel_size)
+
+    # voxel_size = round(max(totalCloud.get_max_bound() - totalCloud.get_min_bound()) * 0.01, 4)
+    # down_sample_voxel_size = round(max(totalCloud.get_max_bound() - totalCloud.get_min_bound()) * 0.0041, 4)
+
+
+    # remove_outliers(totalCloud, down_sample_voxel_size, 10, 300, voxel_size*4)
     display_point_cloud(totalCloud)
 
     totalCloud.estimate_normals()
     totalCloud.orient_normals_consistent_tangent_plane(100)
-    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(totalCloud, depth=12, width=0, scale=1.1, linear_fit=False)[0]
+    mesh.paint_uniform_color([0.5, 0.5, 0.5])
+
+    # with o3d.utility.VerbosityContextManager(
+    #         o3d.utility.VerbosityLevel.Debug) as cm:
+    #     triangle_clusters, cluster_n_triangles, cluster_area = (
+    #         mesh.cluster_connected_triangles())
+    # triangle_clusters = np.asarray(triangle_clusters)
+    # cluster_n_triangles = np.asarray(cluster_n_triangles)
+    # cluster_area = np.asarray(cluster_area)
+
+    mesh_0 = copy.deepcopy(mesh)
+    # triangles_to_remove = cluster_n_triangles[triangle_clusters] < 100
+    # mesh_0.remove_triangles_by_mask(triangles_to_remove)
+
+    mesh = mesh.compute_vertex_normals()
     o3d.visualization.draw_geometries([mesh]) 
+    mesh_0 = mesh_0.filter_smooth_laplacian()
+    mesh_0.compute_vertex_normals()
+    o3d.visualization.draw_geometries([mesh_0])
+
+    
     stop = input("stop here for no file")
-    mesh.compute_vertex_normals()
-    o3d.io.write_triangle_mesh("test.stl", mesh)
+    
+    mesh_0.compute_vertex_normals()
+    o3d.io.write_triangle_mesh("" + output_file_base_name + ".stl", mesh_0)
 
     # result.paint_uniform_color([0.5, 0.5, 0.5])
     # display_point_cloud([clouds])
