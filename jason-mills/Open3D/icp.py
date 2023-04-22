@@ -3,9 +3,12 @@ import numpy as np
 import copy
 import random
 from time import sleep
+import time
 import os
 import sys
+import msvcrt
 
+global_visualizer = o3d.visualization.Visualizer()
 
 # Point Cloud class/struct for convenience
 class PointCloudStruct():
@@ -21,7 +24,12 @@ def display_registration_result(source_cloud, target_cloud):
     source_cloud.paint_uniform_color([0.54, 0, 0])
     target_cloud.paint_uniform_color([0.5, 0.5, 0.5])
 
-    o3d.visualization.draw_geometries([source_cloud, target_cloud])
+    global_visualizer.clear_geometries()
+    global_visualizer.add_geometry(source_cloud + target_cloud)
+
+    
+    global_visualizer.update_renderer()
+    # o3d.visualization.draw_geometries([source_cloud, target_cloud])
 
 # display outliers given cloud and indices of inliers
 def display_inlier_outlier(cloud, ind):
@@ -209,72 +217,85 @@ def point_to_plane_merge(cloud_structs, voxelSize):
     totalCloud = base.cloud
     downSampleTotal = base.downsampled_cloud
 
-    # for cloud_struct in cloud_structs:
-    #     if cloud_struct != base:
-    #         print("Adding: " + cloud_struct.name)
-    #         source_down, sourceFpfh = preprocess_point_cloud(cloud_struct.downsampled_cloud, voxel_size=voxelSize)
-    #         target_down, targetFpfh = preprocess_point_cloud(downSampleTotal, voxel_size=voxelSize)
-    #         entry = ""
-    #         while(entry != "y"):
-    #             ransacResult = execute_global_registration(source_down, target_down, sourceFpfh, targetFpfh, voxelSize)
-
-    #             cloud_struct.cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
-    #             totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
-
-    #             transformation = execute_point_to_plane_refinement(cloud_struct.cloud, totalCloud, voxelSize * 1.5, ransacResult.transformation)
-
-    #             entry = input("Good(y/n): ")
-    #             if entry == "s":
-    #                 break
-
-    #         if entry == "s":
-    #             continue
-    #         cloud_struct.cloud.transform(transformation)
-    #         totalCloud += cloud_struct.cloud
-
-    #         # o3d.visualization.draw_geometries([downSampleTotal])
-    #         # o3d.visualization.draw_geometries([totalCloud])
-
-    #         totalCloud = totalCloud.voxel_down_sample(cloud_struct.down_sample_voxel_size)
-    #         downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
-    #         # downSampleTotal = totalCloud
-    #         # thing = input("Stop here if you want traveller")
+    keep_running = True
+    key = "n"
+    source_down = ""
+    sourceFpfh = ""
+    target_down = ""
+    targetFpfh = ""
 
     while len(cloud_structs) > 0:
-        print("Adding: " + cloud_structs[0].name)
-        source_down, sourceFpfh = preprocess_point_cloud(cloud_structs[0].downsampled_cloud, voxel_size=voxelSize)
-        target_down, targetFpfh = preprocess_point_cloud(downSampleTotal, voxel_size=voxelSize)
-        entry = ""
-        while(entry != "y"):
+        if key == "n":
+            source_down, sourceFpfh = preprocess_point_cloud(cloud_structs[0].downsampled_cloud, voxel_size=voxelSize)
+            target_down, targetFpfh = preprocess_point_cloud(downSampleTotal, voxel_size=voxelSize)
+            print("Adding: " + cloud_structs[0].name)
             ransacResult = execute_global_registration(source_down, target_down, sourceFpfh, targetFpfh, voxelSize)
+            sleep(1)
 
             cloud_structs[0].cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
             totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
 
             transformation = execute_point_to_plane_refinement(cloud_structs[0].cloud, totalCloud, voxelSize * 1.5, ransacResult.transformation)
+            key = ""
 
-            entry = input("Good(y/n): ")
-            if entry == "s" or entry == "z":
-                break
+        elif key == "y":
+            cloud_structs[0].cloud.transform(transformation)
+            totalCloud += cloud_structs[0].cloud
+            totalCloud = totalCloud.voxel_down_sample(cloud_structs[0].down_sample_voxel_size)
+            downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
+            cloud_structs.pop(0)
+            key = "n"
 
-        if entry == "s":
+        elif key == "s":
             cloud_structs.append(cloud_structs[0])
             cloud_structs.pop(0)
-            continue
+            key = "n"
 
-        if entry == "z":
+        elif key == "z":
             return totalCloud
-        cloud_structs[0].cloud.transform(transformation)
-        totalCloud += cloud_structs[0].cloud
 
-        # o3d.visualization.draw_geometries([downSampleTotal])
-        # o3d.visualization.draw_geometries([totalCloud])
+        if(msvcrt.kbhit()):
+            print("gotcha")
+            key = msvcrt.getch().decode("ASCII")
 
-        totalCloud = totalCloud.voxel_down_sample(cloud_structs[0].down_sample_voxel_size)
-        downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
-        cloud_structs.pop(0)
-        # downSampleTotal = totalCloud
-        # thing = input("Stop here if you want traveller")
+        global_visualizer.poll_events()
+        
+
+    # while len(cloud_structs) > 0 :
+    #     print("Adding: " + cloud_structs[0].name)
+    #     source_down, sourceFpfh = preprocess_point_cloud(cloud_structs[0].downsampled_cloud, voxel_size=voxelSize)
+    #     target_down, targetFpfh = preprocess_point_cloud(downSampleTotal, voxel_size=voxelSize)
+    #     entry = ""
+    #     while(entry != "y"):
+    #         ransacResult = execute_global_registration(source_down, target_down, sourceFpfh, targetFpfh, voxelSize)
+
+    #         cloud_structs[0].cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+    #         totalCloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxelSize*2, max_nn=30))
+
+    #         transformation = execute_point_to_plane_refinement(cloud_structs[0].cloud, totalCloud, voxelSize * 1.5, ransacResult.transformation)
+
+    #         entry = input("Good(y/n): ")
+    #         if entry == "s" or entry == "z":
+    #             break
+
+    #     if entry == "s":
+    #         cloud_structs.append(cloud_structs[0])
+    #         cloud_structs.pop(0)
+    #         continue
+
+    #     if entry == "z":
+    #         return totalCloud
+    #     cloud_structs[0].cloud.transform(transformation)
+    #     totalCloud += cloud_structs[0].cloud
+
+    #     # o3d.visualization.draw_geometries([downSampleTotal])
+    #     # o3d.visualization.draw_geometries([totalCloud])
+
+    #     totalCloud = totalCloud.voxel_down_sample(cloud_structs[0].down_sample_voxel_size)
+    #     downSampleTotal = totalCloud.voxel_down_sample(voxelSize)
+    #     cloud_structs.pop(0)
+    #     # downSampleTotal = totalCloud
+    #     # thing = input("Stop here if you want traveller")
 
     return totalCloud
 
@@ -398,6 +419,7 @@ def execute_global_registration(source_down, target_down, source_fpfh, target_fp
     transformed_cloud = copy.deepcopy(source_down)
     transformed_cloud.transform(registration_result.transformation)
     target_copy = copy.deepcopy(target_down)
+    print("updating cloud")
     display_registration_result(transformed_cloud, target_copy)
 
     return registration_result
@@ -437,6 +459,7 @@ def execute_point_to_plane_refinement(source, target, voxel_size, initial_transf
     transformed_cloud = copy.deepcopy(source)
     transformed_cloud.transform(registration_result.transformation)
     target_copy = copy.deepcopy(target)
+    print("updating cloud")
     display_registration_result( transformed_cloud, target_copy)
 
     return registration_result.transformation
@@ -534,6 +557,13 @@ def main():
     #     cloud_structs.append(current_cloud_struct)
         # display_point_cloud(current_cloud)
 
+    
+    # global_visualizer.add_geometry(cloud_structs[0].cloud)
+    # global_visualizer.run()
+    # global_visualizer.destroy_window()
+
+
+    global_visualizer.create_window()
     totalCloud = point_to_plane_merge(cloud_structs, cloud_structs[0].voxel_size)
 
     # clouds = []
@@ -554,6 +584,9 @@ def main():
 
 
     # remove_outliers(totalCloud, down_sample_voxel_size, 10, 300, voxel_size*4)
+
+    
+    global_visualizer.destroy_window()
     display_point_cloud(totalCloud)
 
     totalCloud.estimate_normals()
