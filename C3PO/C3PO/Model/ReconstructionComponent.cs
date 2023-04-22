@@ -12,8 +12,8 @@ namespace C3PO.Model
 {
     internal class ReconstructionComponent : IComponent
     {
-        private CancellationToken ct;
-        private SettingsParser settingsParser;
+        private readonly CancellationToken ct;
+        private readonly SettingsParser settingsParser;
 
         public ReconstructionComponent()
         {
@@ -41,18 +41,19 @@ namespace C3PO.Model
                     Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + "\"" + order + "\"" + " True"
                 }
             };
-            //var p = new Process()
-            //{
-            //    StartInfo = new ProcessStartInfo()
-            //    {
-            //        FileName = "C:\\Users\\froil\\source\\repos\\PointCloudReconstruction\\Debug\\reconstruct.exe",
-            //        Arguments = "--dir=C:\\Users\\froil\\Downloads\\bunny\\data --prefix=bun --out=C:\\Users\\froil\\Downloads\\bunny\\data\\out.ply"
-            //    }
-            //};
 
             // Start process
-            p.Start();
-            //p.WaitForExit();
+            bool result;
+            try
+            {
+                result = p.Start();
+            }
+            catch
+            {
+                return false;
+            }
+
+            // Test for finished process or cancellation
             while (!p.HasExited)
             {
                 if (ct.IsCancellationRequested)
@@ -62,7 +63,9 @@ namespace C3PO.Model
                 }
             }
 
-            return true;
+            bool pc2ImageResult = PC2Image();
+
+            return result && pc2ImageResult;
         }
 
         public bool StopOp()
@@ -82,6 +85,48 @@ namespace C3PO.Model
 
             order = order.Remove(order.Length - 1);
             return order;
+        }
+
+        public bool PC2Image()
+        {
+            // Get path variables
+            string dir = settingsParser.dir;
+            string prefixPath = dir + "\\" + settingsParser.outPrefix;
+            string iPath = prefixPath + ".xyz";
+            string oPath = prefixPath + "png";
+            string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\pc2png.py";
+
+            // Set up process
+            Process p = new Process()
+            {
+                StartInfo =
+                {
+                    FileName = "python",
+                    Arguments = $"{exeDir} --file {iPath} --out {oPath}"
+                }
+            };
+
+            // Start scanning process
+            bool result;
+            try
+            {
+                result = p.Start();
+            }
+            catch
+            {
+                return false;
+            }
+
+            while (!p.HasExited)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    p.Kill();
+                    return false;
+                }
+            }
+
+            return result;
         }
     }
 }

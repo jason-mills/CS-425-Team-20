@@ -22,9 +22,11 @@
         <StackPanel Orientation="Vertical"
                     Grid.Column="0"
                     Grid.Row="1">
-            <Image Width="350"
+            <!--<Image Width="350"
                    Source="pack://application:,,,/Resources/Images/cat_fixed.png"
-                   Margin="5"/>
+                   Margin="5"/>-->
+            <Image Width="350" Grid.Column="0" Grid.Row="1"
+                   Source="{Binding CloudImagePath}"/>
             <Button HorizontalAlignment="Center"
                     Content="Save Results"
                     MinWidth="50"

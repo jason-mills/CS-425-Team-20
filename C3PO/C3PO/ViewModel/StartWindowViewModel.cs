@@ -132,6 +132,18 @@ namespace C3PO.ViewModel
             }
         }
         public ObservableCollection<ScanMetadata> Metadata { get; set; }
+        public string CloudImagePath
+        {
+            get
+            {
+                return GetCloudImagePath();
+            }
+            set
+            {
+                CloudImagePath = value;
+                OnPropertyChanged(nameof(CloudImagePath));
+            }
+        }
 
         /*
          * Commands
@@ -288,6 +300,12 @@ namespace C3PO.ViewModel
             }
 
             RawResults = new ObservableCollection<string>(orderedFiles);
+        }
+
+        public string GetCloudImagePath()
+        {
+            SettingsParser settings = settingsVM.settings;
+            return $"{settings.dir}\\{settings.outPrefix}.xyz";
         }
     }
 }

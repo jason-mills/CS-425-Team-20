@@ -71,42 +71,6 @@ namespace C3PO.Model
                 return false;
             }
 
-            // Configure process for generating PLY files
-            /*p = new Process()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = "python.exe",
-                    Arguments = path + "\\bin\\xyzToPly.py " + path + "\\output " + " temp " + path + "\\output out"
-                }
-            };
-
-            // Start process to generate PLY files
-            try
-            {
-                result = p.Start();
-            }
-            catch
-            {
-                return false;
-            }
-
-            // Test if process didn't run correctly
-            if (!result)
-            {
-                return false;
-            }
-
-            // Wait for process to finish
-            while (!p.HasExited)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    p.Kill();
-                    return false;
-                }
-            }*/
-
             return true;
         }
 
