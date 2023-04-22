@@ -47,6 +47,7 @@ namespace C3PO.ViewModel
             set
             {
                 _partitions = (int)value;
+                settings.turnRadius = (int)value;
                 UpdatePartitionIndex();
                 OnPropertyChanged(nameof(Partitions));
             }
@@ -77,14 +78,14 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(ScansPerAngle));
             }
         }
-        private SettingsParser _settings;
-        public SettingsParser Settings
-        {
-            get
-            {
-                return _settings;
-            }
-        }
+        public SettingsParser settings;
+        //public SettingsParser Settings
+        //{
+        //    get
+        //    {
+        //        return _settings;
+        //    }
+        //}
 
         public ICommand BackBtnCommand { get; }
         public ICommand ImportSettingsCommand { get; }
@@ -95,14 +96,15 @@ namespace C3PO.ViewModel
         {
             _partitions = Int32.Parse(_noOfPartitionsOpt[_selectionPartitionIndex]);
             _scansPerAngle = 1;
+
+            settings = new SettingsParser();
+            settings.ImportSettingsFile();
             UpdatePartitionIndex();
 
-            _settings = new SettingsParser();
-            _settings.ImportSettingsFile();
 
             BackBtnCommand = new SettingsBackButtonCommand(ns);
-            ImportSettingsCommand = new CommandImportSettings(_settings);
-            ExportSettingsCommand = new CommandExportSettings(_settings);
+            ImportSettingsCommand = new CommandImportSettings(settings);
+            ExportSettingsCommand = new CommandExportSettings(settings);
             InputRotationsCommand = new RotationsChangedCommand(this);
         }
 

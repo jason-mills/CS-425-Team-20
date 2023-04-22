@@ -99,7 +99,7 @@
             <ItemsControl ItemsSource="{Binding RawResults}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Content="{Binding .}" Margin="20, 5, 20, 5"
+                        <Button Content="{Binding .}" Margin="20, 5, 20, 5" Width="100"
                                 Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.ViewResultsBtnCommand}"
                                 CommandParameter="{Binding .}"/>
                     </DataTemplate>

@@ -151,7 +151,7 @@ namespace C3PO.ViewModel
             _rawResults = new ObservableCollection<string>() { "1", "2", "3" };
             _navigateStore = navigateStore;
             settingsVM = new SettingsViewModel(navigateStore);
-            _componentLinker = new ComponentLinker(settingsVM.Settings);
+            _componentLinker = new ComponentLinker(settingsVM.settings);
             Metadata = new ObservableCollection<ScanMetadata>();
 
             _resultsUC = new C3PO.View.ScanResultsEmpty();
@@ -163,12 +163,12 @@ namespace C3PO.ViewModel
 
             _resultPanelHeader = "No Scanned Content Available";
 
-            ScannerBtnCommand = new ScannerButtonsClickedCommand(this, settingsVM.Settings);
+            ScannerBtnCommand = new ScannerButtonsClickedCommand(this, settingsVM.settings);
             SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore, settingsVM);
             NavigateStore.PreviousViewModel = this;
             SaveBtnCommand = new SaveFileCommand();
             SaveAllResultsBtnCommand = new CommandSaveAllResults();
-            ViewResultsBtnCommand = new ViewResultsCommand();
+            ViewResultsBtnCommand = new ViewResultsCommand(settingsVM.settings);
             GoToHomePageCommand = new NavigateUriCommand("https://sites.google.com/nevada.unr.edu/team-20-c3po/home?authuser=1");
         }
 
@@ -251,6 +251,7 @@ namespace C3PO.ViewModel
                 newBtns.Add("Load Scans");
                 ScanButtonsSet(newBtns);
                 UpdateMetadata();
+                UpdatePartitionList();
             }));
         }
 
@@ -262,6 +263,31 @@ namespace C3PO.ViewModel
             Metadata.Add(new ScanMetadata("Scans Taken", "0"));
             Metadata.Add(new ScanMetadata("Avg. Fitness Score", "0"));
             Metadata.Add(new ScanMetadata("Points Captured", "0"));
+        }
+
+        public void UpdatePartitionList()
+        {
+            ScannerComponent sc = new ScannerComponent(settingsVM.settings);
+            List<int> orderedNums = new List<int>();
+            List<string> orderedFiles = new List<string>();
+            string prefix = settingsVM.settings.inPrefix;
+
+            foreach(string fname in sc.GetScansFromDir())
+            {
+                int startIndex = fname.IndexOfAny("0123456789".ToCharArray());
+                orderedNums.Add(
+                    int.Parse(fname[startIndex..fname.LastIndexOf('.')])
+                    );
+            }
+
+            orderedNums.Sort();
+
+            foreach(int num in orderedNums)
+            {
+                orderedFiles.Add($"{prefix}{num}");
+            }
+
+            RawResults = new ObservableCollection<string>(orderedFiles);
         }
     }
 }

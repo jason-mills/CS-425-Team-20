@@ -31,7 +31,7 @@ namespace C3PO.Model
             icpIters = 0;
             distanceThresh = 0;
             algo = "icp";
-            dir = Directory.GetCurrentDirectory() + "\\output";
+            dir = Directory.GetCurrentDirectory() + "\\output\\";
             inPrefix = "temp";
             outPrefix = "Final";
         }
@@ -94,8 +94,10 @@ namespace C3PO.Model
                 string defRot = scansPerAngle.ToString();
                 string defPar = turnRadius.ToString();
 
+                var test = hardwareSettings?.Element("scansPerAngle");
+
                 int rot = Int32.Parse(
-                    (hardwareSettings?.Element("scansPerAngle") ?? new XElement(defRot))
+                    (hardwareSettings?.Element("rotations") ?? new XElement(defRot))
                     .Value
                     .ToString());
                 int par = Int32.Parse(

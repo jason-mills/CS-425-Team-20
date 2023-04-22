@@ -32,7 +32,7 @@ namespace C3PO.Model
             string path = System.IO.Directory.GetCurrentDirectory();
             string sourcePath = settingsParser.dir;
             string sourcePrefix = settingsParser.inPrefix;
-            string order = "0 1 2 3 4 5 6 7";
+            string order = GetICPOrder();
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
@@ -68,6 +68,20 @@ namespace C3PO.Model
         public bool StopOp()
         {
             throw new NotImplementedException();
+        }
+
+        public string GetICPOrder()
+        {
+            string order = "";
+            int turnRadius = settingsParser.turnRadius;
+
+            for (int i = 0, rad = 0; rad < 360; i++, rad += turnRadius)
+            {
+                order += i.ToString() + " ";
+            }
+
+            order = order.Remove(order.Length - 1);
+            return order;
         }
     }
 }
