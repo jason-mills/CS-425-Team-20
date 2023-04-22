@@ -10,20 +10,21 @@ class WindowApp:
 
     def __init__(self):
         self.window = gui.Application.instance.create_window("Spinnables", 1400, 900)
+        self.window.set_on_layout(self._on_layout)
         w = self.window
 
         # member variables
         self.model_dir = ""
         self.model_name = ""
 
-        em = w.theme.font_size
+        em = self.window.theme.font_size
         # 3D Widget
         _widget3d = gui.SceneWidget()
-        _widget3d.scene = rendering.Open3DScene(w.renderer)
+        _widget3d.scene = rendering.Open3DScene(self.window.renderer)
         _widget3d.set_view_controls(gui.SceneWidget.Controls.ROTATE_CAMERA)
         # create a frame that encapsulates the Scenewidget
-        _widget3d.frame = gui.Rect(500, w.content_rect.y,
-                                        900, w.content_rect.height)
+        _widget3d.frame = gui.Rect(500, self.window.content_rect.y,
+                                        900, self.window.content_rect.height)
         # mesh = o3d.geometry.TriangleMesh.create_sphere()
         # mesh.compute_vertex_normals()
         # material = rendering.MaterialRecord()
@@ -36,8 +37,8 @@ class WindowApp:
         # gui layout
         gui_layout = gui.Vert(0, gui.Margins(0.5 * em, 0.5 * em, 0.5 * em, 0.5 * em))
         # create frame that encapsulates the gui
-        gui_layout.frame = gui.Rect(w.content_rect.x, w.content_rect.y,
-                                    500, w.content_rect.height)
+        gui_layout.frame = gui.Rect(self.window.content_rect.x, self.window.content_rect.y,
+                                    500, self.window.content_rect.height)
         # File-chooser widget
         self._fileedit = gui.TextEdit()
         filedlgbutton = gui.Button("...")
@@ -53,8 +54,8 @@ class WindowApp:
         # add to the top-level (vertical) layout
         gui_layout.add_child(fileedit_layout)
 
-        w.add_child(gui_layout)
-        w.add_child(_widget3d)
+        self.window.add_child(gui_layout)
+        self.window.add_child(_widget3d)
 
     def setup_scene(self):
         return
@@ -63,7 +64,7 @@ class WindowApp:
         return
 
     def _on_mouse_widget3d(self, event):
-        print(event.type)
+        # print(event.type)
         return gui.Widget.EventCallbackResult.IGNORED
 
     def _on_filedlg_button(self):
@@ -81,37 +82,18 @@ class WindowApp:
     def _on_filedlg_done(self, path):
         self._fileedit.text_value = path
         self.model_dir = os.path.normpath(path)
-        # self.update_scene()
         self._widget3d
         self.window.close_dialog()
 
-# def Viewer(object):
-#     def __init__(self, title):
-#         app = gui.Application.instance
-#         app.initialize()
-
-#         self.main_vis = o3d.visualization.O3DVisualizer(title)
-
-#         self.setupPointClouds()
-#         self.setupScene()
-
-#     def update_o3d_scene(self):
-#         self.main_vis.remove_geometry(self.point_cloud_o3d_name)
-#         self.main_vis.add_geometry(self.point_cloud_o3d_name, self.ponit_cloud_o3d)
-
-#     def run_one_tick(self):
-#         app = gui.application.instance
-#         tick_return = app.run_one_tick()
-#         if tick_return:
-#             self.main_vis.post_redraw()
-#         return tick_return
+    def _on_layout(self, layout_context):
+        # The on_layout callback should set the frame (position + size) of every
+        # child correctly. After the callback is done the window will layout
+        # the grandchildren.
+        """Callback on window initialize / resize"""
+        self._widget()
+        print("something")
 
 def main():
-    # viewer = Viewer("Title")
-    # while True:
-    #     viewer.update_point_clouds()
-    #     viewer.update_o3d_scene()
-    #     sleep(5)
     gui.Application.instance.initialize()
     w = WindowApp()
     gui.Application.instance.run()
