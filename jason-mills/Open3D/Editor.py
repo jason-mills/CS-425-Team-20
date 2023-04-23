@@ -48,65 +48,65 @@ class Editor():
         self.total_cloud = self.cloud_structs[0].cloud
         self.down_sample_total = self.cloud_structs[0].downsampled_cloud
 
-    # get a general transformation matrix to apply to align points
-def execute_global_registration(source_down, target_down, source_fpfh, target_fpfh, voxel_size):
-    distance_threshold = voxel_size * 1.5
-    print("Global Registration Started")
-    registration_result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(source_down,
-                                                                                        target_down,
-                                                                                        source_fpfh, 
-                                                                                        target_fpfh, 
-                                                                                        True, 
-                                                                                        distance_threshold, 
-                                                                                        o3d.pipelines.registration.TransformationEstimationPointToPoint(False), 
-                                                                                        3, 
-                                                                                        [o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-                                                                                        o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)], 
-                                                                                        o3d.pipelines.registration.RANSACConvergenceCriteria(100000, 0.999))
-    
-    transformed_cloud = copy.deepcopy(source_down)
-    transformed_cloud.transform(registration_result.transformation)
-    target_copy = copy.deepcopy(target_down)
-    print("updating cloud")
+        # get a general transformation matrix to apply to align points
+    def execute_global_registration(source_down, target_down, source_fpfh, target_fpfh, voxel_size):
+        distance_threshold = voxel_size * 1.5
+        print("Global Registration Started")
+        registration_result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(source_down,
+                                                                                            target_down,
+                                                                                            source_fpfh, 
+                                                                                            target_fpfh, 
+                                                                                            True, 
+                                                                                            distance_threshold, 
+                                                                                            o3d.pipelines.registration.TransformationEstimationPointToPoint(False), 
+                                                                                            3, 
+                                                                                            [o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+                                                                                            o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)], 
+                                                                                            o3d.pipelines.registration.RANSACConvergenceCriteria(100000, 0.999))
+        
+        transformed_cloud = copy.deepcopy(source_down)
+        transformed_cloud.transform(registration_result.transformation)
+        target_copy = copy.deepcopy(target_down)
+        print("updating cloud")
 
-    return registration_result
+        return registration_result
 
-def execute_point_to_point_refinement(source, target, voxel_size, initial_transformation):
-    cloud_to_transform = o3d.geometry.PointCloud()
-    combined_cloud = o3d.geometry.PointCloud()
+    def execute_point_to_point_refinement(source, target, voxel_size, initial_transformation):
+        cloud_to_transform = o3d.geometry.PointCloud()
+        combined_cloud = o3d.geometry.PointCloud()
 
-    print("Local Point to Point Refinement Started")
-    registration_result = o3d.pipelines.registration.registration_icp(source, 
-                                                            target, 
-                                                            voxel_size * 1.5,
-                                                            initial_transformation,
-                                                            o3d.pipelines.registration.TransformationEstimationPointToPoint(),
-                                                            o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
-    
-    cloud_to_transform = copy.deepcopy(source)
-    combined_cloud = cloud_to_transform.transform(registration_result.transformation) + target
+        print("Local Point to Point Refinement Started")
+        registration_result = o3d.pipelines.registration.registration_icp(source, 
+                                                                target, 
+                                                                voxel_size * 1.5,
+                                                                initial_transformation,
+                                                                o3d.pipelines.registration.TransformationEstimationPointToPoint(),
+                                                                o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
+        
+        cloud_to_transform = copy.deepcopy(source)
+        combined_cloud = cloud_to_transform.transform(registration_result.transformation) + target
 
-    return combined_cloud, registration_result.fitness
-    
+        return combined_cloud, registration_result.fitness
+        
 
-def execute_point_to_plane_refinement(source, target, voxel_size, initial_transformation):
-    source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
-                                                                max_nn=30))
-    
-    target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
-                                                                max_nn=30))
+    def execute_point_to_plane_refinement(source, target, voxel_size, initial_transformation):
+        source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
+                                                                    max_nn=30))
+        
+        target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
+                                                                    max_nn=30))
 
-    print("Local Point to Plane Refinement Started")
-    registration_result = o3d.pipelines.registration.registration_icp(source,
-                                                                       target,
-                                                                        voxel_size * 1.5,
-                                                                        initial_transformation,
-                                                                        o3d.pipelines.registration.TransformationEstimationPointToPlane())
+        print("Local Point to Plane Refinement Started")
+        registration_result = o3d.pipelines.registration.registration_icp(source,
+                                                                        target,
+                                                                            voxel_size * 1.5,
+                                                                            initial_transformation,
+                                                                            o3d.pipelines.registration.TransformationEstimationPointToPlane())
 
-    transformed_cloud = copy.deepcopy(source)
-    transformed_cloud.transform(registration_result.transformation)
+        transformed_cloud = copy.deepcopy(source)
+        transformed_cloud.transform(registration_result.transformation)
 
-    return registration_result.transformation
+        return registration_result.transformation
 
     def display_registration_result(self, source_cloud, target_cloud, transformation):
         source_cloud_copy = copy.deepcopy(source_cloud)
