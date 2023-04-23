@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <C3PO>
-    <subsystem category="hardware">
-        <rotations>1</rotations>
-        <turnRadius>45</turnRadius>
-    </subsystem>
+  <subsystem category="hardware">
+    <rotations>1</rotations>
+    <turnRadius>30</turnRadius>
+  </subsystem>
 </C3PO>

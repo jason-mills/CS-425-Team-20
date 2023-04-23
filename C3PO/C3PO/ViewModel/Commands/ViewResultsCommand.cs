@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace C3PO.ViewModel.Commands
 {
@@ -13,6 +15,7 @@ namespace C3PO.ViewModel.Commands
     {
         private readonly SettingsParser settings;
         private readonly int SW_SHOWMAXIMIZED = 3;
+        private string pythonPath;
 
         [DllImport("user32.dll", SetLastError =true)]
         static extern bool ShowWindow(IntPtr hWnd, int nComdShow);
@@ -23,25 +26,27 @@ namespace C3PO.ViewModel.Commands
         public ViewResultsCommand(SettingsParser settings)
         {
             this.settings = settings;
+            pythonPath = GetPythonPath();
         }
 
         public override void Execute(object? parameter)
         {
             // Get file to display
-            string fName = "Final.py";
+            string fName = "Final.xyz";
             if (parameter != null)
             {
                 fName = (string)parameter + ".xyz";
             }
             // Declaring and configuring process-running object
-            string path = settings.dir;
+            string fPath = settings.dir + "\\" + fName;
+            string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\render.py";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "python.exe",
-                    Arguments = path + "\\bin\\render.py " + path + "\\" + fName,
-                    UseShellExecute = false,
+                    FileName = pythonPath + "\\python.exe",
+                    Arguments = exeDir + " " + fPath,
+                    UseShellExecute = true,
                     CreateNoWindow = true
                 }
             };
@@ -67,6 +72,23 @@ namespace C3PO.ViewModel.Commands
                 return "Final.ply";
             }
             return settings.outPrefix + int.Parse(sel) + ".ply";
+        }
+
+        public string GetPythonPath()
+        {
+            var paths = Environment.GetEnvironmentVariable("path")?.Split(';');
+            string pyPath = "";
+
+            foreach(string p in paths)
+            {
+                string[] pSplit = p.ToLower().Split('\\');
+                if (pSplit[pSplit.Length - 1].Contains("python"))
+                {
+                    pyPath = p;
+                }
+            }
+
+            return pyPath;
         }
     }
 }
