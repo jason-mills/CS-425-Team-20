@@ -38,7 +38,7 @@ namespace C3PO.Model
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = "python",
-                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + "\"" + order + "\"" + " True"
+                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + order + " True"
                 }
             };
 
@@ -80,7 +80,7 @@ namespace C3PO.Model
 
             for (int i = 0, rad = 0; rad < 360; i++, rad += turnRadius)
             {
-                order += i.ToString() + " ";
+                order += i.ToString() + ",";
             }
 
             order = order.Remove(order.Length - 1);
@@ -93,7 +93,7 @@ namespace C3PO.Model
             string dir = settingsParser.dir;
             string prefixPath = dir + "\\" + settingsParser.outPrefix;
             string iPath = prefixPath + ".xyz";
-            string oPath = prefixPath + "png";
+            string oPath = prefixPath + ".png";
             string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\pc2png.py";
 
             // Set up process
