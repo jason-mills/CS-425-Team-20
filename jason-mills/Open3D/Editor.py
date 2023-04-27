@@ -2,6 +2,7 @@ import open3d as o3d
 import numpy as np
 import PointCloudStruct
 import copy
+from time import sleep
 
 class Editor():
     def __init__(self, cloud_structs):
@@ -11,8 +12,6 @@ class Editor():
         
         # self.visualizer.register_key_callback(334, self.point_to_point_merge) # keypad add
         self.initialize_default_callbacks()
-        self.visualizer.register_key_callback(334, self.point_to_plane_merge) # keypad add
-        self.visualizer.register_key_callback(260, self.point_to_plane_merge) # insert
         self.visualizer.register_key_callback(77, self.make_poisson_mesh) # M key
 
         # Give object cloud structs and cloud index for state management
@@ -44,18 +43,19 @@ class Editor():
         self.visualizer.register_key_callback(48, self.set_multiway_registration_callbacks) # 0 key
         self.visualizer.register_key_callback(49, self.set_point_to_plane_callbacks) # 1 key
         self.visualizer.register_key_callback(50, self.set_point_to_point_callbacks) # 2 key
-        self.visualizer.register_key_callback(51, self.set_color_point_to_point_callbacks) # 3 key
+        self.visualizer.register_key_callback(51, self.set_color_point_to_plane_callbacks) # 3 key
         self.visualizer.register_key_callback(320, self.set_multiway_registration_callbacks) # keypad 0
         self.visualizer.register_key_callback(321, self.set_point_to_plane_callbacks) # keypad 1
         self.visualizer.register_key_callback(322, self.set_point_to_point_callbacks) # keypad 2
-        self.visualizer.register_key_callback(323, self.set_color_point_to_point_callbacks) # keypad 3
+        self.visualizer.register_key_callback(323, self.set_color_point_to_plane_callbacks) # keypad 3
+        self.set_multiway_registration_callbacks(self.visualizer)
 
         return
 
     # set callbacks for multiway registration editing
     def set_multiway_registration_callbacks(self, context):
-        # self.visualizer.register_key_callback(260, self.point_to_plane_merge) # insert
-        # self.visualizer.register_key_callback(334, self.point_to_plane_merge) # keypad add
+        self.visualizer.register_key_callback(334, self.multiway_registration_merge) # keypad add
+        self.visualizer.register_key_callback(260, self.multiway_registration_merge) # insert
 
         return
 
@@ -72,12 +72,13 @@ class Editor():
         self.visualizer.register_key_callback(334, self.point_to_point_merge) # keypad add
 
     # set callbacks for color point to plane registration editing
-    def set_color_point_to_point_callbacks(self, context):
-        self.visualizer.register_key_callback(260, self.point_to_point_merge) # insert
-        self.visualizer.register_key_callback(334, self.point_to_point_merge) # keypad add
+    def set_color_point_to_plane_callbacks(self, context):
+        self.visualizer.register_key_callback(260, self.color_point_to_plane_merge) # insert
+        self.visualizer.register_key_callback(334, self.color_point_to_plane_merge) # keypad add
         
         return
 
+    # clear changes to the cloud
     def revert_changes(self, context):
         self.cloud_structs = copy.deepcopy(self.backup_structs)
         self.current_cloud_index = 0
@@ -92,31 +93,34 @@ class Editor():
 
         return
 
+    # increase the index and view the next cloud angle
     def view_next_cloud(self, context):
-        if self.current_cloud_index >= 0 and self.current_cloud_index < len(self.cloud_structs) - 1:
+        if self.current_cloud_index >= 0 and self.current_cloud_index < self.get_cloud_struct_len() - 1:
             self.current_cloud_index += 1
 
-        elif len(self.cloud_structs) == 0:
+        elif self.get_cloud_struct_len() == 0:
             return
 
-        elif self.current_cloud_index > len(self.cloud_structs) - 1:
-            self.current_cloud = len(self.cloud_structs) - 1
+        elif self.current_cloud_index > self.get_cloud_struct_len() - 1:
+            self.current_cloud = self.get_cloud_struct_len() - 1
 
         self.update_visualizer(self.cloud_structs[self.current_cloud_index].cloud)
 
         return
 
+    # decrease the index and view the previous cloud angle
     def view_previous_cloud(self, context):
-        if self.current_cloud_index > 0 and len(self.cloud_structs) > 0:
+        if self.current_cloud_index > 0 and self.get_cloud_struct_len() > 0:
             self.current_cloud_index -= 1
 
-        elif len(self.cloud_structs) == 0:
+        elif self.get_cloud_struct_len() == 0:
             return
         
         self.update_visualizer(self.cloud_structs[self.current_cloud_index].cloud)
 
         return
 
+    # cloud to be merged into is gray, cloud being merged in red
     def display_registration_result(self, source_cloud, target_cloud, transformation):
         source_cloud_copy = copy.deepcopy(source_cloud)
         target_cloud_copy = copy.deepcopy(target_cloud)
@@ -145,6 +149,7 @@ class Editor():
 
         self.update_visualizer(combined_cloud)
 
+    # update the visualization by clearing previous geometry with new geometry
     def update_visualizer(self, geometry):
         self.visualizer.clear_geometries()
         self.visualizer.add_geometry(geometry)
@@ -152,28 +157,25 @@ class Editor():
 
         return
 
+    # start the visualization
     def run_visualizer(self):
         self.visualizer.run()
 
         return
 
-
-    def run_visualizer(self):
-        self.visualizer.run()
-
-        return
-
+    # clean up by destroying visualization window
     def destroy_visualizer(self):
         self.visualizer.destroy_window()
 
         return
 
+    # add a cloud with the last calculated transformation
     def add_transformed_cloud(self, context):
-        print("Adding: " + self.cloud_structs[0].name)
-        if not len(self.cloud_structs) > 0:
+        if not self.get_cloud_struct_len() > 0:
             return
         
-        print(self.transformation)
+        print("Adding: " + self.cloud_structs[0].name)
+
         self.total_cloud += self.cloud_structs[0].cloud.transform(self.transformation)
         self.down_sample_total += self.cloud_structs[0].downsampled_cloud.transform(self.transformation)
 
@@ -183,8 +185,9 @@ class Editor():
 
         return
 
+    # move the cloud being merged to the end of the cloud structs
     def send_cloud_to_back(self, context):
-        if not len(self.cloud_structs) > 0:
+        if not self.get_cloud_struct_len() > 0:
             return
         
         self.cloud_structs.append(self.cloud_structs[0])
@@ -192,126 +195,119 @@ class Editor():
 
         return
 
-    # estimate normals and compute 33 dimensional FPHP vector
-    def preprocess_point_cloud(self, point_cloud, voxel_size):
-        radius_normal = voxel_size * 2
-        point_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
-        radius_feature = voxel_size * 5
-        pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(point_cloud, o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
-
-        return point_cloud, pcd_fpfh
-
-        # get a general transformation matrix to apply to align points
-    def execute_global_registration(self, source_down, target_down, source_fpfh, target_fpfh, voxel_size):
-        distance_threshold = voxel_size * 1.5
-        print("Global Registration Started")
-        registration_result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(source_down,
-                                                                                            target_down,
-                                                                                            source_fpfh, 
-                                                                                            target_fpfh, 
-                                                                                            True, 
-                                                                                            distance_threshold, 
-                                                                                            o3d.pipelines.registration.TransformationEstimationPointToPoint(False), 
-                                                                                            3, 
-                                                                                            [o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-                                                                                            o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)], 
-                                                                                            o3d.pipelines.registration.RANSACConvergenceCriteria(100000, 0.999))
+    def multiway_registration_merge(self, context):
+        if not self.get_cloud_struct_len() > 0:
+            return
         
-        return registration_result
+        pose_graph = self.full_registration()
 
-    # def multiway_registration(self, source, downed_source, voxel_size):
-    #     coarse_dist = voxel_size * 15
-    #     fine_dist = voxel_size * 1.5
-
-    #     pose_graph = self.all_registration(downed_source, coarse_dist, fine_dist, voxel_size)
-
-    #     option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=fine_dist,
-    #                                                                  edge_prune_threshold = 0.25,
-    #                                                                  reference_node = 0)
+        option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance = self.cloud_structs[0].voxel_size,
+                                                                     edge_prune_threshold = 0.25,
+                                                                     reference_node = 0)
         
-    #     o3d.pipelines.registration.global_optimization(pose_graph,
-    #                                                    o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(),
-    #                                                    o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(),
-    #                                                    option)
+        o3d.pipelines.registration.global_optimization(pose_graph,
+                                                       o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(),
+                                                       o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(),
+                                                       option)
+
+        for i in range(self.get_cloud_struct_len()):
+            self.transformation = pose_graph.nodes[i].pose
+            self.add_transformed_cloud(context)
+
+        voxel_size = self.calculate_voxel_size(self.total_cloud)
+        self.total_cloud.voxel_down_sample(voxel_size)
+
+        self.update_visualizer(self.total_cloud)
+
+        return
+
+    def full_registration(self):
+        pose_graph = o3d.pipelines.registration.PoseGraph()
+        odometry = np.identity(4)
+        pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(odometry))
+
+        print("There are " + str(self.get_cloud_struct_len()) + " clouds")
         
-    #     self.cloud_structs[0].cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius = voxel_size * 2, max_nn = 30))
+        cloud_struct_length = self.get_cloud_struct_len()
+        for i in range(cloud_struct_length):
+            for j in range(i + 1, cloud_struct_length):
+                transformation, information_matrix = self.pairwise_registration(self.cloud_structs[i],
+                                                            self.cloud_structs[j],
+                                                            self.cloud_structs[i].voxel_size)
+                
+                if j == i + 1:
+                    odometry = np.dot(transformation, odometry)
+                    pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(np.linalg.inv(odometry)))
+                    pose_graph.edges.append(o3d.pipelines.registration.PoseGraphEdge(i, 
+                                                                                    j, 
+                                                                                    transformation, 
+                                                                                    information_matrix, 
+                                                                                    uncertain = False))
+                
+                else:
+                    pose_graph.edges.append(o3d.pipelines.registration.PoseGraphEdge(i,
+                                                                                    j,
+                                                                                    transformation,
+                                                                                    information_matrix,
+                                                                                    uncertain = True))                                               
 
-    #     for source_id in range(1, len(self.cloud_structs)):
-    #         # test = pose_graph.nodes[source_id].pose
-    #         source[source_id].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
 
-    #         reg_p2p = o3d.pipelines.registration.registration_icp(source[source_id], 
-    #                                                               totalCloud, 
-    #                                                               voxel_size * 0.4, 
-    #                                                               pose_graph.nodes[source_id].pose, 
-    #                                                               o3d.pipelines.registration.TransformationEstimationPointToPlane())
-            
-    #         source[source_id].transform(reg_p2p.transformation)
-    #         totalCloud += source[source_id]
+        print("Pose graph has " + str(len(pose_graph.nodes)) + " nodes")
 
-    #     return totalCloud
-
-    # def all_registration(self, clouds, coarse_dist, fine_dist, voxel_size):
-    #     pose_graph = o3d.pipelines.registration.PoseGraph()
-    #     odometry = np.identity(4)
-    #     pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(odometry))
-    #     num_clouds = len(clouds)
-        
-    #     for source_id in range(num_clouds):
-    #         for target_id in range(source_id + 1, num_clouds):
-    #             transformation_icp, information_icp = self.pairwise_registration(
-    #                 clouds[source_id], clouds[target_id],
-    #                 coarse_dist, fine_dist, voxel_size)
-    #             print("Build o3d.pipelines.registration.PoseGraph")
-    #             if target_id == source_id + 1:  # odometry case
-    #                 odometry = np.dot(transformation_icp, odometry)
-    #                 pose_graph.nodes.append(
-    #                     o3d.pipelines.registration.PoseGraphNode(
-    #                         np.linalg.inv(odometry)))
-    #                 pose_graph.edges.append(
-    #                     o3d.pipelines.registration.PoseGraphEdge(source_id,
-    #                                                             target_id,
-    #                                                             transformation_icp,
-    #                                                             information_icp,
-    #                                                             uncertain=False))
-    #             else:
-    #                 pose_graph.edges.append(
-    #                     o3d.pipelines.registration.PoseGraphEdge(source_id,
-    #                                                              target_id,
-    #                                                              transformation_icp,
-    #                                                              information_icp,
-    #                                                              uncertain=True))
-        
-    #     return pose_graph
+        return pose_graph
     
-    # def pairwise_registration(self, source, target, coarse_dist, fine_dist, voxel_size):
-    #     print("Applying pairwise registration with point to plane icp...")
-    #     source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
-    #     target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
+    # apply a coarse point to plane merge and then a fine point to plane merge based on that coarse merge transformation
+    def pairwise_registration(self, source, target, voxel_size):
+        print("Applying pairwise registration with point to plane icp to: " + source.name + " and " + target.name)
 
-    #     icp_coarse = o3d.pipelines.registration.registration_icp(source,
-    #                                                             target,
-    #                                                             coarse_dist,
-    #                                                             np.identity(4),
-    #                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
+        source.downsampled_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
+        target.downsampled_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
+   
+        coarse_transformation = self.execute_distance_point_to_plane_refinement(source.downsampled_cloud,
+                                                                       target.downsampled_cloud,
+                                                                       voxel_size * 15,
+                                                                       np.identity(4))
         
-    #     icp_fine = o3d.pipelines.registration.registration_icp(source,
-    #                                                             target,
-    #                                                             fine_dist,
-    #                                                             icp_coarse.transformation,
-    #                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
-    #     trans_icp = icp_fine.transformation
-    #     info_icp = o3d.pipelines.registration.get_information_matrix_from_point_clouds(source,
-    #                                                                                 target,
-    #                                                                                 fine_dist,
-    #                                                                                 icp_fine.transformation)
-    #     return trans_icp, info_icp
+        fine_transformation = self.execute_distance_point_to_plane_refinement(source.downsampled_cloud,
+                                                                     target.downsampled_cloud,
+                                                                     voxel_size * 1.5,
+                                                                     coarse_transformation)
+   
+        
 
+        information_matrix = o3d.pipelines.registration.get_information_matrix_from_point_clouds(source.downsampled_cloud,
+                                                                                                 target.downsampled_cloud,
+                                                                                                 voxel_size * 1.5,
+                                                                                                 fine_transformation)
+
+        return fine_transformation, information_matrix
+
+    def global_pairwise_registration(self):
+        # fine_transformation = self.execute_distance_point_to_plane_refinement(source.downsampled_cloud,
+        #                                                              target.downsampled_cloud,
+        #                                                              voxel_size * 1.5,
+        #                                                              ransac_result.transformation)
+
+        # source_down, sourceFpfh = self.preprocess_point_cloud(source.downsampled_cloud, 
+        #                                                       voxel_size)
+            
+        # target_down, targetFpfh = self.preprocess_point_cloud(target.downsampled_cloud, 
+        #                                                       voxel_size)
+        
+        
+        # ransac_result = self.execute_global_registration(source_down, 
+        #                                                     target_down, 
+        #                                                     sourceFpfh, 
+        #                                                     targetFpfh, 
+        #                                                     voxel_size)
+        return
+
+    # calculate the transformation for a point to plane merge with one point cloud onto the total cloud and display visualization
     def point_to_plane_merge(self, context):
             if len(self.total_cloud.points) == 0:
                 self.add_transformed_cloud(context)
 
-            if not len(self.cloud_structs) > 0:
+            if not self.get_cloud_struct_len() > 0:
                 return
 
             source_down, sourceFpfh = self.preprocess_point_cloud(point_cloud=self.cloud_structs[0].downsampled_cloud, 
@@ -344,11 +340,12 @@ class Editor():
 
             return
     
+    # calculate the transformation for a point to point merge with one point cloud onto the total cloud and display visualization
     def point_to_point_merge(self, context):
             if len(self.total_cloud.points) == 0:
                 self.add_transformed_cloud(context)
 
-            if not len(self.cloud_structs) > 0:
+            if not self.get_cloud_struct_len() > 0:
                 return
 
             source_down, sourceFpfh = self.preprocess_point_cloud(point_cloud=self.cloud_structs[0].downsampled_cloud, 
@@ -381,11 +378,12 @@ class Editor():
 
             return
     
+    # calculate the transformation for a color point to plane merge with one point cloud onto the total cloud and display visualization
     def color_point_to_plane_merge(self, context):
             if len(self.total_cloud.points) == 0:
                 self.add_transformed_cloud(context)
 
-            if not len(self.cloud_structs) > 0:
+            if not self.get_cloud_struct_len() > 0:
                 return
 
             source_down, sourceFpfh = self.preprocess_point_cloud(point_cloud=self.cloud_structs[0].downsampled_cloud, 
@@ -406,7 +404,7 @@ class Editor():
             self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.cloud_structs[0].voxel_size * 2,
                                                                                     max_nn=30))
             
-            transformation = self.execute_color_point_to_point_refinement(self.cloud_structs[0].cloud, 
+            transformation = self.execute_color_point_to_plane_refinement(self.cloud_structs[0].cloud, 
                                                                           self.total_cloud,
                                                                           self.cloud_structs[0].voxel_size * 1.5, 
                                                                           ransac_result.transformation)
@@ -417,6 +415,35 @@ class Editor():
 
             return
 
+    # estimate normals and compute 33 dimensional FPHP vector
+    def preprocess_point_cloud(self, point_cloud, voxel_size):
+        radius_normal = voxel_size * 2
+        point_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
+        radius_feature = voxel_size * 5
+        pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(point_cloud, o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
+
+        return point_cloud, pcd_fpfh
+
+    # get a general transformation matrix to apply to align points
+    def execute_global_registration(self, source_down, target_down, source_fpfh, target_fpfh, voxel_size):
+        distance_threshold = voxel_size * 1.5
+        print("Global Registration Started")
+
+        registration_result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(source_down,
+                                                                                                       target_down,
+                                                                                                       source_fpfh, 
+                                                                                                       target_fpfh, 
+                                                                                                       True, 
+                                                                                                       distance_threshold, 
+                                                                                                       o3d.pipelines.registration.TransformationEstimationPointToPoint(False), 
+                                                                                                       3, 
+                                                                                                       [o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+                                                                                                        o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)], 
+                                                                                                        o3d.pipelines.registration.RANSACConvergenceCriteria(100000, 0.999))
+        
+        return registration_result
+
+    # use point to point refinement
     def execute_point_to_point_refinement(self, source, target, voxel_size, initial_transformation):
         print("Local Point to Point Refinement Started")
         registration_result = o3d.pipelines.registration.registration_icp(source, 
@@ -429,6 +456,7 @@ class Editor():
 
         return registration_result.transformation
 
+    # use point to plane refinement
     def execute_point_to_plane_refinement(self, source, target, voxel_size, initial_transformation):
         source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
                                                                     max_nn=30))
@@ -438,14 +466,24 @@ class Editor():
 
         print("Local Point to Plane Refinement Started")
         registration_result = o3d.pipelines.registration.registration_icp(source,
-                                                                        target,
-                                                                            voxel_size * 1.5,
-                                                                            initial_transformation,
-                                                                            o3d.pipelines.registration.TransformationEstimationPointToPlane())
+                                                                          target,
+                                                                          voxel_size * 1.5,
+                                                                          initial_transformation,
+                                                                          o3d.pipelines.registration.TransformationEstimationPointToPlane())
 
         return registration_result.transformation
 
-    def execute_color_point_to_point_refinement(source, target, voxel_size, initial_transformation):
+    def execute_distance_point_to_plane_refinement(self, source, target, distance, initial_transformation):
+        registration_result = o3d.pipelines.registration.registration_icp(source,
+                                                                          target,
+                                                                          distance,
+                                                                          initial_transformation,
+                                                                          o3d.pipelines.registration.TransformationEstimationPointToPlane())
+
+        return registration_result.transformation
+
+    # use color point to plane refinement
+    def execute_color_point_to_plane_refinement(self, source, target, voxel_size, initial_transformation):
         print("Local Color Point to Point Refinement Started")
         registration_result = o3d.pipelines.registration.registration_colored_icp(source,
                                                                                   target,
@@ -456,6 +494,8 @@ class Editor():
 
         return registration_result.transformation
 
+    # might need to get rid of this
+    # use to make different meshes with different options
     def make_mesh(self, method, options):
         if method == "poisson":
             self.make_poisson_mesh(options)
@@ -463,6 +503,7 @@ class Editor():
             raise TypeError("Attempt to use unsupported meshing type")
         return
 
+    # make a mesh using poisson meshing
     def make_poisson_mesh(self, options):
         if len(self.total_cloud.points) == 0:
             return
@@ -472,38 +513,49 @@ class Editor():
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=12, width=0, scale=1.1, linear_fit=False)[0]
 
         self.color_mesh([0.5, 0.5, 0.5])
+        self.mesh = self.mesh.filter_smooth_simple(number_of_iterations=5)
         self.mesh.compute_vertex_normals()
+        
 
         self.update_visualizer(self.mesh)
 
         return
 
+    # color the total point cloud a specific color
     def color_cloud(self, color):
         self.total_cloud.paint_uniform_color([color[0], color[1], color[2]])
 
         return
 
+    # color the mesh a specific color
     def color_mesh(self, color):
         self.mesh.paint_uniform_color([color[0], color[1], color[2]])
 
         return
 
+    # calculate a voxel size for a point cloud
+    # this calculated voxel size can be used for icp
     def calculate_voxel_size(self, cloud):
         return round(max(cloud.get_max_bound() - cloud.get_min_bound()) * 0.01, 4)
 
+    # get length of cloud struct
+    # this is me being lazy because I don't want to tyle len(self.cloud_structs) - oh no I just did it
     def get_cloud_struct_len(self):
         return len(self.cloud_structs)
 
+    # write a point cloud file with a specific file extension
     def write_point_cloud_file(self, file_path, file_type):
         o3d.io.write_point_cloud(file_path + file_type, self.total_cloud)
 
         return
 
+    # write a mesh file 
     def write_mesh_file(self, file_path, file_type):
         o3d.io.write_triangle_mesh(file_path + file_type, self.mesh)
 
         return
 
+    # destroy with visualizer when the editor is destroyed
     def __del__ (self):
         self.visualizer.destroy_window()
 
