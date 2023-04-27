@@ -52,22 +52,26 @@ class Editor():
 
         return
 
+    # set callbacks for multiway registration editing
     def set_multiway_registration_callbacks(self, context):
         # self.visualizer.register_key_callback(260, self.point_to_plane_merge) # insert
         # self.visualizer.register_key_callback(334, self.point_to_plane_merge) # keypad add
 
         return
 
+    # set callbacks for point to plane registration editing
     def set_point_to_plane_callbacks(self, context):
         self.visualizer.register_key_callback(260, self.point_to_plane_merge) # insert
         self.visualizer.register_key_callback(334, self.point_to_plane_merge) # keypad add
 
         return
 
+    # set callbacks for point to point registration editing
     def set_point_to_point_callbacks(self, context):
         self.visualizer.register_key_callback(260, self.point_to_point_merge) # insert
         self.visualizer.register_key_callback(334, self.point_to_point_merge) # keypad add
 
+    # set callbacks for color point to plane registration editing
     def set_color_point_to_point_callbacks(self, context):
         self.visualizer.register_key_callback(260, self.point_to_point_merge) # insert
         self.visualizer.register_key_callback(334, self.point_to_point_merge) # keypad add
@@ -215,132 +219,93 @@ class Editor():
         
         return registration_result
 
-    def execute_point_to_point_refinement(self, source, target, voxel_size, initial_transformation):
-        print("Local Point to Point Refinement Started")
-        registration_result = o3d.pipelines.registration.registration_icp(source, 
-                                                                target, 
-                                                                voxel_size * 1.5,
-                                                                initial_transformation,
-                                                                o3d.pipelines.registration.TransformationEstimationPointToPoint(),
-                                                                o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
+    # def multiway_registration(self, source, downed_source, voxel_size):
+    #     coarse_dist = voxel_size * 15
+    #     fine_dist = voxel_size * 1.5
+
+    #     pose_graph = self.all_registration(downed_source, coarse_dist, fine_dist, voxel_size)
+
+    #     option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=fine_dist,
+    #                                                                  edge_prune_threshold = 0.25,
+    #                                                                  reference_node = 0)
         
-
-        return registration_result.transformation
-
-    def execute_point_to_plane_refinement(self, source, target, voxel_size, initial_transformation):
-        source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
-                                                                    max_nn=30))
+    #     o3d.pipelines.registration.global_optimization(pose_graph,
+    #                                                    o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(),
+    #                                                    o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(),
+    #                                                    option)
         
-        target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
-                                                                    max_nn=30))
+    #     self.cloud_structs[0].cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius = voxel_size * 2, max_nn = 30))
 
-        print("Local Point to Plane Refinement Started")
-        registration_result = o3d.pipelines.registration.registration_icp(source,
-                                                                        target,
-                                                                            voxel_size * 1.5,
-                                                                            initial_transformation,
-                                                                            o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    #     for source_id in range(1, len(self.cloud_structs)):
+    #         # test = pose_graph.nodes[source_id].pose
+    #         source[source_id].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
 
-        return registration_result.transformation
-
-    def execute_color_point_to_point_refinement(source, target, voxel_size, initial_transformation):
-        print("Local Color Point to Point Refinement Started")
-        registration_result = o3d.pipelines.registration.registration_colored_icp(source,
-                                                                    target,
-                                                                        voxel_size*0.05,
-                                                                        initial_transformation,
-                                                                        o3d.pipelines.registration.TransformationEstimationForColoredICP(),
-                                                                        o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
-
-        return registration_result.transformation
-
-    def multiway_registration(self, source, downed_source, voxel_size):
-        coarse_dist = voxel_size * 15
-        fine_dist = voxel_size * 1.5
-
-        pose_graph = self.all_registration(downed_source, coarse_dist, fine_dist, voxel_size)
-
-        option = o3d.pipelines.registration.GlobalOptimizationOption(max_correspondence_distance=fine_dist,
-                                                                    edge_prune_threshold=0.25,
-                                                                    reference_node=0)
-        
-        o3d.pipelines.registration.global_optimization(pose_graph,
-                                                    o3d.pipelines.registration.GlobalOptimizationLevenbergMarquardt(),
-                                                    o3d.pipelines.registration.GlobalOptimizationConvergenceCriteria(),
-                                                    option)
-        
-        source[0].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
-        totalCloud = copy.deepcopy(source[0])
-
-        for source_id in range(1, len(downed_source)):
-            # test = pose_graph.nodes[source_id].pose
-            source[source_id].estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
-            reg_p2p = o3d.pipelines.registration.registration_icp(source[source_id], 
-                                                                totalCloud, 
-                                                                voxel_size * 0.4, 
-                                                                pose_graph.nodes[source_id].pose, 
-                                                                o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    #         reg_p2p = o3d.pipelines.registration.registration_icp(source[source_id], 
+    #                                                               totalCloud, 
+    #                                                               voxel_size * 0.4, 
+    #                                                               pose_graph.nodes[source_id].pose, 
+    #                                                               o3d.pipelines.registration.TransformationEstimationPointToPlane())
             
-            source[source_id].transform(reg_p2p.transformation)
-            totalCloud += source[source_id]
+    #         source[source_id].transform(reg_p2p.transformation)
+    #         totalCloud += source[source_id]
 
-        return totalCloud
+    #     return totalCloud
 
-    def all_registration(self, clouds, coarse_dist, fine_dist, voxel_size):
-        pose_graph = o3d.pipelines.registration.PoseGraph()
-        odometry = np.identity(4)
-        pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(odometry))
-        num_clouds = len(clouds)
+    # def all_registration(self, clouds, coarse_dist, fine_dist, voxel_size):
+    #     pose_graph = o3d.pipelines.registration.PoseGraph()
+    #     odometry = np.identity(4)
+    #     pose_graph.nodes.append(o3d.pipelines.registration.PoseGraphNode(odometry))
+    #     num_clouds = len(clouds)
         
-        for source_id in range(num_clouds):
-            for target_id in range(source_id + 1, num_clouds):
-                transformation_icp, information_icp = self.pairwise_registration(
-                    clouds[source_id], clouds[target_id],
-                    coarse_dist, fine_dist, voxel_size)
-                print("Build o3d.pipelines.registration.PoseGraph")
-                if target_id == source_id + 1:  # odometry case
-                    odometry = np.dot(transformation_icp, odometry)
-                    pose_graph.nodes.append(
-                        o3d.pipelines.registration.PoseGraphNode(
-                            np.linalg.inv(odometry)))
-                    pose_graph.edges.append(
-                        o3d.pipelines.registration.PoseGraphEdge(source_id,
-                                                                target_id,
-                                                                transformation_icp,
-                                                                information_icp,
-                                                                uncertain=False))
-                else:
-                    pose_graph.edges.append(
-                        o3d.pipelines.registration.PoseGraphEdge(source_id,
-                                                                 target_id,
-                                                                 transformation_icp,
-                                                                 information_icp,
-                                                                 uncertain=True))
+    #     for source_id in range(num_clouds):
+    #         for target_id in range(source_id + 1, num_clouds):
+    #             transformation_icp, information_icp = self.pairwise_registration(
+    #                 clouds[source_id], clouds[target_id],
+    #                 coarse_dist, fine_dist, voxel_size)
+    #             print("Build o3d.pipelines.registration.PoseGraph")
+    #             if target_id == source_id + 1:  # odometry case
+    #                 odometry = np.dot(transformation_icp, odometry)
+    #                 pose_graph.nodes.append(
+    #                     o3d.pipelines.registration.PoseGraphNode(
+    #                         np.linalg.inv(odometry)))
+    #                 pose_graph.edges.append(
+    #                     o3d.pipelines.registration.PoseGraphEdge(source_id,
+    #                                                             target_id,
+    #                                                             transformation_icp,
+    #                                                             information_icp,
+    #                                                             uncertain=False))
+    #             else:
+    #                 pose_graph.edges.append(
+    #                     o3d.pipelines.registration.PoseGraphEdge(source_id,
+    #                                                              target_id,
+    #                                                              transformation_icp,
+    #                                                              information_icp,
+    #                                                              uncertain=True))
         
-        return pose_graph
+    #     return pose_graph
     
-    def pairwise_registration(self, source, target, coarse_dist, fine_dist, voxel_size):
-        print("Applying pairwise registration with point to plane icp...")
-        source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
-        target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
+    # def pairwise_registration(self, source, target, coarse_dist, fine_dist, voxel_size):
+    #     print("Applying pairwise registration with point to plane icp...")
+    #     source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
+    #     target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 2, max_nn = 30))
 
-        icp_coarse = o3d.pipelines.registration.registration_icp(source,
-                                                                target,
-                                                                coarse_dist,
-                                                                np.identity(4),
-                                                                o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    #     icp_coarse = o3d.pipelines.registration.registration_icp(source,
+    #                                                             target,
+    #                                                             coarse_dist,
+    #                                                             np.identity(4),
+    #                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
         
-        icp_fine = o3d.pipelines.registration.registration_icp(source,
-                                                                target,
-                                                                fine_dist,
-                                                                icp_coarse.transformation,
-                                                                o3d.pipelines.registration.TransformationEstimationPointToPlane())
-        trans_icp = icp_fine.transformation
-        info_icp = o3d.pipelines.registration.get_information_matrix_from_point_clouds(source,
-                                                                                    target,
-                                                                                    fine_dist,
-                                                                                    icp_fine.transformation)
-        return trans_icp, info_icp
+    #     icp_fine = o3d.pipelines.registration.registration_icp(source,
+    #                                                             target,
+    #                                                             fine_dist,
+    #                                                             icp_coarse.transformation,
+    #                                                             o3d.pipelines.registration.TransformationEstimationPointToPlane())
+    #     trans_icp = icp_fine.transformation
+    #     info_icp = o3d.pipelines.registration.get_information_matrix_from_point_clouds(source,
+    #                                                                                 target,
+    #                                                                                 fine_dist,
+    #                                                                                 icp_fine.transformation)
+    #     return trans_icp, info_icp
 
     def point_to_plane_merge(self, context):
             if len(self.total_cloud.points) == 0:
@@ -451,6 +416,45 @@ class Editor():
             self.transformation = transformation
 
             return
+
+    def execute_point_to_point_refinement(self, source, target, voxel_size, initial_transformation):
+        print("Local Point to Point Refinement Started")
+        registration_result = o3d.pipelines.registration.registration_icp(source, 
+                                                                target, 
+                                                                voxel_size * 1.5,
+                                                                initial_transformation,
+                                                                o3d.pipelines.registration.TransformationEstimationPointToPoint(),
+                                                                o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
+        
+
+        return registration_result.transformation
+
+    def execute_point_to_plane_refinement(self, source, target, voxel_size, initial_transformation):
+        source.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
+                                                                    max_nn=30))
+        
+        target.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size*2,
+                                                                    max_nn=30))
+
+        print("Local Point to Plane Refinement Started")
+        registration_result = o3d.pipelines.registration.registration_icp(source,
+                                                                        target,
+                                                                            voxel_size * 1.5,
+                                                                            initial_transformation,
+                                                                            o3d.pipelines.registration.TransformationEstimationPointToPlane())
+
+        return registration_result.transformation
+
+    def execute_color_point_to_point_refinement(source, target, voxel_size, initial_transformation):
+        print("Local Color Point to Point Refinement Started")
+        registration_result = o3d.pipelines.registration.registration_colored_icp(source,
+                                                                                  target,
+                                                                                  voxel_size * 0.05,
+                                                                                  initial_transformation,
+                                                                                  o3d.pipelines.registration.TransformationEstimationForColoredICP(),
+                                                                                  o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=200))
+
+        return registration_result.transformation
 
     def make_mesh(self, method, options):
         if method == "poisson":
