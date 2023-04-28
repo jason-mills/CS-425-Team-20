@@ -1,10 +1,11 @@
 import open3d as o3d
 import numpy as np
-import copy
 import os
 import sys
 from Editor import Editor
 from PointCloudStruct import PointCloudStruct
+import open3d.visualization.gui as gui
+
 
 # Read a supported file type
 def read_file(file_path):
@@ -114,10 +115,15 @@ def main():
                                  file_order, is_user_scan)
 
     
+    # editor = Editor(cloud_structs)
+    # editor.update_visualizer(cloud_structs[0].cloud)
+    # editor.run_visualizer()
+    # editor.destroy_visualizer()
+
+    gui.Application.instance.initialize()
     editor = Editor(cloud_structs)
-    editor.update_visualizer(cloud_structs[0].cloud)
-    editor.run_visualizer()
-    editor.destroy_visualizer()
+    # editor.run_visualizer()
+    gui.Application.instance.run()
 
 if __name__ == '__main__':
     main()
