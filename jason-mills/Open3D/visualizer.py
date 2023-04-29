@@ -25,14 +25,16 @@ class WindowApp:
         # create a frame that encapsulates the Scenewidget
         _widget3d.frame = gui.Rect(500, self.window.content_rect.y,
                                         900, self.window.content_rect.height)
-        # mesh = o3d.geometry.TriangleMesh.create_sphere()
-        # mesh.compute_vertex_normals()
-        # material = rendering.MaterialRecord()
-        # material.shader = "defaultLit"
+        mesh = o3d.geometry.TriangleMesh.create_sphere()
+        mesh.compute_vertex_normals()
+        material = rendering.MaterialRecord()
+        material.shader = "defaultLit"
         # _widget3d.scene.add_geometry('mesh', mesh, material)
         _widget3d.scene.set_background([200, 0, 0, 200]) # not working?!
-        # _widget3d.scene.camera.look_at([0, 0, 0], [1, 1, 1], [0, 0, 1])
+        _widget3d.scene.camera.look_at([0, 0, 0], [1, 1, 1], [0, 0, 1])
         _widget3d.set_on_mouse(self._on_mouse_widget3d)
+
+
 
         # gui layout
         gui_layout = gui.Vert(0, gui.Margins(0.5 * em, 0.5 * em, 0.5 * em, 0.5 * em))
@@ -55,7 +57,7 @@ class WindowApp:
         gui_layout.add_child(fileedit_layout)
 
         self.window.add_child(gui_layout)
-        self.window.add_child(_widget3d)
+        # self.window.add_child(_widget3d)
 
     def setup_scene(self):
         return

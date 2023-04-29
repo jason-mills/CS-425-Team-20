@@ -8,26 +8,8 @@ import open3d.visualization.gui as gui
 
 
 # Read a supported file type
-def read_file(file_path):
-    if file_path.endswith(".xyz"):
-        points = []
-        fileStream = open(file_path, 'r')
-
-        firstLine = fileStream.readline()
-        if(firstLine == 'X Y Z\n'):
-            for line in fileStream:
-                line = line.rstrip('\n')
-                x, y, z = line.split(' ')
-                if x == '-0' or y == '-0' or z == '-0':
-                    continue
-                points.append([float(x), float(y), float(z)])
-
-        new_cloud = o3d.geometry.PointCloud()
-        new_cloud.points.extend(points)
-
-        return new_cloud
-    
-    elif file_path.endswith((".xyzn", ".xyzrgb", ".pts", ".ply", ".pcd")):
+def read_file(file_path):    
+    if file_path.endswith((".xyz", ".xyzn", ".xyzrgb", ".pts", ".ply", ".pcd")):
         new_cloud = o3d.io.read_point_cloud(file_path)
         return new_cloud
 
