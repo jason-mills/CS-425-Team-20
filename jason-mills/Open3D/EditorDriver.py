@@ -3,7 +3,7 @@ import numpy as np
 import os
 import sys
 from Editor import Editor
-from PointCloudStruct import PointCloudStruct
+from Structs import PointCloudStruct
 import open3d.visualization.gui as gui
 
 
