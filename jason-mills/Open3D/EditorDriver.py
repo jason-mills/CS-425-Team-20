@@ -33,7 +33,7 @@ def remove_outliers(pcd, voxel_size, iterations, numberOfPoints, radius):
 
     return downPcd
 
-def process_scan(input_directory_path, input_file_base_name, input_file_extension, output_file_base_name, file_order, is_user_scan):
+def process_scan(input_directory_path, input_file_base_name, input_file_extension, file_order, is_user_scan):
     file_paths = []
     if is_user_scan:
         for number in file_order:
@@ -93,19 +93,12 @@ def main():
     cloud_structs = process_scan(input_directory_path, 
                                  input_file_base_name, 
                                  input_file_extension, 
-                                 output_file_base_name, 
                                  file_order, is_user_scan)
-
-    
-    # editor = Editor(cloud_structs)
-    # editor.update_visualizer(cloud_structs[0].cloud)
-    # editor.run_visualizer()
-    # editor.destroy_visualizer()
 
     gui.Application.instance.initialize()
     editor = Editor(cloud_structs)
-    # editor.run_visualizer()
     gui.Application.instance.run()
+    gui.Application.instance.quit()
 
 if __name__ == '__main__':
     main()
