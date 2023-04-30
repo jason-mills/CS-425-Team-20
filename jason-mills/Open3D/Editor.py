@@ -72,9 +72,10 @@ class Editor():
         self.initial_screen_width = int(GetSystemMetrics(0) * 0.75)
         self.initial_screen_heigth = int(GetSystemMetrics(1) * 0.75)
 
-        # Create window adn declare function for resizing widgets
+        # Create window, declare function for resizing widgets, and set keys for editing
         self.window = gui.Application.instance.create_window("C3P0", self.initial_screen_width, self.initial_screen_heigth)
         self.window.set_on_layout(self.on_layout)
+        self.window.set_on_key(self.key_callbacks)
         self.em = self.window.theme.font_size
 
         # Call functions that add editor and scene widgets to the window
@@ -97,10 +98,14 @@ class Editor():
         merge_button = gui.Button("Merge Next Cloud")
         merge_button.set_on_clicked(self.multiway_registration_merge)
 
+        skip_merge_button = gui.Button("Skip Cloud")
+        skip_merge_button.set_on_clicked(self.send_cloud_to_back)
+
         merging_method_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
         merging_method_container.add_child(merging_container_label)
         merging_method_container.add_child(merging_method_selection)
         merging_method_container.add_child(merge_button)
+        merging_method_container.add_child(skip_merge_button)
         # END ICP GUI ELEMENTS
         
         # START MESH GUI ELEMENTS
@@ -134,11 +139,6 @@ class Editor():
         previous_next_container.add_child(next_button)
         # END PREVIOUS NEXT GEOMETRIES ELEMENTS
 
-        # START OF PROGRESS BAR ELEMENTS
-        self.progress_bar = gui.ProgressBar()
-        self.progress_bar.visible = False
-        # END OF PROGRESS BAR ELEMENTS
-
         # START SAVE GUI ELEMENTS
         saving_container_label = gui.Label("Save Options: ")
 
@@ -154,11 +154,20 @@ class Editor():
         saving_container.add_child(save_mesh_button)
         # END SAVE GUI ELEMENTS
 
+        reset_button = gui.Button("Reset Clouds and Mesh")
+        reset_button.set_on_clicked(self.revert_changes)
+
+        # START OF PROGRESS BAR ELEMENTS
+        self.progress_bar = gui.ProgressBar()
+        self.progress_bar.visible = False
+        # END OF PROGRESS BAR ELEMENTS
+
         # Add gui elements to layout and then the layout to the window
         self.layout.add_child(merging_method_container)
         self.layout.add_child(meshing_container)
         self.layout.add_child(saving_container)
         self.layout.add_child(previous_next_container)
+        self.layout.add_child(reset_button)
         self.layout.add_child(self.progress_bar)
         
         self.window.add_child(self.layout)
@@ -171,7 +180,7 @@ class Editor():
         self.scene_widget.enable_scene_caching(True)
         self.scene_widget.scene = rendering.Open3DScene(self.window.renderer)
         self.scene = self.scene_widget.scene
-        self.scene_widget.set_on_key(self.key_callbacks)
+        # self.scene_widget.set_on_key(self.key_callbacks)
         self.scene_widget.frame = gui.Rect(self.initial_screen_width * 0.25, self.window.content_rect.y, self.initial_screen_width, self.window.content_rect.height)
 
         self.add_all_geometry(cloud_structs)
@@ -182,12 +191,14 @@ class Editor():
 
         return
 
+    # Define how the layout should change when the window is resized
     def on_layout(self, context):
         self.layout.frame = gui.Rect(0, self.window.content_rect.y, self.window.content_rect.get_right() * 0.25, self.window.content_rect.height)
         self.scene_widget.frame = gui.Rect(self.window.content_rect.get_right() * 0.25, self.window.content_rect.y, self.window.content_rect.get_right(), self.window.content_rect.height)
 
         return
     
+    # Add all of the geometry into the scene widget
     def add_all_geometry(self, cloud_structs):
         self.material = rendering.MaterialRecord()
 
@@ -205,6 +216,7 @@ class Editor():
 
         return
 
+    # Remove all geometry in the scene widget - used for reverting changes
     def remove_all_geometry(self, cloud_structs):
         self.scene.remove_geometry("Merge Result")
 
@@ -217,6 +229,7 @@ class Editor():
 
         return
 
+    # Set the key callbacks that can be used instead of gui buttons
     def key_callbacks(self, context):
         if context.type == gui.KeyEvent.UP:
             if context.key == gui.KeyName.RIGHT: # right arrow key
@@ -241,22 +254,22 @@ class Editor():
             elif context.key in (257, 335): #enter and keypad enter
                 self.add_transformed_cloud()
 
-            elif context.key in (48, 320):
+            elif context.key in (48, 320): # keyboard and keypad 0
                 self.current_mode = "multiway_registration"
 
-            elif context.key in (49, 321):
+            elif context.key in (49, 321): # keyboard and keypad 1
                 self.current_mode = "point to plane"
 
-            elif context.key in (50, 322):
+            elif context.key in (50, 322): # keyboard and keypad 2
                 self.current_mode = "point to point"
 
-            elif context.key in (51, 323):
+            elif context.key in (51, 323): # keyboard and keypad 3
                 self.current_mode = "color point to point"
 
             elif context.key == gui.KeyName.R:
                 self.revert_changes()
 
-        return gui.Widget.EventCallbackResult.IGNORED
+        return True
 
     # clear changes to the cloud
     def revert_changes(self):
@@ -336,6 +349,7 @@ class Editor():
 
         self.update_visualizer(combined_cloud, "Remove Outlier Result")
     
+    # Update the visualizer widget to show the appropriate geometry with the name given to it
     def update_visualizer(self, geometry, name):
         label_position = [0, 0, 0]
 
@@ -354,8 +368,8 @@ class Editor():
             self.scene.show_geometry(self.current_geometry_name, False)
 
         self.current_3d_label = self.scene_widget.add_3d_label(label_position, name)
-        self.scene.show_geometry(name, True)
         self.current_geometry_name = name
+        self.scene.show_geometry(name, True)
         
         return
 
@@ -387,6 +401,7 @@ class Editor():
 
         return
 
+    # perform multiway registration on the given point clouds and update the visualizer accordingly
     def multiway_registration_merge(self):
         if not self.get_cloud_struct_len() > 0:
             return
@@ -412,6 +427,7 @@ class Editor():
 
         return
 
+    # make the pose graph for the point clouds using pairwise_registration
     def full_registration(self):
         pose_graph = o3d.pipelines.registration.PoseGraph()
         odometry = np.identity(4)
@@ -679,13 +695,15 @@ class Editor():
         
         return
 
+    # Make a mesh using ball pivoting method
     def make_ball_pivoting_mehs():
         return
     
+    # Make a mesh using convex hull method
     def make_convex_hull_mesh():
         return
 
-    # make a mesh using poisson meshing
+    # make a mesh using poisson method
     def make_poisson_mesh(self):
         if len(self.mesh.vertices) == 0:
             return
