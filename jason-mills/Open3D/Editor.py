@@ -39,7 +39,7 @@ class Editor():
 
         # Keep track of what mode is being used for editing
         self.current_mode = "multiway_registration"
-        self.meshing_method = "poisson"
+        self.meshing_method = "ball pivoting"
 
         # Initialize the gui
         self.initialize_gui(cloud_structs)
@@ -74,7 +74,7 @@ class Editor():
 
         # Create window adn declare function for resizing widgets
         self.window = gui.Application.instance.create_window("C3P0", self.initial_screen_width, self.initial_screen_heigth)
-        # self.window.set_on_layout(self.on_layout)
+        self.window.set_on_layout(self.on_layout)
         self.em = self.window.theme.font_size
 
         # Call functions that add editor and scene widgets to the window
@@ -87,8 +87,23 @@ class Editor():
     def initialize_editor(self):
         self.layout = gui.Vert(2 * self.em, gui.Margins(self.em * 2, 2 * self.em, 2 * self.em, 2 * self.em))
         self.layout.frame = gui.Rect(0, self.window.content_rect.y, self.initial_screen_width * 0.25, self.window.content_rect.height)
-        # self.layout.add_stretch()
+
+        # START ICP GUI ELEMENTS
+        merging_container_label = gui.Label("Point Cloud Merging Method: ")
+
+        merging_method_selection = gui.RadioButton(gui.RadioButton.VERT)
+        merging_method_selection.set_items(["Multiway Registration", "Point to Plane", "Point to Point", "Color Point to Point"])
+
+        merge_button = gui.Button("Merge Next Cloud")
+        merge_button.set_on_clicked(self.multiway_registration_merge)
+
+        merging_method_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
+        merging_method_container.add_child(merging_container_label)
+        merging_method_container.add_child(merging_method_selection)
+        merging_method_container.add_child(merge_button)
+        # END ICP GUI ELEMENTS
         
+        # START MESH GUI ELEMENTS
         mesh_container_label = gui.Label("Meshing Method: ")
 
         meshing_method_selection = gui.RadioButton(gui.RadioButton.VERT)
@@ -97,11 +112,17 @@ class Editor():
         mesh_button = gui.Button("Make Mesh")
         mesh_button.set_on_clicked(self.make_mesh)
 
+        smooth_mesh_button = gui.Button("Smooth Mesh")
+        smooth_mesh_button.set_on_clicked(self.smooth_mesh)
+
         meshing_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
         meshing_container.add_child(mesh_container_label)
         meshing_container.add_child(meshing_method_selection)
         meshing_container.add_child(mesh_button)
+        meshing_container.add_child(smooth_mesh_button)
+        # END MESH GUI ELEMENTS
 
+        # START PREVIOUS NEXT GEOMETRIES ELEMENTS
         next_button = gui.Button("Next")
         next_button.set_on_clicked(self.view_next_cloud)
         
@@ -111,14 +132,35 @@ class Editor():
         previous_next_container = gui.Vert(0.5 * self.em, gui.Margins(0, 0, 0 ,0))
         previous_next_container.add_child(previous_buttion)
         previous_next_container.add_child(next_button)
+        # END PREVIOUS NEXT GEOMETRIES ELEMENTS
 
+        # START OF PROGRESS BAR ELEMENTS
         self.progress_bar = gui.ProgressBar()
         self.progress_bar.visible = False
+        # END OF PROGRESS BAR ELEMENTS
 
+        # START SAVE GUI ELEMENTS
+        saving_container_label = gui.Label("Save Options: ")
+
+        save_cloud_button = gui.Button("Save Point Cloud")
+        save_cloud_button.set_on_clicked(self.write_point_cloud_file)
+
+        save_mesh_button = gui.Button("Save Mesh")
+        save_mesh_button.set_on_clicked(self.write_mesh_file)
+
+        saving_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
+        saving_container.add_child(saving_container_label)
+        saving_container.add_child(save_cloud_button)
+        saving_container.add_child(save_mesh_button)
+        # END SAVE GUI ELEMENTS
+
+        # Add gui elements to layout and then the layout to the window
+        self.layout.add_child(merging_method_container)
         self.layout.add_child(meshing_container)
+        self.layout.add_child(saving_container)
         self.layout.add_child(previous_next_container)
         self.layout.add_child(self.progress_bar)
-
+        
         self.window.add_child(self.layout)
 
         return
@@ -317,18 +359,6 @@ class Editor():
         
         return
 
-    # start the visualization
-    def run_visualizer(self):
-        self.visualizer.run()
-
-        return
-
-    # clean up by destroying visualization window
-    def destroy_visualizer(self):
-        self.visualizer.destroy_window()
-
-        return
-
     # add a cloud with the last calculated transformation
     def add_transformed_cloud(self):
         if not self.get_cloud_struct_len() > 0:
@@ -342,7 +372,6 @@ class Editor():
         self.cloud_structs.pop(0)
 
         self.scene.remove_geometry("Total Cloud")
-        self.material.shader = "DEPTH"
         self.scene.add_geometry("Total Cloud", self.total_cloud, self.material)
         self.update_visualizer(self.total_cloud, "Total Cloud")
 
@@ -639,15 +668,26 @@ class Editor():
     # might need to get rid of this
     # use to make different meshes with different options
     def make_mesh(self):
-        if self.meshing_method == "poisson":
+        if self.meshing_method == "ball pivoting":
             self.make_poisson_mesh()
-        else:
-            raise TypeError("Attempt to use unsupported meshing type")
+
+        elif self.meshing_method == "convex hull":
+            self.make_convex_hull_mesh
+
+        elif self.meshing_method == "poisson":
+            self.make_ball_pivoting_mesh()
+        
+        return
+
+    def make_ball_pivoting_mehs():
+        return
+    
+    def make_convex_hull_mesh():
         return
 
     # make a mesh using poisson meshing
     def make_poisson_mesh(self):
-        if len(self.total_cloud.points) == 0:
+        if len(self.mesh.vertices) == 0:
             return
 
         self.total_cloud.estimate_normals()
@@ -664,6 +704,9 @@ class Editor():
         return
 
     def smooth_mesh(self):
+        if len(self.mesh.vertices) == 0:
+            return
+        
         self.mesh = self.mesh.filter_smooth_simple(number_of_iterations=1)
 
         self.scene.remove_geometry("Mesh")
