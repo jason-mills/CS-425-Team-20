@@ -36,6 +36,7 @@ class Editor():
 
         # Keep track of what mode is being used for editing
         self.current_mode = "multiway_registration"
+        self.meshing_method = "poisson"
 
         # Initialize the gui
         self.initialize_gui(cloud_structs)
@@ -43,8 +44,11 @@ class Editor():
         # Give the gui something to load with
         self.update_visualizer(self.geometries[1].geometry, self.geometries[1].name)
 
+        self.metadata = []
+
         return
     
+    # Initialize a circular array for use in moving through geometries in the scene viewer
     def initialize_circular_array(self, cloud_structs):
         geometries = []
 
@@ -59,18 +63,57 @@ class Editor():
 
         return circular_array
 
+    # Initialize the gui
     def initialize_gui(self, cloud_structs):
-        screen_width = int(GetSystemMetrics(0) * 0.75)
-        screen_height = int(GetSystemMetrics(1) * 0.75)
+        # Numbers that are useful to track for initilization
+        self.initial_screen_width = int(GetSystemMetrics(0) * 0.75)
+        self.initial_screen_heigth = int(GetSystemMetrics(1) * 0.75)
 
-        self.window = gui.Application.instance.create_window("C3P0", screen_width, screen_height)
+        # Create window adn declare function for resizing widgets
+        self.window = gui.Application.instance.create_window("C3P0", self.initial_screen_width, self.initial_screen_heigth)
+        self.window.set_on_layout(self.on_layout)
+        self.em = self.window.theme.font_size
+
+        # Call functions that add editor and scene widgets to the window
+        self.initialize_editor()
+        self.initialize_scene_widget(cloud_structs)
+
+        return
+    
+    # Initialize the editor with desire buttons/functions
+    def initialize_editor(self):
+        self.layout = gui.Vert(0, gui.Margins(2 * self.em, 2 * self.em, 2 * self.em, 2 * self.em))
+        self.layout.frame = gui.Rect(0, self.window.content_rect.y, self.initial_screen_width * 0.25, self.window.content_rect.height)
+        self.layout.add_stretch()
+
+        next_button = gui.Button("Next")
+        next_button.set_on_clicked(self.view_next_cloud)
         
+        previous_buttion = gui.Button("Previous")
+        previous_buttion.set_on_clicked(self.view_previous_cloud)
+
+        mesh_button = gui.Button("Make Mesh")
+        mesh_button.set_on_clicked(self.make_mesh)
+
+        self.progress_bar = gui.ProgressBar()
+        self.progress_bar.visible = False
+
+        self.layout.add_child(previous_buttion)
+        self.layout.add_child(next_button)
+        self.layout.add_child(self.progress_bar)
+
+        self.window.add_child(self.layout)
+
+        return
+
+    # Initialize the scene widget with desired functionality and geometries
+    def initialize_scene_widget(self, cloud_structs):
         self.scene_widget = gui.SceneWidget()
         self.scene_widget.enable_scene_caching(True)
         self.scene_widget.scene = rendering.Open3DScene(self.window.renderer)
         self.scene = self.scene_widget.scene
         self.scene_widget.set_on_key(self.key_callbacks)
-        self.scene_widget.frame = gui.Rect(screen_width * 0.25, self.window.content_rect.y, screen_width, self.window.content_rect.height)
+        self.scene_widget.frame = gui.Rect(self.initial_screen_width * 0.25, self.window.content_rect.y, self.initial_screen_width, self.window.content_rect.height)
 
         self.add_all_geometry(cloud_structs)
 
@@ -79,10 +122,15 @@ class Editor():
         self.window.add_child(self.scene_widget)
 
         return
+
+    def on_layout(self, context):
+        self.layout.frame = gui.Rect(0, self.window.content_rect.y, self.window.content_rect.get_right() * 0.25, self.window.content_rect.height)
+        self.scene_widget.frame = gui.Rect(self.window.content_rect.get_right() * 0.25, self.window.content_rect.y, self.window.content_rect.get_right(), self.window.content_rect.height)
+
+        return
     
     def add_all_geometry(self, cloud_structs):
         self.material = rendering.MaterialRecord()
-        self.material.shader = "defaultLit"
 
         self.scene.add_geometry("Merge Result", self.total_cloud, self.material)
 
@@ -97,7 +145,7 @@ class Editor():
         self.scene.show_geometry("Mesh", False)
 
         return
-    
+
     def remove_all_geometry(self, cloud_structs):
         self.scene.remove_geometry("Merge Result")
 
@@ -231,15 +279,14 @@ class Editor():
     
     def update_visualizer(self, geometry, name):
         label_position = [0, 0, 0]
-        if not geometry == None:
+
+        if geometry == None:
+            self.scene.camera.look_at([0, 0, 0], [1, 1, 1], [0, 0, 1])
+        else:
             bounding_box = geometry.get_axis_aligned_bounding_box()
             bounding_box_corners = np.asarray(bounding_box.get_box_points())
             label_position = bounding_box_corners[5]
             self.scene_widget.setup_camera(60, bounding_box, bounding_box.get_center())
-        else:
-            self.scene.camera.look_at([0, 0, 0], [1, 1, 1], [0, 0, 1])
-
-
 
         if not self.current_3d_label == None:
             self.scene_widget.remove_3d_label(self.current_3d_label)
@@ -248,7 +295,6 @@ class Editor():
             self.scene.show_geometry(self.current_geometry_name, False)
 
         self.current_3d_label = self.scene_widget.add_3d_label(label_position, name)
-
         self.scene.show_geometry(name, True)
         self.current_geometry_name = name
         
@@ -279,6 +325,7 @@ class Editor():
         self.cloud_structs.pop(0)
 
         self.scene.remove_geometry("Total Cloud")
+        self.material.shader = "DEPTH"
         self.scene.add_geometry("Total Cloud", self.total_cloud, self.material)
         self.update_visualizer(self.total_cloud, "Total Cloud")
 
@@ -574,15 +621,15 @@ class Editor():
 
     # might need to get rid of this
     # use to make different meshes with different options
-    def make_mesh(self, method, options):
-        if method == "poisson":
-            self.make_poisson_mesh(options)
+    def make_mesh(self):
+        if self.meshing_method == "poisson":
+            self.make_poisson_mesh()
         else:
             raise TypeError("Attempt to use unsupported meshing type")
         return
 
     # make a mesh using poisson meshing
-    def make_poisson_mesh(self, options):
+    def make_poisson_mesh(self):
         if len(self.total_cloud.points) == 0:
             return
 
@@ -591,10 +638,19 @@ class Editor():
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=12, width=0, scale=1.1, linear_fit=False)[0]
 
         self.color_mesh([0.5, 0.5, 0.5])
-        self.mesh = self.mesh.filter_smooth_simple(number_of_iterations=5)
         self.mesh.compute_vertex_normals()
         
+        self.scene.remove_geometry("Mesh")
+        self.scene.add_geometry("Mesh", self.mesh, self.material)
+        self.update_visualizer(self.mesh, "Mesh")
 
+        return
+
+    def smooth_mesh(self):
+        self.mesh = self.mesh.filter_smooth_simple(number_of_iterations=1)
+
+        self.scene.remove_geometry("Mesh")
+        self.scene.add_geometry("Mesh", self.mesh, self.material)
         self.update_visualizer(self.mesh, "Mesh")
 
         return

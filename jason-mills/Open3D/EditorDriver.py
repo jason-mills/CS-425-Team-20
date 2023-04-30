@@ -5,7 +5,20 @@ import sys
 from Editor import Editor
 from Structs import PointCloudStruct
 import open3d.visualization.gui as gui
+import json
 
+# Write metadata to json file
+def write_to_json(file_path, key_value_pairs):
+    with open(file_path, 'r+') as file:
+        file_data = json.load(file)
+        
+    for key_value_pair in key_value_pairs:
+        file_data[key_value_pair[0]] = key_value_pair[1]
+
+    with open(file_path, 'w') as file:
+        json.dump(file_data, file, indent=4)
+
+    return
 
 # Read a supported file type
 def read_file(file_path):    
@@ -74,14 +87,15 @@ def process_non_user_scan(input_directory_path, input_file_base_name, input_file
 def main():
     if (len(sys.argv) - 1) != 6:
         print("Please provide command line arguments when running")
-        print("Example: python icp.py input_directory_path input_file_base_name input_file_extension output_file_base_name file_order is_user_scan")
+        print("Example: python icp.py input_directory_path input_file_base_name input_file_extension file_order output_directory_path output_file_base_name is_user_scan")
         return 1
     
     input_directory_path = sys.argv[1].replace("\\", "/")
     input_file_base_name = sys.argv[2]
     input_file_extension = sys.argv[3]
-    output_file_base_name = sys.argv[4]
-    file_order = sys.argv[5].split(",")
+    file_order = sys.argv[4].split(",")
+    output_directory_path = sys.argv[1].replace("\\", "/")
+    output_file_base_name = sys.argv[6]
     is_user_scan = sys.argv[6].lower() == "true"
 
     if not os.path.isdir(input_directory_path):
@@ -99,6 +113,8 @@ def main():
     editor = Editor(cloud_structs)
     gui.Application.instance.run()
     gui.Application.instance.quit()
-
+    
+    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)
+    
 if __name__ == '__main__':
     main()
