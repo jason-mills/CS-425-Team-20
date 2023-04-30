@@ -9,8 +9,11 @@ import open3d.visualization.rendering as rendering
 from win32api import GetSystemMetrics
 
 class Editor():
-    def __init__(self, cloud_structs):
-        print(GetSystemMetrics(0), GetSystemMetrics(1))
+    def __init__(self, cloud_structs, output_directory_path, output_file_base_name):
+        # Define output file directory and output base name
+        self.output_directory_path = output_directory_path
+        self.output_file_base_name = output_file_base_name
+        self.output_file_extension = ".stl"
 
         # Give object cloud structs and cloud index for state management
         self.cloud_structs = copy.deepcopy(cloud_structs)
@@ -71,7 +74,7 @@ class Editor():
 
         # Create window adn declare function for resizing widgets
         self.window = gui.Application.instance.create_window("C3P0", self.initial_screen_width, self.initial_screen_heigth)
-        self.window.set_on_layout(self.on_layout)
+        # self.window.set_on_layout(self.on_layout)
         self.em = self.window.theme.font_size
 
         # Call functions that add editor and scene widgets to the window
@@ -82,9 +85,22 @@ class Editor():
     
     # Initialize the editor with desire buttons/functions
     def initialize_editor(self):
-        self.layout = gui.Vert(0, gui.Margins(2 * self.em, 2 * self.em, 2 * self.em, 2 * self.em))
+        self.layout = gui.Vert(2 * self.em, gui.Margins(self.em * 2, 2 * self.em, 2 * self.em, 2 * self.em))
         self.layout.frame = gui.Rect(0, self.window.content_rect.y, self.initial_screen_width * 0.25, self.window.content_rect.height)
-        self.layout.add_stretch()
+        # self.layout.add_stretch()
+        
+        mesh_container_label = gui.Label("Meshing Method: ")
+
+        meshing_method_selection = gui.RadioButton(gui.RadioButton.VERT)
+        meshing_method_selection.set_items(["Ball Pivoting", "Convex Hull", "Poisson"])
+
+        mesh_button = gui.Button("Make Mesh")
+        mesh_button.set_on_clicked(self.make_mesh)
+
+        meshing_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
+        meshing_container.add_child(mesh_container_label)
+        meshing_container.add_child(meshing_method_selection)
+        meshing_container.add_child(mesh_button)
 
         next_button = gui.Button("Next")
         next_button.set_on_clicked(self.view_next_cloud)
@@ -92,14 +108,15 @@ class Editor():
         previous_buttion = gui.Button("Previous")
         previous_buttion.set_on_clicked(self.view_previous_cloud)
 
-        mesh_button = gui.Button("Make Mesh")
-        mesh_button.set_on_clicked(self.make_mesh)
+        previous_next_container = gui.Vert(0.5 * self.em, gui.Margins(0, 0, 0 ,0))
+        previous_next_container.add_child(previous_buttion)
+        previous_next_container.add_child(next_button)
 
         self.progress_bar = gui.ProgressBar()
         self.progress_bar.visible = False
 
-        self.layout.add_child(previous_buttion)
-        self.layout.add_child(next_button)
+        self.layout.add_child(meshing_container)
+        self.layout.add_child(previous_next_container)
         self.layout.add_child(self.progress_bar)
 
         self.window.add_child(self.layout)
@@ -678,13 +695,15 @@ class Editor():
         return len(self.cloud_structs)
 
     # write a point cloud file with a specific file extension
-    def write_point_cloud_file(self, file_path, file_type):
-        o3d.io.write_point_cloud(file_path + file_type, self.total_cloud)
+    def write_point_cloud_file(self):
+        file_path = self.output_directory_path + "/" + self.output_file_base_name + ".xyz"
+        o3d.io.write_point_cloud(file_path, self.total_cloud)
 
         return
 
     # write a mesh file 
-    def write_mesh_file(self, file_path, file_type):
-        o3d.io.write_triangle_mesh(file_path + file_type, self.mesh)
+    def write_mesh_file(self):
+        file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_extension
+        o3d.io.write_triangle_mesh(file_path, self.mesh)
 
         return

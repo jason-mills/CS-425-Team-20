@@ -41,14 +41,14 @@ def remove_outliers(pcd, voxel_size, iterations, numberOfPoints, radius):
     for i in range(iterations):
         cur_cloud, indices = downPcd.remove_radius_outlier(nb_points=numberOfPoints, radius=radius, print_progress=True)
         downPcd = downPcd.select_by_index(indices)
-        cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0)
+        cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0, print_progress=True)
         downPcd = downPcd.select_by_index(indices)
 
     return downPcd
 
 def process_scan(input_directory_path, input_file_base_name, input_file_extension, file_order, is_user_scan):
     file_paths = []
-    if is_user_scan:
+    if not input_file_base_name == " ":
         for number in file_order:
             file_paths.append(input_directory_path + "/" + input_file_base_name + number + input_file_extension)
     else:
@@ -81,22 +81,19 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
 
     return cloud_structs
 
-def process_non_user_scan(input_directory_path, input_file_base_name, input_file_extension, output_file_base_name, file_order):
-    print("something")
-
 def main():
-    if (len(sys.argv) - 1) != 6:
+    if (len(sys.argv) - 1) != 7:
         print("Please provide command line arguments when running")
-        print("Example: python icp.py input_directory_path input_file_base_name input_file_extension file_order output_directory_path output_file_base_name is_user_scan")
+        print("Example: python EditorDriver.py input_directory_path input_file_base_name input_file_extension file_order output_directory_path output_file_base_name is_user_scan")
         return 1
     
     input_directory_path = sys.argv[1].replace("\\", "/")
     input_file_base_name = sys.argv[2]
     input_file_extension = sys.argv[3]
     file_order = sys.argv[4].split(",")
-    output_directory_path = sys.argv[1].replace("\\", "/")
+    output_directory_path = sys.argv[5].replace("\\", "/")
     output_file_base_name = sys.argv[6]
-    is_user_scan = sys.argv[6].lower() == "true"
+    is_user_scan = sys.argv[7].lower() == "true"
 
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
@@ -107,14 +104,15 @@ def main():
     cloud_structs = process_scan(input_directory_path, 
                                  input_file_base_name, 
                                  input_file_extension, 
-                                 file_order, is_user_scan)
+                                 file_order, 
+                                 is_user_scan)
 
     gui.Application.instance.initialize()
-    editor = Editor(cloud_structs)
+    editor = Editor(cloud_structs, output_directory_path, output_file_base_name)
     gui.Application.instance.run()
     gui.Application.instance.quit()
     
-    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)
+    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
     
 if __name__ == '__main__':
     main()
