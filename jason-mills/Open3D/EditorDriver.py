@@ -6,17 +6,79 @@ from Editor import Editor
 from Structs import PointCloudStruct
 import open3d.visualization.gui as gui
 import json
+import argparse
+
+def parseArgs():
+    usage = '''python %(prog)s [-h] --dir DIR --prefix PREFIX --out OUT'''
+    parser = argparse.ArgumentParser(usage=usage, add_help=False)
+    required = parser.add_argument_group("Required")
+    required.add_argument("--run_interactive_mode", 
+                        type=str,  
+                        help="Choose to run in interactive mode or not",
+                        required=True)
+    required.add_argument("--input_directory_path", 
+                        type=str,  
+                        help="The directory containing the files to work with",
+                        required=True)
+    required.add_argument("--input_file_extension", 
+                        type=str,  
+                        help="The extension being used, example: .xyz, .ply",
+                        required=True)
+    required.add_argument("--output_directory_path", 
+                        type=str,  
+                        help="The output directory",
+                        required=True)
+    required.add_argument("--output_file_base_name", 
+                        type=str,  
+                        help="The output file base name",
+                        required=True)
+    required.add_argument("--is_user_scan", 
+                        type=str,  
+                        help="If the data is from user scan",
+                        required=True)
+    
+    optional = parser.add_argument_group("optional")
+
+    required.add_argument("--input_file_base_name", 
+                        type=str,  
+                        default="",
+                        help="The base file name being read from",
+                        required=False)
+    required.add_argument("--file_order", 
+                        type=str,  
+                        default=" ",
+                        help="The base file name being read from",
+                        required=False)
+    optional.add_argument("--merge_method", 
+                        type=str, 
+                        default="mutliway registration", 
+                        help="The registration algorithm to use",
+                        required=False)
+    
+    args = parser.parse_known_args()
+
+    return args[0]
 
 # Write metadata to json file
 def write_to_json(file_path, key_value_pairs):
-    with open(file_path, 'r+') as file:
-        file_data = json.load(file)
-        
-    for key_value_pair in key_value_pairs:
-        file_data[key_value_pair[0]] = key_value_pair[1]
+    if not (os.path.isfile(file_path)):
+        file_data = {}
 
-    with open(file_path, 'w') as file:
-        json.dump(file_data, file, indent=4)
+        for key_value_pair in key_value_pairs:
+            file_data[key_value_pair[0]] = key_value_pair[1]
+
+        with open(file_path, 'w') as file:
+            json.dump(file_data, file, indent=4)
+
+    else:
+        with open(file_path, 'r+') as file:
+            file_data = json.load(file)
+            
+        for key_value_pair in key_value_pairs:
+            file_data[key_value_pair[0]] = key_value_pair[1]
+
+        with open(file_path, 'w') as file:
+            json.dump(file_data, file, indent=4)
 
     return
 
@@ -48,7 +110,7 @@ def remove_outliers(pcd, voxel_size, iterations, numberOfPoints, radius):
 
 def process_scan(input_directory_path, input_file_base_name, input_file_extension, file_order, is_user_scan):
     file_paths = []
-    if not input_file_base_name == " ":
+    if not input_file_base_name == "":
         for number in file_order:
             file_paths.append(input_directory_path + "/" + input_file_base_name + number + input_file_extension)
     else:
@@ -82,18 +144,17 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
     return cloud_structs
 
 def main():
-    if (len(sys.argv) - 1) != 7:
-        print("Please provide command line arguments when running")
-        print("Example: python EditorDriver.py input_directory_path input_file_base_name input_file_extension file_order output_directory_path output_file_base_name is_user_scan")
-        return 1
-    
-    input_directory_path = sys.argv[1].replace("\\", "/")
-    input_file_base_name = sys.argv[2]
-    input_file_extension = sys.argv[3]
-    file_order = sys.argv[4].split(",")
-    output_directory_path = sys.argv[5].replace("\\", "/")
-    output_file_base_name = sys.argv[6]
-    is_user_scan = sys.argv[7].lower() == "true"
+    args = parseArgs()
+
+    run_interactive_mode = args.run_interactive_mode.lower() == 'true'
+    input_directory_path = args.input_directory_path.replace("\\", "/")
+    input_file_base_name = args.input_file_base_name
+    print("input file base name: " + input_file_base_name)
+    input_file_extension = args.input_file_extension
+    file_order = args.file_order.split(",")
+    output_directory_path = args.output_directory_path.replace("\\", "/")
+    output_file_base_name = args.output_file_base_name
+    is_user_scan = args.is_user_scan.lower == 'true'
 
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
@@ -107,10 +168,13 @@ def main():
                                  file_order, 
                                  is_user_scan)
 
-    gui.Application.instance.initialize()
-    editor = Editor(cloud_structs, output_directory_path, output_file_base_name)
-    gui.Application.instance.run()
-    gui.Application.instance.quit()
+    if run_interactive_mode:
+        gui.Application.instance.initialize()
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, run_interactive_mode)
+        gui.Application.instance.run()
+        gui.Application.instance.quit()
+    else:
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, run_interactive_mode)
     
     # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
     
