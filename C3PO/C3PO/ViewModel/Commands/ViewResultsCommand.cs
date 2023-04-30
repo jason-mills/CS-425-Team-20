@@ -39,7 +39,8 @@ namespace C3PO.ViewModel.Commands
             }
             // Declaring and configuring process-running object
             string fPath = settings.dir + "\\" + fName;
-            string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\render.py";
+            string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\RenderDriver.py";
+
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()

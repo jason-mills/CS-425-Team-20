@@ -22,6 +22,7 @@ namespace C3PO.Model
         public string inPrefix;
         public string outPrefix;
         public string regOrder;
+        public bool interMode;
 
         public SettingsParser()
         {
@@ -36,6 +37,7 @@ namespace C3PO.Model
             inPrefix = "temp";
             outPrefix = "Final";
             regOrder = "";
+            interMode = false;
         }
 
         public void ImportSettingsFile(string? fpath = null)
@@ -160,12 +162,14 @@ namespace C3PO.Model
             string distThresh = (subsystem.Element("distThresh") ?? new XElement("")).Value.ToString();
             string alg = (subsystem.Element("algo") ?? new XElement("")).Value.ToString();
             string order = (subsystem.Element("regOrder") ?? new XElement("")).Value.ToString();
+            string intMode = (subsystem.Element("interMode") ?? new XElement("")).Value.ToString();
 
             // Set to proper values
             icpIters = icpIt == "" ? 20 : int.Parse(icpIt);
             distanceThresh = distThresh == "" ? 0.00001 : double.Parse(distThresh);
             algo = alg == "" ? "icp" : alg;
             regOrder = order == "" ? GenDefaultRegOrder() : order;
+            interMode = intMode == "" ? false : bool.Parse(intMode);
         }
 
         private string GenDefaultRegOrder()

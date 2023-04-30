@@ -310,13 +310,21 @@ namespace C3PO.ViewModel
         public void UpdateMetadata()
         {
             metadataParser.LoadMetadata(settingsVM.settings.dir);
-
             Metadata = new ObservableCollection<ScanMetadata>();
+            
             Metadata.Add(new ScanMetadata("Time Spanned", _componentLinker.TimeSpanned.ToString(@"hh\:mm\:ss")));
-            Metadata.Add(new ScanMetadata("Partitions", "0"));
-            Metadata.Add(new ScanMetadata("Scans Taken", "0"));
-            Metadata.Add(new ScanMetadata("Avg. Fitness Score", "0"));
-            Metadata.Add(new ScanMetadata("Points Captured", "0"));
+
+            string md = metadataParser.Get("Partitions") ?? "0";
+            Metadata.Add(new ScanMetadata("Partitions", md));
+
+            md = metadataParser.Get("Scans Taken") ?? "0";
+            Metadata.Add(new ScanMetadata("Scans Taken", md));
+
+            md = metadataParser.Get("averageFitnessScore") ?? "0";
+            Metadata.Add(new ScanMetadata("Avg. Fitness Score", md));
+
+            md = metadataParser.Get("Points Captured") ?? "0";
+            Metadata.Add(new ScanMetadata("Points Captured", md));
         }
 
         public void UpdatePartitionList()

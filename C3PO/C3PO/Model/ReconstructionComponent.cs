@@ -32,13 +32,23 @@ namespace C3PO.Model
             string path = System.IO.Directory.GetCurrentDirectory();
             string sourcePath = settingsParser.dir;
             string sourcePrefix = settingsParser.inPrefix;
-            string order = GetICPOrder();
+            // string order = GetICPOrder();
+            string order = settingsParser.regOrder;
+            string interMode = settingsParser.interMode.ToString();
+            string args = $"--input_directory_path={sourcePath} " +
+                $"--input_file_base_name={sourcePrefix} " +
+                $"--input_file_extension=.xyz " +
+                $"--file_order={order} " +
+                $"--output_directory_path=.\\output\\ " +
+                $"--output_file_base_name=final " +
+                $"--is_user_scan=False " +
+                $"--run_interactive_mode={interMode}";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = "python",
-                    Arguments = ".\\bin\\icp.py " + sourcePath + " " + sourcePrefix + " .xyz .\\output\\final " + order + " True"
+                    Arguments = ".\\bin\\icp.py " + args
                 }
             };
 

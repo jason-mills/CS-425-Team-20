@@ -73,82 +73,80 @@
         </StackPanel>
 
         <!--Main settings panel-->
-        <StackPanel Orientation="Vertical"
-                    Grid.Column="1"
-                    Grid.Row="1">
-
-            <Border Background="#1e2124"
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.Row="1">
+            <StackPanel Orientation="Vertical">
+                <Border Background="#1e2124"
                     Margin="5">
-                <Label Content="General Configurations"
+                    <Label Content="General Configurations"
                        FontSize="24"
                        HorizontalAlignment="Left"/>
-            </Border>
-            
-            <!--USB Device selction-->
-            <Label Content="Select USB Port:"
+                </Border>
+
+                <!--USB Device selction-->
+                <Label Content="Select USB Port:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <ComboBox Name="comboBox1"
+                <ComboBox Name="comboBox1"
                       Height="30"
                       Width="400"
                       FontSize="16"
                       HorizontalAlignment="Left"
                       SelectedIndex="0"
                       Margin="10,0,10,10">
-                <ComboBox.Resources>
-                    <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
-                </ComboBox.Resources>
-                <ComboBox.ItemsSource>
-                    <CompositeCollection>
-                        <ListBoxItem Content="Select Device"/>
-                        <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
-                    </CompositeCollection>
-                </ComboBox.ItemsSource>
-            </ComboBox>
-            
-            <!--Select default export format-->
-            <Label Content="Default Export Format:"
+                    <ComboBox.Resources>
+                        <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <ListBoxItem Content="Select Device"/>
+                            <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
+
+                <!--Select default export format-->
+                <Label Content="Default Export Format:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <ComboBox Name="ExportFormat"
+                <ComboBox Name="ExportFormat"
                       Height="30"
                       Width="400"
                       FontSize="16"
                       HorizontalAlignment="Left"
                       SelectedIndex="0"
                       Margin="10,0,10,10">
-                <ComboBox.Resources>
-                    <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
-                </ComboBox.Resources>
-                <ComboBox.ItemsSource>
-                    <CompositeCollection>
-                        <ListBoxItem Content="STL"/>
-                        <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
-                    </CompositeCollection>
-                </ComboBox.ItemsSource>
-            </ComboBox>
+                    <ComboBox.Resources>
+                        <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <ListBoxItem Content="STL"/>
+                            <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
 
-            <Border Background="#1e2124"
+                <Border Background="#1e2124"
                     Margin="5">
-                <Label Content="Scanning Configurations"
+                    <Label Content="Scanning Configurations"
                        FontSize="24"
                        HorizontalAlignment="Left"/>
-            </Border>
-            
-            <!--Number of rotations input-->
-            <Label Content="No. of Scans/Angle:"
+                </Border>
+
+                <!--Number of rotations input-->
+                <Label Content="No. of Scans/Angle:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <TextBox Text="{Binding NoOfRotations}"
+                <TextBox Text="{Binding NoOfRotations}"
                      x:Name="RotationsTextBox"
                      Height="30"
                      Width="400"
@@ -157,29 +155,29 @@
                      Foreground="Gray"
                      Background="LightGray"
                      Margin="10,0,10,10">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter"
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
                                 Command="{Binding InputRotationsCommand}"
                                 CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
-                </TextBox.InputBindings>
-            </TextBox>
+                    </TextBox.InputBindings>
+                </TextBox>
 
 
-            <Border Background="#1e2124"
+                <Border Background="#1e2124"
                     Margin="5">
-                <Label Content="Hardware Configurations"
+                    <Label Content="Hardware Configurations"
                        FontSize="24"
                        HorizontalAlignment="Left"/>
-            </Border>
-            
-            <!--Number of partitions input-->
-            <Label Content="Turn Radius:"
+                </Border>
+
+                <!--Number of partitions input-->
+                <Label Content="Turn Radius:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Margin="10,10,10,0"
                    Foreground="White"/>
-            <ComboBox Name="NoOfPartitionsList"
+                <ComboBox Name="NoOfPartitionsList"
                       Height="30"
                       Width="400"
                       FontSize="16"
@@ -187,30 +185,30 @@
                       Margin="10,0,10,10"
                       SelectedIndex="{Binding SelectionPartitionIndex}"
                       SelectedItem="{Binding Partitions}">
-                <ComboBox.Resources>
-                    <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
-                </ComboBox.Resources>
-                <ComboBox.ItemsSource>
-                    <CompositeCollection>
-                        <CollectionContainer Collection="{Binding Source={StaticResource NoOfPartitionsOpt}}"/>
-                    </CompositeCollection>
-                </ComboBox.ItemsSource>
-            </ComboBox>
+                    <ComboBox.Resources>
+                        <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <CollectionContainer Collection="{Binding Source={StaticResource NoOfPartitionsOpt}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
 
-            <Border Background="#1e2124"
+                <Border Background="#1e2124"
                     Margin="5">
-                <Label Content="Reconstruction Configurations"
+                    <Label Content="Reconstruction Configurations"
                        FontSize="24"
                        HorizontalAlignment="Left"/>
-            </Border>
+                </Border>
 
-            <Label Content="ICP Iterations"
+                <Label Content="ICP Iterations"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <TextBox Text="15"
+                <TextBox Text="15"
                      x:Name="ICPIterations"
                      Height="30"
                      Width="400"
@@ -219,33 +217,33 @@
                      Foreground="Gray"
                      Background="LightGray"
                      Margin="10,0,10,10">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter"
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
                                 Command="{Binding InputRotationsCommand}"
                                 CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
-                </TextBox.InputBindings>
-            </TextBox>
+                    </TextBox.InputBindings>
+                </TextBox>
 
-            <Label Content="Reconstruction Order" Height="30" FontSize="18"
+                <Label Content="Reconstruction Order" Height="30" FontSize="18"
                    HorizontalAlignment="Left" Foreground="White" Margin="10,10,10,0"/>
-            <TextBox x:Name="RegOrder" Height="30" Width="400" FontSize="18"
+                <TextBox x:Name="RegOrder" Height="30" Width="400" FontSize="18"
                      HorizontalAlignment="Left" Foreground="Gray" Background="LightGray"
                      Margin="10,0,10,0">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter"
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
                                 Command="{Binding InputRegOrder}"
                                 CommandParameter="{Binding ElementName=RegOrder,Path=Text}"/>
-                </TextBox.InputBindings>
-            </TextBox>
+                    </TextBox.InputBindings>
+                </TextBox>
 
-            <!--Registration Distance Threshold-->
-            <Label Content="Registration Distance Threshold"
+                <!--Registration Distance Threshold-->
+                <Label Content="Registration Distance Threshold"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-            <TextBox Text="0.01"
+                <TextBox Text="0.01"
                      x:Name="DistanceThreshold"
                      Height="30"
                      Width="400"
@@ -254,21 +252,21 @@
                      Foreground="Gray"
                      Background="LightGray"
                      Margin="10,0,10,10">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter"
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
                                 Command="{Binding InputRotationsCommand}"
                                 CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
-                </TextBox.InputBindings>
-            </TextBox>
+                    </TextBox.InputBindings>
+                </TextBox>
 
-            <!--Number of partitions input-->
-            <Label Content="Registration Algorithm"
+                <!--Number of partitions input-->
+                <Label Content="Registration Algorithm"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Margin="10,10,10,0"
                    Foreground="White"/>
-            <ComboBox Name="ReconstructAlgo"
+                <ComboBox Name="ReconstructAlgo"
                       Height="30"
                       Width="400"
                       FontSize="16"
@@ -276,29 +274,41 @@
                       Margin="10,0,10,10"
                       SelectedIndex="{Binding SelectionPartitionIndex}"
                       SelectedItem="{Binding Partitions}">
-                <ComboBox.Resources>
-                    <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
-                </ComboBox.Resources>
-                <ComboBoxItem Content="Iterative Closest Point"/>
-            </ComboBox>
-        </StackPanel>
+                    <ComboBox.Resources>
+                        <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
+                    </ComboBox.Resources>
+                    <ComboBoxItem Content="Iterative Closest Point"/>
+                </ComboBox>
+
+                <!--Interactive mode switch-->
+                <Label Content="Interactive Mode"
+                   Height="30"
+                   FontSize="18"
+                   HorizontalAlignment="Left"
+                   Foreground="White"
+                   Margin="10,10,10,0"/>
+                <ui:ToggleSwitch Margin="10,0,10,10"
+                                 IsOn="{Binding InterMode}"/>
+
+            </StackPanel>
+        </ScrollViewer>
 
         <ui:SimpleStackPanel Grid.Column="2"
                              Grid.Row="1">
-            <Button Content="Export Settings"
+                <Button Content="Export Settings"
                 Margin="10"
                 Width="Auto"
                 Height="Auto"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     Command="{Binding ExportSettingsCommand}"/>
-            <Button Content="Import Settings"
+                <Button Content="Import Settings"
                 Margin="10"
                 Width="Auto"
                 Height="Auto"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     Command="{Binding ImportSettingsCommand}"/>
-        </ui:SimpleStackPanel>
+         </ui:SimpleStackPanel>
     </Grid>
 </UserControl>

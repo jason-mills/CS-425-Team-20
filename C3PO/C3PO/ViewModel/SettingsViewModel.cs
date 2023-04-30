@@ -86,6 +86,18 @@ namespace C3PO.ViewModel
         //        return _settings;
         //    }
         //}
+        private bool _interMode;
+        public bool InterMode
+        {
+            get
+            {
+                return _interMode;
+            }
+            set
+            {
+                _interMode = value;
+            }
+        }
 
         public ICommand BackBtnCommand { get; }
         public ICommand ImportSettingsCommand { get; }
@@ -96,6 +108,7 @@ namespace C3PO.ViewModel
         {
             _partitions = Int32.Parse(_noOfPartitionsOpt[_selectionPartitionIndex]);
             _scansPerAngle = 1;
+            _interMode = false;
 
             settings = new SettingsParser();
             settings.ImportSettingsFile();
