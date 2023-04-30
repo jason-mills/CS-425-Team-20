@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\C3PO_Hardware_Connected_Example.png" />
+    <None Remove="Resources\Images\C3PO_Press_Cancel_Example.png" />
+    <None Remove="Resources\Images\C3PO_Press_Scan_Example.png" />
+    <None Remove="Resources\Images\C3PO_Press_Settings_Example.png" />
     <None Remove="Resources\Images\cat_fixed.png" />
     <None Remove="Resources\Images\computer_desktop_inverse.png" />
     <None Remove="Resources\Images\motion_sensor_inverse.png" />
@@ -16,12 +20,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis" Version="1.60.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.60.0" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.60.0.3024" />
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Utilities" Version="17.4.33103.184" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\C3PO_Hardware_Connected_Example.png" />
+    <Resource Include="Resources\Images\C3PO_Press_Cancel_Example.png" />
+    <Resource Include="Resources\Images\C3PO_Press_Settings_Example.png" />
+    <Resource Include="Resources\Images\C3PO_Press_Scan_Example.png" />
     <Resource Include="Resources\Images\cat_fixed.png" />
     <Resource Include="Resources\Images\computer_desktop_inverse.png" />
     <Resource Include="Resources\Images\motion_sensor_inverse.png" />

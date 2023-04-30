@@ -97,5 +97,50 @@ namespace C3PO.Model
 
             return scans;
         }
+
+        public bool CheckConnection()
+        {
+            // Variables
+            string binPath = System.IO.Directory.GetCurrentDirectory() + "\\bin";
+
+            // Check arduino connection
+            if(!System.IO.File.Exists(binPath + "\\check_arduino.exe"))
+            {
+                return false;
+            }
+
+            Process p = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = binPath + "\\check_arduino.exe"
+                }
+            };
+
+            p.Start();
+            p.WaitForExit();
+
+            if(p.ExitCode != 0)
+            {
+                return false;
+            }
+
+            // Check camera connection
+            if (!System.IO.File.Exists(binPath + "\\check_camera.exe"))
+            {
+                return false;
+            }
+
+            p.StartInfo.FileName = binPath + "\\check_camera.exe";
+            p.Start();
+            p.WaitForExit();
+
+            if(p.ExitCode != 0 )
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

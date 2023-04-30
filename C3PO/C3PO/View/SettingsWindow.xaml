@@ -225,7 +225,19 @@
                                 CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
                 </TextBox.InputBindings>
             </TextBox>
-            
+
+            <Label Content="Reconstruction Order" Height="30" FontSize="18"
+                   HorizontalAlignment="Left" Foreground="White" Margin="10,10,10,0"/>
+            <TextBox x:Name="RegOrder" Height="30" Width="400" FontSize="18"
+                     HorizontalAlignment="Left" Foreground="Gray" Background="LightGray"
+                     Margin="10,0,10,0">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter"
+                                Command="{Binding InputRegOrder}"
+                                CommandParameter="{Binding ElementName=RegOrder,Path=Text}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
             <!--Registration Distance Threshold-->
             <Label Content="Registration Distance Threshold"
                    Height="30"

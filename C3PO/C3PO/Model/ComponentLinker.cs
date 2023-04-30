@@ -82,5 +82,10 @@ namespace C3PO.Model
             _timeSpanned = (_endTime - _startTime);
             return true;
         }
+
+        public bool CheckConnections()
+        {
+            return _scanComp.CheckConnection() && _reconstructComp.CheckConnection();
+        }
     }
 }

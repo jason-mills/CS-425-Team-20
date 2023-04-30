@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Navigation;
 
 namespace C3PO.ViewModel
@@ -36,7 +37,9 @@ namespace C3PO.ViewModel
         Reconstruct,
         Finish,
         Display,
-        Empty
+        Empty,
+        GuiTutorial,
+        HardwareTutorial
     }
 
     public class StartWindowViewModel : ViewModelBase
@@ -45,6 +48,7 @@ namespace C3PO.ViewModel
          * Attributes
          */
         private SettingsViewModel settingsVM;
+        private MetadataParser metadataParser;
         private ComponentLinker _componentLinker;
         public ComponentLinker ComponentLinker
         {
@@ -145,6 +149,20 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(CloudImagePath));
             }
         }
+        public string ConnectionStatus
+        {
+            get
+            {
+                return GetConnectionStatus();
+            }
+        }
+        public string ConnectionColor
+        {
+            get
+            {
+                return GetConnectionColor();
+            }
+        }
 
         /*
          * Commands
@@ -155,6 +173,11 @@ namespace C3PO.ViewModel
         public ICommand ViewResultsBtnCommand { get; }
         public ICommand GoToHomePageCommand { get; }
         public ICommand SaveAllResultsBtnCommand { get; }
+        public ICommand SaveFinalToCloudCommand { get; }
+        public ICommand SaveAllFilesToCloudCommand { get; }
+        public ICommand GuiTutorialBtnCommand { get; }
+        public ICommand BackResultsBtnCommand { get; }
+        public ICommand HwTutorialBtnCommand { get; }
 
         /*
          * Constructors
@@ -166,7 +189,8 @@ namespace C3PO.ViewModel
             settingsVM = new SettingsViewModel(navigateStore);
             _componentLinker = new ComponentLinker(settingsVM.settings);
             Metadata = new ObservableCollection<ScanMetadata>();
-
+            _cloudImagePath = "";
+            _linkerState = ScanStates.Empty;
             _resultsUC = new C3PO.View.ScanResultsEmpty();
             _resultsUC.DataContext = new ScanResultsEmptyViewModel();
 
@@ -183,6 +207,11 @@ namespace C3PO.ViewModel
             SaveAllResultsBtnCommand = new CommandSaveAllResults();
             ViewResultsBtnCommand = new ViewResultsCommand(settingsVM.settings);
             GoToHomePageCommand = new NavigateUriCommand("https://sites.google.com/nevada.unr.edu/team-20-c3po/home?authuser=1");
+            SaveFinalToCloudCommand = new CommandUploadToCloud(settingsVM.settings, "final");
+            SaveAllFilesToCloudCommand = new CommandUploadToCloud(settingsVM.settings, "all");
+            GuiTutorialBtnCommand = new CommandUpdateResultsPanel(this);
+            BackResultsBtnCommand = new CommandUpdateResultsPanel(this);
+            HwTutorialBtnCommand = new CommandUpdateResultsPanel(this);
         }
 
         /*
@@ -216,6 +245,14 @@ namespace C3PO.ViewModel
             {
                 ResultPanelHeader = "No Scanned Content Available";
             }
+            else if(_linkerState == ScanStates.GuiTutorial)
+            {
+                ResultPanelHeader = "GUI Tutorial";
+            }
+            else if(_linkerState == ScanStates.HardwareTutorial)
+            {
+                ResultPanelHeader = "Hardware Tutorial";
+            }
         }
 
         public void StartScan(CancellationToken ct)
@@ -225,6 +262,7 @@ namespace C3PO.ViewModel
                 LinkerState = ScanStates.Scan;
             }));
             bool result = _componentLinker.StartScan();
+            
             if (result)
             {
                 FinishScan();
@@ -271,6 +309,8 @@ namespace C3PO.ViewModel
 
         public void UpdateMetadata()
         {
+            metadataParser.LoadMetadata(settingsVM.settings.dir);
+
             Metadata = new ObservableCollection<ScanMetadata>();
             Metadata.Add(new ScanMetadata("Time Spanned", _componentLinker.TimeSpanned.ToString(@"hh\:mm\:ss")));
             Metadata.Add(new ScanMetadata("Partitions", "0"));
@@ -309,6 +349,30 @@ namespace C3PO.ViewModel
             SettingsParser settings = settingsVM.settings;
             CloudImagePath = $"{settings.dir}\\{settings.outPrefix}.png";
             return _cloudImagePath;
+        }
+
+        public string GetConnectionStatus()
+        {
+            bool connectionStatus = _componentLinker.CheckConnections();
+
+            if(connectionStatus)
+            {
+                return "Connected";
+            }
+
+            return "Disconnected";
+        }
+
+        public string GetConnectionColor()
+        {
+            bool connectionStatus = _componentLinker.CheckConnections();
+
+            if(connectionStatus)
+            {
+                return "LawnGreen";
+            }
+
+            return "Red";
         }
     }
 }

@@ -16,11 +16,12 @@ namespace C3PO.Model
         public int turnRadius;
         public int scansPerAngle;
         public int icpIters;
-        public int distanceThresh;
+        public double distanceThresh;
         public string algo;
         public string dir;
         public string inPrefix;
         public string outPrefix;
+        public string regOrder;
 
         public SettingsParser()
         {
@@ -34,6 +35,7 @@ namespace C3PO.Model
             dir = Directory.GetCurrentDirectory() + "\\output\\";
             inPrefix = "temp";
             outPrefix = "Final";
+            regOrder = "";
         }
 
         public void ImportSettingsFile(string? fpath = null)
@@ -87,31 +89,96 @@ namespace C3PO.Model
             {
                 XElement settings = XElement.Load(fpath);
 
-                XElement? hardwareSettings = (from subsystem in settings?.Descendants("subsystem")
-                                              where subsystem?.Attribute("category")?.Value.ToString() == "hardware"
-                                              select subsystem)?.FirstOrDefault();
+                XElement? category = LoadCategory(settings, "general");
+                if(category is not null)
+                {
+                    LoadGeneralSettings(category);
+                }
 
-                string defRot = scansPerAngle.ToString();
-                string defPar = turnRadius.ToString();
+                category = LoadCategory(settings, "scanning");
+                if(category is not null)
+                {
+                    LoadScanningSettings(category);
+                }
 
-                var test = hardwareSettings?.Element("scansPerAngle");
-
-                int rot = Int32.Parse(
-                    (hardwareSettings?.Element("rotations") ?? new XElement(defRot))
-                    .Value
-                    .ToString());
-                int par = Int32.Parse(
-                    (hardwareSettings?.Element("turnRadius") ?? new XElement(defPar))
-                    .Value
-                    .ToString());
-
-                scansPerAngle = rot;
-                turnRadius = par;
+                category = LoadCategory(settings, "reconstruction");
+                if(category is not null)
+                {
+                    LoadReconstructionSettings(category);
+                }
             }
             catch
             {
                 return;
             }
+        }
+
+        private XElement? LoadCategory(XElement settings, string category)
+        {
+            try
+            {
+                XElement? categorySettings = (from subsystem in settings?.Descendants("subsystem")
+                                              where subsystem?.Attribute("category")?.Value.ToString() == category
+                                              select subsystem)?.FirstOrDefault();
+
+                return categorySettings;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void LoadGeneralSettings(XElement subsystem)
+        {
+            // Get settings file values
+            string iPrefix = (subsystem.Element("inPrefix") ?? new XElement("")).Value.ToString();
+            string oPrefix = (subsystem.Element("outPrefix") ?? new XElement("")).Value.ToString();
+            string lDir = (subsystem.Element("loadDir") ?? new XElement("")).Value.ToString();
+
+            // Set to proper values
+            inPrefix = iPrefix == "" ? "temp" : iPrefix;
+            outPrefix = oPrefix == "" ? "out" : oPrefix;
+            dir = lDir == "" ? ".\\output" : lDir;
+        }
+
+        private void LoadScanningSettings(XElement subsystem)
+        {
+            // Get settings file values
+            string tRad = (subsystem.Element("turnRadius") ?? new XElement("")).Value.ToString();
+            string scansPAng = (subsystem.Element("scansPerAngle") ?? new XElement("")).Value.ToString();
+
+            // Set to proper values
+            turnRadius = tRad == "" ? 30 : int.Parse(tRad);
+            scansPerAngle = scansPAng == "" ? 1 : int.Parse(scansPAng);
+        }
+
+        private void LoadReconstructionSettings(XElement subsystem)
+        {
+            // Get settings file values
+            string icpIt = (subsystem.Element("icpIters") ?? new XElement("")).Value.ToString();
+            string distThresh = (subsystem.Element("distThresh") ?? new XElement("")).Value.ToString();
+            string alg = (subsystem.Element("algo") ?? new XElement("")).Value.ToString();
+            string order = (subsystem.Element("regOrder") ?? new XElement("")).Value.ToString();
+
+            // Set to proper values
+            icpIters = icpIt == "" ? 20 : int.Parse(icpIt);
+            distanceThresh = distThresh == "" ? 0.00001 : double.Parse(distThresh);
+            algo = alg == "" ? "icp" : alg;
+            regOrder = order == "" ? GenDefaultRegOrder() : order;
+        }
+
+        private string GenDefaultRegOrder()
+        {
+            string order = "";
+
+            for(int i = 0; i < 360 / turnRadius - 1; i++)
+            {
+                order += $"{i},";
+            }
+            order += (360 / turnRadius - 1).ToString();
+
+            return order;
         }
     }
 }

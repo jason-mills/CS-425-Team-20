@@ -10,5 +10,7 @@ namespace C3PO.Model
     {
         public bool StartOp();
         public bool StopOp();
+
+        public bool CheckConnection();
     }
 }

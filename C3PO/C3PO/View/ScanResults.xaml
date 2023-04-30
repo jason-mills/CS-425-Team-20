@@ -44,6 +44,14 @@
                     Padding="5"
                     Command="{Binding ViewResultsBtnCommand}"
                     CommandParameter="0"/>
+            <Button HorizontalAlignment="Center"
+                    Content="Save to Drive"
+                    MinWidth="50"
+                    MinHeight="30"
+                    FontSize="16"
+                    Margin="5"
+                    Padding="5"
+                    Command="{Binding SaveFinalToCloudCommand}"/>
         </StackPanel>
 
         
@@ -96,8 +104,14 @@
             <!-- End: Separator -->
 
             <!--Raw data buttons-->
-            <Button Content="Save All" Margin="20,5,20,5"
+            <Button Content="Save All" 
+                    MinWidth="50" MinHeight="30" FontSize="16"
+                    Margin="20,5,20,5" Padding="5"
                     Command="{Binding SaveAllResultsBtnCommand}"/>
+            <Button Content="Save All To Drive"
+                    MinWidth="50" MinHeight="30" FontSize="16"
+                    Margin="20,5,20,5" Padding="5"
+                    Command="{Binding SaveAllFilesToCloudCommand}"/>
             <ItemsControl ItemsSource="{Binding RawResults}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

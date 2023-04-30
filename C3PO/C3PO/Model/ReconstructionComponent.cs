@@ -128,5 +128,10 @@ namespace C3PO.Model
 
             return result;
         }
+
+        public bool CheckConnection()
+        {
+            return true;
+        }
     }
 }

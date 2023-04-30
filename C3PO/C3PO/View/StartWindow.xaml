@@ -58,11 +58,24 @@
                             </CompositeCollection>
                         </ComboBox.ItemsSource>
                     </ComboBox>
+                    
+                    <!--GUI Usage Tutorial Button-->
+                    <Button Content="GUI Tutorial" HorizontalContentAlignment="Center"
+                            Height="Auto" Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"
+                            FontSize="16"
+                            Command="{Binding GuiTutorialBtnCommand}"
+                            CommandParameter="GuiTutorial"/>
+                    <!--Hardware Usage Tutorial Button-->
+                    <Button Content="Hardware Tutorial" HorizontalContentAlignment="Center"
+                            Height="Auto" Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"
+                            FontSize="16"
+                            Command="{Binding HwTutorialBtnCommand}"
+                            CommandParameter="HwTutorial"/>
 
                     <Button Content="Settings"
                         HorizontalContentAlignment="Center"
                         Height="Auto"
-                            Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"
+                        Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"
                         FontSize="16"
                         Command="{Binding SettingsBtnCommand}"/>
 
@@ -141,10 +154,10 @@
                 <!-- End: Header Icons -->
 
                 <!-- Connection Status -->
-                <Label Content="Connected"
+                <Label Content="{Binding ConnectionStatus}"
                    HorizontalAlignment="Center"
                    FontSize="18"
-                   Foreground="LawnGreen"
+                   Foreground="{Binding ConnectionColor}"
                    Grid.Row="0"/>
                 <!-- End: Connection Status -->
 
