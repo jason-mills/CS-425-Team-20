@@ -39,11 +39,15 @@ PointCloud::PointCloud() {}
 PointCloud::PointCloud(std::vector<Eigen::Matrix<float, 4, 1>> newPoints)
 {
 	points = newPoints;
+
+	return;
 }
 
 PointCloud::PointCloud(const PointCloud& aPointCloud)
 {
 	points = aPointCloud.points;
+
+	return;
 }
 
 std::vector< Eigen::Matrix<float, 4, 1>> PointCloud::getPoints()
