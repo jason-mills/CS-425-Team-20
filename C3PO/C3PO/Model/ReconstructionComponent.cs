@@ -39,8 +39,8 @@ namespace C3PO.Model
                 $"--input_file_base_name={sourcePrefix} " +
                 $"--input_file_extension=.xyz " +
                 $"--file_order={order} " +
-                $"--output_directory_path=.\\output\\ " +
-                $"--output_file_base_name=final " +
+                $"--output_directory_path={settingsParser.dir} " +
+                $"--output_file_base_name={settingsParser.outPrefix} " +
                 $"--is_user_scan=False " +
                 $"--run_interactive_mode={interMode}";
             var p = new Process()

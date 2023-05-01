@@ -43,22 +43,16 @@
                        FontSize="48"
                        HorizontalAlignment="Center"/>
 
-                    <ComboBox Name="comboBox1"
-                          Height="30"
-                              Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"
-                          FontSize="16"
-                          SelectedIndex="0">
-                        <ComboBox.Resources>
-                            <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
-                        </ComboBox.Resources>
-                        <ComboBox.ItemsSource>
-                            <CompositeCollection>
-                                <ListBoxItem Content="Select Device"/>
-                                <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
-                            </CompositeCollection>
-                        </ComboBox.ItemsSource>
-                    </ComboBox>
-                    
+                    <Rectangle HorizontalAlignment="Stretch"
+                           Fill="LightGray"
+                           Height="2"
+                           Margin="0,5,0,5"/>
+
+                    <Rectangle HorizontalAlignment="Stretch"
+                           Fill="LightGray"
+                           Height="2"
+                           Margin="0,5,0,5"/>
+
                     <!--GUI Usage Tutorial Button-->
                     <Button Content="GUI Tutorial" HorizontalContentAlignment="Center"
                             Height="Auto" Width="{Binding ElementName=SideBarPanel,Path=ActualWidth}"

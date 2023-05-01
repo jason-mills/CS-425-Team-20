@@ -82,30 +82,51 @@
                        HorizontalAlignment="Left"/>
                 </Border>
 
-                <!--USB Device selction-->
-                <Label Content="Select USB Port:"
+                <!--Set the source prefix name-->
+                <Label Content="Source prefix name:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-                <ComboBox Name="comboBox1"
-                      Height="30"
-                      Width="400"
-                      FontSize="16"
-                      HorizontalAlignment="Left"
-                      SelectedIndex="0"
-                      Margin="10,0,10,10">
-                    <ComboBox.Resources>
-                        <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
-                    </ComboBox.Resources>
-                    <ComboBox.ItemsSource>
-                        <CompositeCollection>
-                            <ListBoxItem Content="Select Device"/>
-                            <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
-                        </CompositeCollection>
-                    </ComboBox.ItemsSource>
-                </ComboBox>
+                <TextBox Text="{Binding SPrefix, Mode=OneWay}"
+                     x:Name="SourcePrefix"
+                     Height="30"
+                     Width="400"
+                     FontSize="18"
+                     HorizontalAlignment="Left"
+                     Foreground="Gray"
+                     Background="LightGray"
+                     Margin="10,0,10,10">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
+                                Command="{Binding UpdateSPrefixCommand}"
+                                CommandParameter="{Binding ElementName=SourcePrefix, Path=Text}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <!--Set the source prefix name-->
+                <Label Content="Output prefix name:"
+                   Height="30"
+                   FontSize="18"
+                   HorizontalAlignment="Left"
+                   Foreground="White"
+                   Margin="10,10,10,0"/>
+                <TextBox Text="{Binding OPrefix, Mode=OneWay}"
+                     x:Name="OutputPrefix"
+                     Height="30"
+                     Width="400"
+                     FontSize="18"
+                     HorizontalAlignment="Left"
+                     Foreground="Gray"
+                     Background="LightGray"
+                     Margin="10,0,10,10">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter"
+                                Command="{Binding UpdateOPrefixCommand}"
+                                CommandParameter="{Binding ElementName=OutputPrefix, Path=Text}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
 
                 <!--Select default export format-->
                 <Label Content="Default Export Format:"

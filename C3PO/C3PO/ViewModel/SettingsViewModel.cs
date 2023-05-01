@@ -86,16 +86,30 @@ namespace C3PO.ViewModel
         //        return _settings;
         //    }
         //}
-        private bool _interMode;
+        //private bool _interMode;
         public bool InterMode
         {
             get
             {
-                return _interMode;
+                return settings.interMode;
             }
             set
             {
-                _interMode = value;
+                settings.interMode = value;
+            }
+        }
+        public string SPrefix
+        {
+            get
+            {
+                return settings.inPrefix;
+            }
+        }
+        public string OPrefix
+        {
+            get
+            {
+                return settings.outPrefix;
             }
         }
 
@@ -103,12 +117,14 @@ namespace C3PO.ViewModel
         public ICommand ImportSettingsCommand { get; }
         public ICommand ExportSettingsCommand { get; }
         public ICommand InputRotationsCommand { get; }
+        public ICommand InputRegOrder { get; }
+        public ICommand UpdateSPrefixCommand { get; }
+        public ICommand UpdateOPrefixCommand { get; }
 
         public SettingsViewModel(NavigationStore ns)
         {
             _partitions = Int32.Parse(_noOfPartitionsOpt[_selectionPartitionIndex]);
             _scansPerAngle = 1;
-            _interMode = false;
 
             settings = new SettingsParser();
             settings.ImportSettingsFile();
@@ -119,6 +135,9 @@ namespace C3PO.ViewModel
             ImportSettingsCommand = new CommandImportSettings(settings);
             ExportSettingsCommand = new CommandExportSettings(settings);
             InputRotationsCommand = new RotationsChangedCommand(this);
+            InputRegOrder = new CommandUpdateRegOrder(this);
+            UpdateSPrefixCommand = new CommandUpdateSourcePrefix(settings);
+            UpdateOPrefixCommand = new CommandUpdateOutPrefix(settings);
         }
 
         public void UpdatePartitionIndex()
