@@ -15,14 +15,14 @@ import copy
 from win32api import GetSystemMetrics
 
 class Editor():
-    def __init__(self, cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode):
+    def __init__(self, cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode):
         self.run_interactive_mode = run_interactive_mode
         self.metadata = []
 
         # Define output file directory and output base name
         self.output_directory_path = output_directory_path
         self.output_file_base_name = output_file_base_name
-        self.output_file_type = output_file_type
+        self.output_file_extension = output_file_extension
 
         # Give object cloud structs and cloud index for state management
         self.cloud_structs = copy.deepcopy(cloud_structs)
@@ -163,6 +163,11 @@ class Editor():
         # START SAVE GUI ELEMENTS
         saving_container_label = gui.Label("Save Options: ")
 
+        file_extension_selection = gui.RadioButton(gui.RadioButton.VERT)
+        self.file_extensions = [".stl", ".ply", ".obj", ".off", ".gltf"]
+        file_extension_selection.set_items(self.file_extensions)
+        file_extension_selection.set_on_selection_changed(self.file_extension_selection)
+
         save_cloud_button = gui.Button("Save Point Cloud")
         save_cloud_button.set_on_clicked(self.write_point_cloud_file)
 
@@ -173,6 +178,7 @@ class Editor():
         saving_container.add_child(saving_container_label)
         saving_container.add_child(save_cloud_button)
         saving_container.add_child(save_mesh_button)
+        saving_container.add_child(file_extension_selection)
         # END SAVE GUI ELEMENTS
 
         reset_button = gui.Button("Reset Clouds and Mesh")
@@ -183,18 +189,26 @@ class Editor():
         self.progress_bar.visible = False
         # END OF PROGRESS BAR ELEMENTS
 
-        show_voxel_grid_button = gui.Button("Show voxel grid")
-        show_voxel_grid_button.set_on_clicked(self.show_voxel_grid)
+        # START OF DOWN SAMPLE GUI ELEMENTS
+        down_sample_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
+        voxel_grid_down_sample_button = gui.Button("Voxel Grid Downsample")
+        voxel_grid_down_sample_button.set_on_clicked(self.voxel_grid_down_sample)
+        voxel_down_sample_button = gui.Button("Voxel Grid Downsample")
+        voxel_down_sample_button.set_on_clicked(self.voxel_down_sample)
+
+        down_sample_container.add_child(voxel_grid_down_sample_button)
+        down_sample_container.add_child(voxel_down_sample_button)
+        # END OF DOWN SAMPLE GUI ELEMENTS
 
         # Add gui elements to layout and then the layout to the window
+        self.layout.add_child(self.progress_bar)
         self.layout.add_child(merging_method_container)
         self.layout.add_child(meshing_container)
         self.layout.add_child(saving_container)
         self.layout.add_child(previous_next_container)
+        self.layout.add_child(down_sample_container)
         self.layout.add_child(reset_button)
-        self.layout.add_child(self.progress_bar)
-        self.layout.add_child(show_voxel_grid_button)
-        
+
         self.window.add_child(self.layout)
 
         return
@@ -207,6 +221,11 @@ class Editor():
 
     def meshing_method_selection(self, new_index):
         self.meshing_method = self.meshing_methods[new_index]
+
+        return
+    
+    def file_extension_selection(self, new_index):
+        self.output_file_extension = self.file_extensions[new_index]
 
         return
 
@@ -749,18 +768,58 @@ class Editor():
 
         elif self.meshing_method == "poisson":
             self.make_poisson_mesh()
+
+        elif self.meshing_method == "alpha":
+            self.make_poisson_mesh()
         
         return
 
-    def show_voxel_grid(self):
+    def voxel_grid_down_sample(self):
         if len(self.total_cloud.points) == 0:
             return
         
         self.total_cloud = self.total_cloud.voxel_down_sample(self.calculate_voxel_size(self.total_cloud) * 3)
 
-        self.scene.remove_geometry("Total Cloud")
-        self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
-        self.update_visualizer(self.total_cloud, "Total Cloud")
+        if self.run_interactive_mode:
+            self.scene.remove_geometry("Total Cloud")
+            self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
+            self.update_visualizer(self.total_cloud, "Total Cloud")
+        return
+    
+    def voxel_down_sample(self):
+        if len(self.total_cloud.points) == 0:
+            return
+        
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.total_cloud, self.calculate_voxel_size(self.total_cloud) * 3)
+        all_voxels = voxel_grid.get_voxels()
+        all_centers = []
+        all_colors = []
+
+        for voxel in all_voxels:
+            voxel_center = voxel_grid.get_voxel_center_coordinate(voxel.grid_index)
+            all_centers.append(voxel_center)
+            all_colors.append(voxel.color)
+
+        self.total_cloud.points = o3d.utility.Vector3dVector(all_centers)
+        self.total_cloud.colors = o3d.utility.Vector3dVector(all_colors)
+
+        if self.run_interactive_mode:
+            self.scene.remove_geometry("Total Cloud")
+            self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
+            self.update_visualizer(self.total_cloud, "Total Cloud")
+        return
+
+    def make_alpha_mesh(self): 
+        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(self.total_cloud, 0.005)
+        self.mesh.compute_vertex_normals()
+        
+        material = rendering.MaterialRecord()
+        material.shader = "defaultLit"
+        if self.run_interactive_mode:
+            self.scene.remove_geometry("Mesh")
+            self.scene.add_geometry("Mesh", self.mesh, material)
+            self.update_visualizer(self.mesh, "Mesh")
+
         return
 
     # Make a mesh using ball pivoting method
@@ -822,15 +881,9 @@ class Editor():
         self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
         self.total_cloud.orient_normals_consistent_tangent_plane(100)
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=8, width=0, scale=1.1, linear_fit=False)[0]
-        # self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(self.total_cloud, 0.005)
 
-        # distances = self.total_cloud.compute_nearest_neighbor_distance()
-        # avg_dist = np.mean(distances)
-        # radius = 3 * avg_dist 
-        # self.mesh.simplify_vertex_clustering(radius, contraction=o3d.geometry.SimplificationContraction.Average)
         self.color_mesh([0.5, 0.5, 0.5])
         self.mesh.compute_vertex_normals()
-        
         
         if self.run_interactive_mode:
             self.scene.remove_geometry("Mesh")
@@ -839,6 +892,7 @@ class Editor():
 
         return
 
+    # smooth the mesh using smiple filter
     def smooth_mesh(self):
         if len(self.mesh.vertices) == 0:
             return
@@ -883,11 +937,10 @@ class Editor():
 
     # write a mesh file 
     def write_mesh_file(self):
-        file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_type
+        file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_extension
         print(file_path)
         print(len(self.mesh.triangles))
         self.mesh.compute_vertex_normals()
         o3d.io.write_triangle_mesh(file_path, self.mesh)
 
-        sleep(5)
         return

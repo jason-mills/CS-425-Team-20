@@ -50,7 +50,7 @@ def parseArgs():
                         default="mutliway registration", 
                         help="The registration algorithm to use",
                         required=False)
-    optional.add_argument("--output_file_type", 
+    optional.add_argument("--output_file_extension", 
                         type=str, 
                         default=".stl", 
                         help="Object file type being created",
@@ -161,7 +161,7 @@ def main():
     output_directory_path = args.output_directory_path.replace("\\", "/")
     output_file_base_name = args.output_file_base_name
     is_user_scan = args.is_user_scan.lower() == "true"
-    output_file_type = args.output_file_type
+    output_file_extension = args.output_file_extension
 
     print(is_user_scan)
     if is_user_scan:
@@ -179,46 +179,13 @@ def main():
                                  file_order, 
                                  is_user_scan)
 
-    # voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(cloud_structs[0].cloud, cloud_structs[0].voxel_size * 3)
-    # all_voxels = voxel_grid.get_voxels()
-    # all_centers = []
-
-    # for voxel in all_voxels:
-    #     voxel_center = voxel_grid.get_voxel_center_coordinate(voxel.grid_index)
-    #     all_centers.append(voxel_center)
-
-    # # cloud = o3d.geometry.PointCloud()
-    # cloud = cloud_structs[0].cloud.voxel_down_sample(cloud_structs[0].voxel_size * 3)
-    # # cloud.points = o3d.utility.Vector3dVector(all_centers)
-
-    # cloud.estimate_normals()
-    # cloud.orient_normals_consistent_tangent_plane(100)
-    # distances = cloud.compute_nearest_neighbor_distance()
-    # avg_dist = np.mean(distances)
-    # radius = 3 * avg_dist 
-
-    # # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
-    # #     cloud,
-    # #     o3d.utility.DoubleVector([radius, radius * 2]))
-    # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(cloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
-    # mesh = mesh.filter_smooth_simple(number_of_iterations=5)
-
-    # vis = o3d.visualization.Visualizer()
-    # vis.create_window(window_name='Bunny Visualize', width=800, height=600)
-    # vis.add_geometry(mesh)
-    # vis.add_geometry(cloud)
-    # vis.run()
-
-
-    # mesh.compute_vertex_normals()
-    # o3d.io.write_triangle_mesh("test.stl", mesh)
     if run_interactive_mode:
         gui.Application.instance.initialize()
-        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode)
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         gui.Application.instance.run()
         gui.Application.instance.quit()
     else:
-        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode)
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
     
     # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
     print("done here")
