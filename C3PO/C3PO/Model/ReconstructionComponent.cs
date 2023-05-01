@@ -41,14 +41,14 @@ namespace C3PO.Model
                 $"--file_order={order} " +
                 $"--output_directory_path={settingsParser.dir} " +
                 $"--output_file_base_name={settingsParser.outPrefix} " +
-                $"--is_user_scan=False " +
+                $"--is_user_scan=True " +
                 $"--run_interactive_mode={interMode}";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = "python",
-                    Arguments = ".\\bin\\icp.py " + args
+                    Arguments = ".\\bin\\EditorDriver.py " + args
                 }
             };
 
