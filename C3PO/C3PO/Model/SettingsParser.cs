@@ -28,9 +28,9 @@ namespace C3PO.Model
         {
             settingsPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\resources\\settings.xml";
 
-            turnRadius = 0;
-            scansPerAngle = 0;
-            icpIters = 0;
+            turnRadius = 30;
+            scansPerAngle = 1;
+            icpIters = 20;
             distanceThresh = 0;
             algo = "icp";
             dir = Directory.GetCurrentDirectory() + "\\output\\";
