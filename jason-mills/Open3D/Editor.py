@@ -39,13 +39,9 @@ class Editor():
         self.transformation = np.identity(4)
 
         if not run_interactive_mode:
-            print("starting registration")
             self.multiway_registration_merge()
-            print("starting meshing")
             self.make_poisson_mesh()
-            print("writing mesh")
             self.write_mesh_file()
-            print("completed auto run")
             return
 
         # Load in circular array that contains structs for meshes and clouds
@@ -57,7 +53,7 @@ class Editor():
         self.current_3d_label = None
 
         # Keep track of what mode is being used for editing
-        self.current_merge_method = "multiway_registration"
+        self.merging_method = "multiway registration"
         self.meshing_method = "ball pivoting"
 
         # Initialize the gui
@@ -110,10 +106,15 @@ class Editor():
         merging_container_label = gui.Label("Point Cloud Merging Method: ")
 
         merging_method_selection = gui.RadioButton(gui.RadioButton.VERT)
+        self.merging_methods = ["multiway registration", "point to plane", "point to point", "color point to point"]
         merging_method_selection.set_items(["Multiway Registration", "Point to Plane", "Point to Point", "Color Point to Point"])
+        merging_method_selection.set_on_selection_changed(self.merging_method_selection)
 
         merge_button = gui.Button("Merge Next Cloud")
-        merge_button.set_on_clicked(self.multiway_registration_merge)
+        merge_button.set_on_clicked(self.merge_cloud)
+
+        add_merge_button = gui.Button("Add Merged Cloud")
+        add_merge_button.set_on_clicked(self.add_transformed_cloud)
 
         skip_merge_button = gui.Button("Skip Cloud")
         skip_merge_button.set_on_clicked(self.send_cloud_to_back)
@@ -122,6 +123,7 @@ class Editor():
         merging_method_container.add_child(merging_container_label)
         merging_method_container.add_child(merging_method_selection)
         merging_method_container.add_child(merge_button)
+        merging_method_container.add_child(add_merge_button)
         merging_method_container.add_child(skip_merge_button)
         # END ICP GUI ELEMENTS
         
@@ -129,7 +131,9 @@ class Editor():
         mesh_container_label = gui.Label("Meshing Method: ")
 
         meshing_method_selection = gui.RadioButton(gui.RadioButton.VERT)
+        self.meshing_methods = ["ball pivoting", "convex hull", "poisson"]
         meshing_method_selection.set_items(["Ball Pivoting", "Convex Hull", "Poisson"])
+        meshing_method_selection.set_on_selection_changed(self.meshing_method_selection)
 
         mesh_button = gui.Button("Make Mesh")
         mesh_button.set_on_clicked(self.make_mesh)
@@ -179,6 +183,9 @@ class Editor():
         self.progress_bar.visible = False
         # END OF PROGRESS BAR ELEMENTS
 
+        show_voxel_grid_button = gui.Button("Show voxel grid")
+        show_voxel_grid_button.set_on_clicked(self.show_voxel_grid)
+
         # Add gui elements to layout and then the layout to the window
         self.layout.add_child(merging_method_container)
         self.layout.add_child(meshing_container)
@@ -186,8 +193,20 @@ class Editor():
         self.layout.add_child(previous_next_container)
         self.layout.add_child(reset_button)
         self.layout.add_child(self.progress_bar)
+        self.layout.add_child(show_voxel_grid_button)
         
         self.window.add_child(self.layout)
+
+        return
+
+    def merging_method_selection(self, new_index):
+        self.merging_method = self.merging_methods[new_index]
+        print(self.merging_method)
+
+        return
+
+    def meshing_method_selection(self, new_index):
+        self.meshing_method = self.meshing_methods[new_index]
 
         return
 
@@ -197,12 +216,19 @@ class Editor():
         self.scene_widget.enable_scene_caching(True)
         self.scene_widget.scene = rendering.Open3DScene(self.window.renderer)
         self.scene = self.scene_widget.scene
-        # self.scene_widget.set_on_key(self.key_callbacks)
+        self.scene.scene.enable_sun_light(True)
+        self.scene.scene.set_sun_light([0, 0, 0], [237/255,213/255,158/255], 1)
+        self.view = self.scene.view
+        self.view.set_shadowing(True, rendering.View.ShadowType.PCF)
+        self.view.set_post_processing(True)
+        self.view.set_ambient_occlusion(True)
+
+        self.scene_widget.set_on_key(self.key_callbacks)
         self.scene_widget.frame = gui.Rect(self.initial_screen_width * 0.25, self.window.content_rect.y, self.initial_screen_width, self.window.content_rect.height)
 
         self.add_all_geometry(cloud_structs)
 
-        self.scene_widget.scene.set_background([0.5, 0.5, 0.5, 0.4])
+        self.scene_widget.scene.set_background([40/255, 67/255, 135/255, 1])
 
         self.window.add_child(self.scene_widget)
 
@@ -217,18 +243,20 @@ class Editor():
     
     # Add all of the geometry into the scene widget
     def add_all_geometry(self, cloud_structs):
-        self.material = rendering.MaterialRecord()
+        material = rendering.MaterialRecord()
+        # material.shader = "defaultLit"
 
-        self.scene.add_geometry("Merge Result", self.total_cloud, self.material)
+        self.scene.add_geometry("Merge Result", self.total_cloud, material)
 
-        self.scene.add_geometry("Total Cloud", self.total_cloud, self.material)
+        self.scene.add_geometry("Total Cloud", self.total_cloud, material)
         self.scene.show_geometry("Total Cloud", False)
 
         for cloud_struct in cloud_structs:
-            self.scene.add_geometry(cloud_struct.name, cloud_struct.cloud, self.material)
+            cloud_struct.cloud
+            self.scene.add_geometry(cloud_struct.name, cloud_struct.cloud, material)
             self.scene.show_geometry(cloud_struct.name, False)
 
-        self.scene.add_geometry("Mesh", self.mesh, self.material)
+        self.scene.add_geometry("Mesh", self.mesh, material)
         self.scene.show_geometry("Mesh", False)
 
         return
@@ -260,30 +288,22 @@ class Editor():
                 self.send_cloud_to_back()
 
             elif context.key in (267, 334): #insert and keypad plus
-                print("Insert or plus pressed")
-                if self.current_merge_method == "multiway_registration":
-                    self.multiway_registration_merge()
-                elif self.current_merge_method == "point to plane":
-                    self.point_to_plane_merge()
-                elif self.current_merge_method == "point to point":
-                    self.point_to_point_merge()
-                elif self.current_merge_method == "color point to point":
-                    self.color_point_to_plane_merge()
+                self.merge_cloud()
 
             elif context.key in (gui.KeyName.ENTER, 257, 335): #enter and keypad enter
                 self.add_transformed_cloud()
 
             elif context.key in (48, 320): # keyboard and keypad 0
-                self.current_merge_method = "multiway_registration"
+                self.merging_method = "multiway registration"
 
             elif context.key in (49, 321): # keyboard and keypad 1
-                self.current_merge_method = "point to plane"
+                self.merging_method = "point to plane"
 
             elif context.key in (50, 322): # keyboard and keypad 2
-                self.current_merge_method = "point to point"
+                self.merging_method = "point to point"
 
             elif context.key in (51, 323): # keyboard and keypad 3
-                self.current_merge_method = "color point to point"
+                self.merging_method = "color point to point"
 
             elif context.key == gui.KeyName.R:
                 self.revert_changes()
@@ -349,7 +369,7 @@ class Editor():
         combined_cloud = source_cloud_copy + target_cloud_copy
 
         self.scene.remove_geometry("Merge Result")
-        self.scene.add_geometry("Merge Result", combined_cloud, self.material)
+        self.scene.add_geometry("Merge Result", combined_cloud, rendering.MaterialRecord())
         self.update_visualizer(combined_cloud, "Merge Result")
 
         return
@@ -406,7 +426,7 @@ class Editor():
 
         if self.run_interactive_mode:
             self.scene.remove_geometry("Total Cloud")
-            self.scene.add_geometry("Total Cloud", self.total_cloud, self.material)
+            self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
             self.update_visualizer(self.total_cloud, "Total Cloud")
 
         return
@@ -443,7 +463,7 @@ class Editor():
 
         if self.run_interactive_mode:
             self.scene.remove_geometry("Total Cloud")
-            self.scene.add_geometry("Total Cloud", self.total_cloud, self.material)
+            self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
             self.update_visualizer(self.total_cloud, "Total Cloud")
 
         return
@@ -586,8 +606,8 @@ class Editor():
 
             return
     
-    # calculate the transformation for a color point to plane merge with one point cloud onto the total cloud and display visualization
-    def color_point_to_plane_merge(self):
+    # calculate the transformation for a color point to point merge with one point cloud onto the total cloud and display visualization
+    def color_point_to_point_merge(self):
             if len(self.total_cloud.points) == 0:
                 self.add_transformed_cloud()
 
@@ -612,7 +632,7 @@ class Editor():
             self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.cloud_structs[0].voxel_size * 2,
                                                                                     max_nn=30))
             
-            transformation = self.execute_color_point_to_plane_refinement(self.cloud_structs[0].cloud, 
+            transformation = self.execute_color_point_to_point_refinement(self.cloud_structs[0].cloud, 
                                                                           self.total_cloud,
                                                                           self.cloud_structs[0].voxel_size * 1.5, 
                                                                           ransac_result.transformation)
@@ -690,8 +710,8 @@ class Editor():
 
         return registration_result.transformation
 
-    # use color point to plane refinement
-    def execute_color_point_to_plane_refinement(self, source, target, voxel_size, initial_transformation):
+    # use color point to point refinement
+    def execute_color_point_to_point_refinement(self, source, target, voxel_size, initial_transformation):
         print("Local Color Point to Point Refinement Started")
         registration_result = o3d.pipelines.registration.registration_colored_icp(source,
                                                                                   target,
@@ -702,59 +722,121 @@ class Editor():
 
         return registration_result.transformation
 
-    # might need to get rid of this
-    # use to make different meshes with different options
-    def make_mesh(self):
-        if self.meshing_method == "ball pivoting":
-            self.make_poisson_mesh()
+    def merge_cloud(self):
+        if self.merging_method == "multiway registration":
+            self.multiway_registration_merge()
 
-        elif self.meshing_method == "convex hull":
-            self.make_convex_hull_mesh
+        elif self.merging_method == "point to plane":
+            self.point_to_plane_merge()
 
-        elif self.meshing_method == "poisson":
-            self.make_ball_pivoting_mesh()
+        elif self.merging_method == "point to point":
+            self.point_to_point_merge()
+
+        elif self.merging_method == "color point to point":
+            self.color_point_to_point_merge()
         
         return
 
-    # Make a mesh using ball pivoting method
-    def make_ball_pivoting_mehs():
-        return
-    
-    # Make a mesh using convex hull method
-    def make_convex_hull_mesh():
+    # might need to get rid of this
+    # use to make different meshes with different options
+    def make_mesh(self):
+        print("meshing button called")
+        if self.meshing_method == "ball pivoting":
+            self.make_ball_pivoting_mesh()
+
+        elif self.meshing_method == "convex hull":
+            self.make_convex_hull_mesh()
+
+        elif self.meshing_method == "poisson":
+            self.make_poisson_mesh()
+        
         return
 
-    # make a mesh using poisson method
-    def make_poisson_mesh(self):
-        print("in mesh funciton")
+    def show_voxel_grid(self):
+        if len(self.total_cloud.points) == 0:
+            return
+        
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.total_cloud, self.calculate_voxel_size(self.total_cloud))
+
+        material = rendering.MaterialRecord()
+        self.scene.remove_geometry("Mesh")
+        self.scene.add_geometry("Mesh", voxel_grid, material)
+
+        self.scene.show_geometry("Mesh")
+        return
+
+    # Make a mesh using ball pivoting method
+    def make_ball_pivoting_mesh(self):
         if len(self.total_cloud.points) == 0:
             return
 
-        print("starting normal calculation")
         self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
-        print("starting orientation of normals")
         self.total_cloud.orient_normals_consistent_tangent_plane(100)
-        print("starting meshing")
-        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
-        # distances = self.total_cloud.compute_nearest_neighbor_distance()
-        # avg_dist = np.mean(distances)
-        # radius = 1.5 * avg_dist   
 
-        # self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
-        #         self.total_cloud,
-        #         o3d.utility.DoubleVector([radius, radius * 2]))
+        distances = self.total_cloud.compute_nearest_neighbor_distance()
+        avg_dist = np.mean(distances)
+        radius = 2 * avg_dist 
 
-        print("coloring mesh")
+        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+            self.total_cloud,
+            o3d.utility.DoubleVector([radius, radius * 2]))
+
         self.color_mesh([0.5, 0.5, 0.5])
-        print("computing vertext normals")
+        self.mesh.compute_vertex_normals()
+        
+        material = rendering.MaterialRecord()
+        material.shader = "defaultLit"
+
+        if self.run_interactive_mode:
+            self.scene.remove_geometry("Mesh")
+            self.scene.add_geometry("Mesh", self.mesh, material)
+            self.update_visualizer(self.mesh, "Mesh")
+
+        return
+    
+    # Make a mesh using convex hull method
+    def make_convex_hull_mesh(self):
+        if len(self.total_cloud.points) == 0:
+            return
+
+        self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
+        self.total_cloud.orient_normals_consistent_tangent_plane(100)
+
+        print("starting meshing")
+        self.mesh = self.total_cloud.compute_convex_hull()[0]
+
+        print("starting coloring and normal computations")
+        self.color_mesh([0.5, 0.5, 0.5])
         self.mesh.compute_vertex_normals()
         
         if self.run_interactive_mode:
             self.scene.remove_geometry("Mesh")
-            self.scene.add_geometry("Mesh", self.mesh, self.material)
+            self.scene.add_geometry("Mesh", self.mesh, rendering.MaterialRecord())
             self.update_visualizer(self.mesh, "Mesh")
 
-        print("all done")
+        return
+
+    # make a mesh using poisson method
+    def make_poisson_mesh(self):
+        if len(self.total_cloud.points) == 0:
+            return
+
+        self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
+        self.total_cloud.orient_normals_consistent_tangent_plane(100)
+        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+
+        # distances = self.total_cloud.compute_nearest_neighbor_distance()
+        # avg_dist = np.mean(distances)
+        # radius = 3 * avg_dist 
+        # self.mesh.simplify_vertex_clustering(radius, contraction=o3d.geometry.SimplificationContraction.Average)
+        self.color_mesh([0.5, 0.5, 0.5])
+        self.mesh.compute_vertex_normals()
+        
+        
+        if self.run_interactive_mode:
+            self.scene.remove_geometry("Mesh")
+            self.scene.add_geometry("Mesh", self.mesh, rendering.MaterialRecord())
+            self.update_visualizer(self.mesh, "Mesh")
 
         return
 
@@ -765,7 +847,8 @@ class Editor():
         self.mesh = self.mesh.filter_smooth_simple(number_of_iterations=1)
 
         self.scene.remove_geometry("Mesh")
-        self.scene.add_geometry("Mesh", self.mesh, self.material)
+        
+        self.scene.add_geometry("Mesh", self.mesh, rendering.MaterialRecord())
         self.update_visualizer(self.mesh, "Mesh")
 
         return
@@ -804,6 +887,7 @@ class Editor():
         file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_type
         print(file_path)
         print(len(self.mesh.triangles))
+        self.mesh.compute_vertex_normals()
         o3d.io.write_triangle_mesh(file_path, self.mesh)
 
         sleep(5)
