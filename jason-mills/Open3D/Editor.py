@@ -110,10 +110,10 @@ class Editor():
         merging_method_selection.set_items(["Multiway Registration", "Point to Plane", "Point to Point", "Color Point to Point"])
         merging_method_selection.set_on_selection_changed(self.merging_method_selection)
 
-        merge_button = gui.Button("Merge Next Cloud")
+        merge_button = gui.Button("Merge Cloud")
         merge_button.set_on_clicked(self.merge_cloud)
 
-        add_merge_button = gui.Button("Add Merged Cloud")
+        add_merge_button = gui.Button("Add Cloud to Total")
         add_merge_button.set_on_clicked(self.add_transformed_cloud)
 
         skip_merge_button = gui.Button("Skip Cloud")
@@ -756,13 +756,11 @@ class Editor():
         if len(self.total_cloud.points) == 0:
             return
         
-        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.total_cloud, self.calculate_voxel_size(self.total_cloud))
+        self.total_cloud = self.total_cloud.voxel_down_sample(self.calculate_voxel_size(self.total_cloud) * 3)
 
-        material = rendering.MaterialRecord()
-        self.scene.remove_geometry("Mesh")
-        self.scene.add_geometry("Mesh", voxel_grid, material)
-
-        self.scene.show_geometry("Mesh")
+        self.scene.remove_geometry("Total Cloud")
+        self.scene.add_geometry("Total Cloud", self.total_cloud, rendering.MaterialRecord())
+        self.update_visualizer(self.total_cloud, "Total Cloud")
         return
 
     # Make a mesh using ball pivoting method
@@ -823,7 +821,8 @@ class Editor():
 
         self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
         self.total_cloud.orient_normals_consistent_tangent_plane(100)
-        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=8, width=0, scale=1.1, linear_fit=False)[0]
+        # self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(self.total_cloud, 0.005)
 
         # distances = self.total_cloud.compute_nearest_neighbor_distance()
         # avg_dist = np.mean(distances)
