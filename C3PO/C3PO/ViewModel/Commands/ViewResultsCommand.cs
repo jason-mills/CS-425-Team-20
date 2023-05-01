@@ -32,7 +32,7 @@ namespace C3PO.ViewModel.Commands
         public override void Execute(object? parameter)
         {
             // Get file to display
-            string fName = "Final.xyz";
+            string fName = "final.xyz";
             if (parameter != null)
             {
                 fName = (string)parameter + ".xyz";
@@ -70,9 +70,9 @@ namespace C3PO.ViewModel.Commands
         {
             if(sel.Equals("0"))
             {
-                return "Final.ply";
+                return "final.xyz";
             }
-            return settings.outPrefix + int.Parse(sel) + ".ply";
+            return settings.outPrefix + int.Parse(sel) + ".xyz";
         }
 
         public string GetPythonPath()

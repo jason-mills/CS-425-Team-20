@@ -34,8 +34,8 @@ namespace C3PO.Model
             distanceThresh = 0;
             algo = "icp";
             dir = Directory.GetCurrentDirectory() + "\\output\\";
-            inPrefix = "temp";
-            outPrefix = "Final";
+            inPrefix = "out";
+            outPrefix = "final";
             regOrder = "";
             interMode = false;
         }
@@ -139,8 +139,8 @@ namespace C3PO.Model
             string lDir = (subsystem.Element("loadDir") ?? new XElement("")).Value.ToString();
 
             // Set to proper values
-            inPrefix = iPrefix == "" ? "temp" : iPrefix;
-            outPrefix = oPrefix == "" ? "out" : oPrefix;
+            inPrefix = iPrefix == "" ? "out" : iPrefix;
+            outPrefix = oPrefix == "" ? "final" : oPrefix;
             dir = lDir == "" ? ".\\output" : lDir;
         }
 
