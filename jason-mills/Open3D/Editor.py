@@ -1,11 +1,17 @@
+# Open3d imports
 import open3d as o3d
-import numpy as np
+import open3d.visualization.gui as gui
+import open3d.visualization.rendering as rendering
+from time import sleep
+# Imports from local files
 from Structs import PointCloudStruct
 from Structs import MeshStruct
 from Structs import CircularArray
+
+# Imports for utility
+import numpy as np
 import copy
-import open3d.visualization.gui as gui
-import open3d.visualization.rendering as rendering
+
 from win32api import GetSystemMetrics
 
 class Editor():
@@ -33,9 +39,13 @@ class Editor():
         self.transformation = np.identity(4)
 
         if not run_interactive_mode:
+            print("starting registration")
             self.multiway_registration_merge()
+            print("starting meshing")
             self.make_poisson_mesh()
+            print("writing mesh")
             self.write_mesh_file()
+            print("completed auto run")
             return
 
         # Load in circular array that contains structs for meshes and clouds
@@ -716,20 +726,35 @@ class Editor():
 
     # make a mesh using poisson method
     def make_poisson_mesh(self):
+        print("in mesh funciton")
         if len(self.total_cloud.points) == 0:
             return
 
-        self.total_cloud.estimate_normals()
+        print("starting normal calculation")
+        self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
+        print("starting orientation of normals")
         self.total_cloud.orient_normals_consistent_tangent_plane(100)
-        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=12, width=0, scale=1.1, linear_fit=False)[0]
+        print("starting meshing")
+        self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=15, width=0, scale=1.1, linear_fit=False)[0]
+        # distances = self.total_cloud.compute_nearest_neighbor_distance()
+        # avg_dist = np.mean(distances)
+        # radius = 1.5 * avg_dist   
 
+        # self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+        #         self.total_cloud,
+        #         o3d.utility.DoubleVector([radius, radius * 2]))
+
+        print("coloring mesh")
         self.color_mesh([0.5, 0.5, 0.5])
+        print("computing vertext normals")
         self.mesh.compute_vertex_normals()
         
         if self.run_interactive_mode:
             self.scene.remove_geometry("Mesh")
             self.scene.add_geometry("Mesh", self.mesh, self.material)
             self.update_visualizer(self.mesh, "Mesh")
+
+        print("all done")
 
         return
 
@@ -777,6 +802,9 @@ class Editor():
     # write a mesh file 
     def write_mesh_file(self):
         file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_type
+        print(file_path)
+        print(len(self.mesh.triangles))
         o3d.io.write_triangle_mesh(file_path, self.mesh)
 
+        sleep(5)
         return
