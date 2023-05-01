@@ -11,54 +11,60 @@ import argparse
 def parseArgs():
     usage = '''python %(prog)s [-h] --dir DIR --prefix PREFIX --out OUT'''
     parser = argparse.ArgumentParser(usage=usage, add_help=False)
+
     required = parser.add_argument_group("Required")
     required.add_argument("--run_interactive_mode", 
-                        type=str,  
-                        help="Choose to run in interactive mode or not",
-                        required=True)
+                          type=str,  
+                          help="Choose to run in interactive mode or not",
+                          required=True)
     required.add_argument("--input_directory_path", 
-                        type=str,  
-                        help="The directory containing the files to work with",
-                        required=True)
+                          type=str,  
+                          help="The directory containing the files to work with",
+                          required=True)
     required.add_argument("--output_directory_path", 
-                        type=str,  
-                        help="The output directory",
-                        required=True)
+                          type=str,  
+                          help="The output directory",
+                          required=True)
     required.add_argument("--output_file_base_name", 
-                        type=str,  
-                        help="The output file base name",
-                        required=True)
+                          type=str,  
+                          help="The output file base name",
+                          required=True)
     required.add_argument("--is_user_scan", 
-                        type=str,  
-                        help="If the data is from user scan",
-                        required=True)
+                          type=str,  
+                          help="If the data is from user scan",
+                          required=True)
     
     optional = parser.add_argument_group("optional")
-
-    required.add_argument("--input_file_base_name", 
-                        type=str,  
-                        default="",
-                        help="The base file name being read from",
-                        required=False)
-    required.add_argument("--file_order", 
-                        type=str,  
-                        default=" ",
-                        help="The base file name being read from",
-                        required=False)
+    optional.add_argument("--input_file_base_name", 
+                          type=str,  
+                          default="",
+                          help="The base file name being read from",
+                          required=False)
+    optional.add_argument("--file_order", 
+                          type=str,
+                          default=" ",
+                          help="The base file name being read from",
+                          required=False)
     optional.add_argument("--merge_method", 
-                        type=str, 
-                        default="mutliway registration", 
-                        help="The registration algorithm to use",
-                        required=False)
+                          type=str, 
+                          default="mutliway registration", 
+                          help="The registration algorithm to use",
+                          required=False)
     optional.add_argument("--output_file_extension", 
-                        type=str, 
-                        default=".stl", 
-                        help="Object file type being created",
-                        required=False)
-    required.add_argument("--input_file_extension", 
-                        type=str,  
-                        help="The extension being used, example: .xyz, .ply",
-                        required=False)
+                          type=str, 
+                          default=".stl", 
+                          help="Object file type being created",
+                          required=False)
+    optional.add_argument("--input_file_extension", 
+                          type=str,  
+                          help="The extension being used, example: .xyz, .ply",
+                          required=False)
+    optional.add_argument("--icp_iterations",
+                          type=str,
+                          default=100,
+                          help="The number of iterations of icp to run",
+                          required=False)
+    
     
     args = parser.parse_known_args()
 
@@ -163,10 +169,6 @@ def main():
     is_user_scan = args.is_user_scan.lower() == "true"
     output_file_extension = args.output_file_extension
 
-    print(is_user_scan)
-    if is_user_scan:
-        print("this is a user scan")
-
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
         return 1
@@ -187,8 +189,7 @@ def main():
     else:
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
     
-    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
-    print("done here")
+    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)
     
 if __name__ == '__main__':
     main()
