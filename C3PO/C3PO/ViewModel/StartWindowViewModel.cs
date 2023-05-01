@@ -309,7 +309,7 @@ namespace C3PO.ViewModel
 
         public void UpdateMetadata()
         {
-            metadataParser.LoadMetadata(settingsVM.settings.dir);
+            metadataParser = new MetadataParser(settingsVM.settings.dir);
             Metadata = new ObservableCollection<ScanMetadata>();
             
             Metadata.Add(new ScanMetadata("Time Spanned", _componentLinker.TimeSpanned.ToString(@"hh\:mm\:ss")));

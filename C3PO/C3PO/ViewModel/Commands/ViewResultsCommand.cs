@@ -45,7 +45,7 @@ namespace C3PO.ViewModel.Commands
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = pythonPath + "\\python.exe",
+                    FileName = pythonPath + "python.exe",
                     Arguments = exeDir + " " + fPath,
                     UseShellExecute = true,
                     CreateNoWindow = true

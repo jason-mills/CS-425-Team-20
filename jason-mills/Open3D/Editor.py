@@ -9,14 +9,14 @@ import open3d.visualization.rendering as rendering
 from win32api import GetSystemMetrics
 
 class Editor():
-    def __init__(self, cloud_structs, output_directory_path, output_file_base_name, run_interactive_mode):
+    def __init__(self, cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode):
         self.run_interactive_mode = run_interactive_mode
         self.metadata = []
 
         # Define output file directory and output base name
         self.output_directory_path = output_directory_path
         self.output_file_base_name = output_file_base_name
-        self.output_file_extension = ".stl"
+        self.output_file_type = output_file_type
 
         # Give object cloud structs and cloud index for state management
         self.cloud_structs = copy.deepcopy(cloud_structs)
@@ -776,7 +776,7 @@ class Editor():
 
     # write a mesh file 
     def write_mesh_file(self):
-        file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_extension
+        file_path = self.output_directory_path + "/" + self.output_file_base_name + self.output_file_type
         o3d.io.write_triangle_mesh(file_path, self.mesh)
 
         return

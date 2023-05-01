@@ -54,6 +54,11 @@ def parseArgs():
                         default="mutliway registration", 
                         help="The registration algorithm to use",
                         required=False)
+    optional.add_argument("--output_file_type", 
+                        type=str, 
+                        default=".stl", 
+                        help="Object file type being created",
+                        required=False)
     
     args = parser.parse_known_args()
 
@@ -155,6 +160,7 @@ def main():
     output_directory_path = args.output_directory_path.replace("\\", "/")
     output_file_base_name = args.output_file_base_name
     is_user_scan = args.is_user_scan.lower == 'true'
+    output_file_type = args.output_file_type
 
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
@@ -170,11 +176,11 @@ def main():
 
     if run_interactive_mode:
         gui.Application.instance.initialize()
-        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, run_interactive_mode)
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode)
         gui.Application.instance.run()
         gui.Application.instance.quit()
     else:
-        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, run_interactive_mode)
+        editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode)
     
     # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
     
