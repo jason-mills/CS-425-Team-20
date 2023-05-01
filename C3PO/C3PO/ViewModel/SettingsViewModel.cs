@@ -167,6 +167,18 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(VoxelMult));
             }
         }
+        public int IcpIters
+        {
+            get
+            {
+                return settings.icpIters;
+            }
+            set
+            {
+                settings.icpIters = value;
+                OnPropertyChanged(nameof(IcpIters));
+            }
+        }
 
         public ICommand BackBtnCommand { get; }
         public ICommand ImportSettingsCommand { get; }

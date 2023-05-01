@@ -41,19 +41,22 @@
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
-                    Padding="20,10,0,5"/>
+                    Padding="20,10,0,5"
+                    Click="FindCategory_Click"/>
             <Button Content="Scanning" x:Name="JumpToScan"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
-                    Padding="20,10,0,5"/>
+                    Padding="20,10,0,5"
+                    Click="FindCategory_Click"/>
             <Button Content="Hardware" x:Name="JumpToHw"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
-                    Padding="20,10,0,5"/>
+                    Padding="20,10,0,5"
+                    Click="FindCategory_Click"/>
             <Button Content="Reconstruction" x:Name="JumpToReg"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
@@ -219,7 +222,7 @@
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-                <TextBox Text="15"
+                <TextBox Text="{Binding IcpIters}"
                      x:Name="ICPIterations"
                      Height="30"
                      Width="400"
