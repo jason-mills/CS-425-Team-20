@@ -108,8 +108,8 @@ def remove_outliers(pcd, voxel_size, iterations, numberOfPoints, radius):
     for i in range(iterations):
         cur_cloud, indices = downPcd.remove_radius_outlier(nb_points=numberOfPoints, radius=radius, print_progress=True)
         downPcd = downPcd.select_by_index(indices)
-        cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0, print_progress=True)
-        downPcd = downPcd.select_by_index(indices)
+        # cl, indices = downPcd.remove_statistical_outlier(nb_neighbors=numberOfPoints, std_ratio=1.0, print_progress=True)
+        # downPcd = downPcd.select_by_index(indices)
 
     return downPcd
 
@@ -151,7 +151,7 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
 def main():
     args = parseArgs()
 
-    run_interactive_mode = args.run_interactive_mode.lower() == 'true'
+    run_interactive_mode = args.run_interactive_mode.lower() == "true"
     input_directory_path = args.input_directory_path.replace("\\", "/")
     input_file_base_name = args.input_file_base_name
     print("input file base name: " + input_file_base_name)
@@ -159,8 +159,12 @@ def main():
     file_order = args.file_order.split(",")
     output_directory_path = args.output_directory_path.replace("\\", "/")
     output_file_base_name = args.output_file_base_name
-    is_user_scan = args.is_user_scan.lower == 'true'
+    is_user_scan = args.is_user_scan.lower() == "true"
     output_file_type = args.output_file_type
+
+    print(is_user_scan)
+    if is_user_scan:
+        print("this is a user scan")
 
     if not os.path.isdir(input_directory_path):
         print("Input directory is not valid")
@@ -183,6 +187,7 @@ def main():
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_type, run_interactive_mode)
     
     # write_to_json(output_directory_path + "/metadata.json", editor.metadata)  
+    print("done here")
     
 if __name__ == '__main__':
     main()
