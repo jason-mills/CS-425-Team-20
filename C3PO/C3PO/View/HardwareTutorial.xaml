@@ -20,18 +20,51 @@
                     VerticalAlignment="Top">
                 <Label Content="The Camera" FontSize="24" HorizontalAlignment="Left"/>
             </Border>
+            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16" Margin="5">
+                    The camera is the eyes of the application - the initial data generated that is used throughout the surface reconstruction process
+                    is derived from the camera. You need to ensure that the camera is properly mounted to the stand and connected to your computer.
+                    <LineBreak/>
+                    Firstly, you need to mount the camera to the stand. For the Intel Realsense D405, the camera contains two screw holes on the
+                    backside. We can mount the camera to the stand via these holes.
+            </TextBlock>
+            <Image Width="350" Margin="10"
+                   Source="pack://application:,,,/Resources/Images/AttachCamera.png"/>
+            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16" Margin="5">
+                    Secondly, you need to connect the proper cable to the camera. This cable should be the cable that connects your camera to your
+                    computer.
+            </TextBlock>
+            <Image Width="350" Margin="10"
+                   Source="pack://application:,,,/Resources/Images/ConnectCableToCamera.png"/>
+            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16" Margin="5">
+                    Thirdly, you need to connect the cable connecting to your camera to your computer.
+            </TextBlock>
+            <Image Width="350" Margin="10"
+                   Source="pack://application:,,,/Resources/Images/ConnectToComputer.png"/>
             
             <!--Explain how to connect the stand-->
             <Border Background="#1e2124" Margin="5" MaxHeight="40"
                     VerticalAlignment="Top">
                 <Label Content="The Stand" FontSize="24" HorizontalAlignment="Left"/>
             </Border>
+            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16" Margin="5">
+                If the camera is the eyes of the application, then the stand is the limbs of the application. The stand serves to hold the object
+                to be scanned and rotate it so that the camera can view it for all angles. The stand contains an Arduino Uno within it - a cable
+                should be sticking out from the stand. This cable should be connected to your computer.
+            </TextBlock>
+            <Image Width="350" Margin="10"
+                   Source="pack://application:,,,/Resources/Images/ConnectToComputer.png"/>
             
             <!--Verifying Connections-->
             <Border Background="#1e2124" Margin="5" MaxHeight="40"
                     VerticalAlignment="Top">
                 <Label Content="Verifying Connections" FontSize="24" HorizontalAlignment="Left"/>
             </Border>
+            <TextBlock TextWrapping="WrapWithOverflow" FontSize="16" Margin="5">
+                To verify that all hardware components are properly connected, check that the application displays a green connection status of
+                "connected" at the top of the starting page. Refresh the application if need be.
+            </TextBlock>
+            <Image Width="350" Margin="10"
+                   Source="pack://application:,,,/Resources/Images/C3PO_Hardware_Connected_Example.png"/>
         </ui:SimpleStackPanel>
     </Grid>
 </UserControl>

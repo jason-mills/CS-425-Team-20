@@ -24,7 +24,7 @@ namespace C3PO.ViewModel.Commands
 
             string newOrder = (string)parameter;
 
-            vm.settings.regOrder = newOrder;
+            vm.RegOrder = newOrder;
         }
     }
 }

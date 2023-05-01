@@ -40,7 +40,7 @@
                                      Grid.Row="0"
                                      x:Name="SideBarPanel">
                     <Label Content="3CPO"
-                       FontSize="48"
+                       FontSize="48" Foreground="Gold"
                        HorizontalAlignment="Center"/>
 
                     <Rectangle HorizontalAlignment="Stretch"
@@ -65,6 +65,16 @@
                             FontSize="16"
                             Command="{Binding HwTutorialBtnCommand}"
                             CommandParameter="HwTutorial"/>
+
+                    <Rectangle HorizontalAlignment="Stretch"
+                           Fill="LightGray"
+                           Height="2"
+                           Margin="0,5,0,5"/>
+
+                    <Rectangle HorizontalAlignment="Stretch"
+                           Fill="LightGray"
+                           Height="2"
+                           Margin="0,5,0,5"/>
 
                     <Button Content="Settings"
                         HorizontalContentAlignment="Center"

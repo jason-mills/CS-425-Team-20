@@ -29,6 +29,46 @@ namespace C3PO.ViewModel
                 return new ObservableCollection<string>((new USBDevices()).GetNames());
             }
         }
+        private ObservableCollection<string> _outputFormats = new ObservableCollection<string> { "stl", "obj", "ply" };
+        public ObservableCollection<string> OutputFormats
+        {
+            get
+            {
+                return _outputFormats;
+            }
+        }
+        public string OutputFormat
+        {
+            get
+            {
+                return settings.outputFormat;
+            }
+            set
+            {
+                settings.outputFormat = value;
+                OnPropertyChanged(nameof(OutputFormat));
+            }
+        }
+        private ObservableCollection<string> _algoOpts = new ObservableCollection<string> { "point-to-plane", "point-to-point", "multiway" };
+        public ObservableCollection<string> AlgoOpts
+        {
+            get
+            {
+                return _algoOpts;
+            }
+        }
+        public string SelectedAlgo
+        {
+            get
+            {
+                return settings.algo;
+            }
+            set
+            {
+                settings.algo = value;
+                OnPropertyChanged(nameof(SelectedAlgo));
+            }
+        }
         private ObservableCollection<string> _noOfPartitionsOpt = new ObservableCollection<string> { "30", "45", "90" };
         public ObservableCollection<string> NoOfPartitionsOpt
         {
@@ -65,28 +105,19 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(SelectionPartitionIndex));
             }
         }
-        private int _scansPerAngle;
         public int ScansPerAngle
         {
             get
             {
-                return _scansPerAngle;
+                return settings.scansPerAngle;
             }
             set
             {
-                _scansPerAngle = value;
+                settings.scansPerAngle = value;
                 OnPropertyChanged(nameof(ScansPerAngle));
             }
         }
         public SettingsParser settings;
-        //public SettingsParser Settings
-        //{
-        //    get
-        //    {
-        //        return _settings;
-        //    }
-        //}
-        //private bool _interMode;
         public bool InterMode
         {
             get
@@ -112,6 +143,30 @@ namespace C3PO.ViewModel
                 return settings.outPrefix;
             }
         }
+        public string RegOrder
+        {
+            get
+            {
+                return settings.regOrder;
+            }
+            set
+            {
+                settings.regOrder = value;
+                OnPropertyChanged(nameof(RegOrder));
+            }
+        }
+        public double VoxelMult
+        {
+            get
+            {
+                return settings.voxelMult;
+            }
+            set
+            {
+                settings.voxelMult = value;
+                OnPropertyChanged(nameof(VoxelMult));
+            }
+        }
 
         public ICommand BackBtnCommand { get; }
         public ICommand ImportSettingsCommand { get; }
@@ -124,7 +179,6 @@ namespace C3PO.ViewModel
         public SettingsViewModel(NavigationStore ns)
         {
             _partitions = Int32.Parse(_noOfPartitionsOpt[_selectionPartitionIndex]);
-            _scansPerAngle = 1;
 
             settings = new SettingsParser();
             settings.ImportSettingsFile();

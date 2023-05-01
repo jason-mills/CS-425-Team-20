@@ -28,16 +28,6 @@
                 VerticalAlignment="Top"
                 Command="{Binding BackBtnCommand}"/>
 
-        <!--Warning: settings not integrated message-->
-        <!--<Viewbox StretchDirection="DownOnly"
-                 Grid.Column="1"
-                 Grid.Row="0">
-            <TextBlock FontSize="36"
-                       Foreground="Red">
-                    NOTE: Settings are currently not supported for this version of C3PO.
-            </TextBlock>
-        </Viewbox>-->
-
         <!--Side bar settings navigation panel-->
         <StackPanel Grid.Column="0"
                     Grid.Row="1">
@@ -46,30 +36,31 @@
                        FontSize="24"
                        HorizontalAlignment="Center"/>
             </Border>
-            <Button Content="General"
+            <Button Content="General" x:Name="JumpToGen"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
                     Padding="20,10,0,5"/>
-            <Button Content="Scanning"
+            <Button Content="Scanning" x:Name="JumpToScan"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
                     Padding="20,10,0,5"/>
-            <Button Content="Hardware"
+            <Button Content="Hardware" x:Name="JumpToHw"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
                     Padding="20,10,0,5"/>
-            <Button Content="Reconstruction"
+            <Button Content="Reconstruction" x:Name="JumpToReg"
                     HorizontalAlignment="Stretch"
                     Height="Auto"
                     FontSize="18"
                     HorizontalContentAlignment="Left"
-                    Padding="20,10,0,5"/>
+                    Padding="20,10,0,5"
+                    Click="FindCategory_Click"/>
         </StackPanel>
 
         <!--Main settings panel-->
@@ -78,7 +69,7 @@
                 <Border Background="#1e2124"
                     Margin="5">
                     <Label Content="General Configurations"
-                       FontSize="24"
+                       FontSize="24" x:Name="GenLabel"
                        HorizontalAlignment="Left"/>
                 </Border>
 
@@ -93,7 +84,7 @@
                      x:Name="SourcePrefix"
                      Height="30"
                      Width="400"
-                     FontSize="18"
+                     FontSize="14"
                      HorizontalAlignment="Left"
                      Foreground="Gray"
                      Background="LightGray"
@@ -116,7 +107,7 @@
                      x:Name="OutputPrefix"
                      Height="30"
                      Width="400"
-                     FontSize="18"
+                     FontSize="14"
                      HorizontalAlignment="Left"
                      Foreground="Gray"
                      Background="LightGray"
@@ -138,17 +129,16 @@
                 <ComboBox Name="ExportFormat"
                       Height="30"
                       Width="400"
-                      FontSize="16"
+                      FontSize="14"
                       HorizontalAlignment="Left"
-                      SelectedIndex="0"
+                      SelectedItem="{Binding OutputFormat}"
                       Margin="10,0,10,10">
                     <ComboBox.Resources>
-                        <CollectionViewSource x:Key="UsbNames" Source="{Binding UsbNames}"/>
+                        <CollectionViewSource x:Key="OutputFormats" Source="{Binding OutputFormats}"/>
                     </ComboBox.Resources>
                     <ComboBox.ItemsSource>
                         <CompositeCollection>
-                            <ListBoxItem Content="STL"/>
-                            <CollectionContainer Collection="{Binding Source={StaticResource UsbNames}}"/>
+                            <CollectionContainer Collection="{Binding Source={StaticResource OutputFormats}}"/>
                         </CompositeCollection>
                     </ComboBox.ItemsSource>
                 </ComboBox>
@@ -156,7 +146,7 @@
                 <Border Background="#1e2124"
                     Margin="5">
                     <Label Content="Scanning Configurations"
-                       FontSize="24"
+                       FontSize="24" x:Name="ScanLabel"
                        HorizontalAlignment="Left"/>
                 </Border>
 
@@ -167,11 +157,11 @@
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-                <TextBox Text="{Binding NoOfRotations}"
+                <TextBox Text="{Binding ScansPerAngle}"
                      x:Name="RotationsTextBox"
                      Height="30"
                      Width="400"
-                     FontSize="18"
+                     FontSize="14"
                      HorizontalAlignment="Left"
                      Foreground="Gray"
                      Background="LightGray"
@@ -187,7 +177,7 @@
                 <Border Background="#1e2124"
                     Margin="5">
                     <Label Content="Hardware Configurations"
-                       FontSize="24"
+                       FontSize="24" x:Name="HwLabel"
                        HorizontalAlignment="Left"/>
                 </Border>
 
@@ -201,7 +191,7 @@
                 <ComboBox Name="NoOfPartitionsList"
                       Height="30"
                       Width="400"
-                      FontSize="16"
+                      FontSize="14"
                       HorizontalAlignment="Left"
                       Margin="10,0,10,10"
                       SelectedIndex="{Binding SelectionPartitionIndex}"
@@ -219,7 +209,7 @@
                 <Border Background="#1e2124"
                     Margin="5">
                     <Label Content="Reconstruction Configurations"
-                       FontSize="24"
+                       FontSize="24" x:Name="RegLabel"
                        HorizontalAlignment="Left"/>
                 </Border>
 
@@ -233,7 +223,7 @@
                      x:Name="ICPIterations"
                      Height="30"
                      Width="400"
-                     FontSize="18"
+                     FontSize="14"
                      HorizontalAlignment="Left"
                      Foreground="Gray"
                      Background="LightGray"
@@ -247,9 +237,9 @@
 
                 <Label Content="Reconstruction Order" Height="30" FontSize="18"
                    HorizontalAlignment="Left" Foreground="White" Margin="10,10,10,0"/>
-                <TextBox x:Name="RegOrder" Height="30" Width="400" FontSize="18"
+                <TextBox x:Name="RegOrder" Height="30" Width="400" FontSize="14"
                      HorizontalAlignment="Left" Foreground="Gray" Background="LightGray"
-                     Margin="10,0,10,0">
+                     Margin="10,0,10,0" Text="{Binding RegOrder}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter"
                                 Command="{Binding InputRegOrder}"
@@ -258,17 +248,17 @@
                 </TextBox>
 
                 <!--Registration Distance Threshold-->
-                <Label Content="Registration Distance Threshold"
+                <Label Content="Voxel Multiplier"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
-                <TextBox Text="0.01"
+                <TextBox Text="{Binding VoxelMult}"
                      x:Name="DistanceThreshold"
                      Height="30"
                      Width="400"
-                     FontSize="18"
+                     FontSize="14"
                      HorizontalAlignment="Left"
                      Foreground="Gray"
                      Background="LightGray"
@@ -280,7 +270,7 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <!--Number of partitions input-->
+                <!--Registration algorithm-->
                 <Label Content="Registration Algorithm"
                    Height="30"
                    FontSize="18"
@@ -290,15 +280,18 @@
                 <ComboBox Name="ReconstructAlgo"
                       Height="30"
                       Width="400"
-                      FontSize="16"
+                      FontSize="14"
                       HorizontalAlignment="Left"
                       Margin="10,0,10,10"
-                      SelectedIndex="{Binding SelectionPartitionIndex}"
-                      SelectedItem="{Binding Partitions}">
+                      SelectedItem="{Binding SelectedAlgo}">
                     <ComboBox.Resources>
-                        <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
+                        <CollectionViewSource x:Key="AlgoOpts" Source="{Binding AlgoOpts, Mode=OneWay}"/>
                     </ComboBox.Resources>
-                    <ComboBoxItem Content="Iterative Closest Point"/>
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <CollectionContainer Collection="{Binding Source={StaticResource AlgoOpts}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
                 </ComboBox>
 
                 <!--Interactive mode switch-->

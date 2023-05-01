@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,13 +17,14 @@ namespace C3PO.Model
         public int turnRadius;
         public int scansPerAngle;
         public int icpIters;
-        public double distanceThresh;
+        public double voxelMult;
         public string algo;
         public string dir;
         public string inPrefix;
         public string outPrefix;
         public string regOrder;
         public bool interMode;
+        public string outputFormat;
 
         public SettingsParser()
         {
@@ -31,13 +33,14 @@ namespace C3PO.Model
             turnRadius = 30;
             scansPerAngle = 1;
             icpIters = 20;
-            distanceThresh = 1;
-            algo = "icp";
+            voxelMult = 1;
+            algo = "point-to-plane";
             dir = Directory.GetCurrentDirectory() + "\\output\\";
             inPrefix = "out";
             outPrefix = "final";
             regOrder = GenDefaultRegOrder();
             interMode = false;
+            outputFormat = "stl";
         }
 
         public void ImportSettingsFile(string? fpath = null)
@@ -166,7 +169,7 @@ namespace C3PO.Model
 
             // Set to proper values
             icpIters = icpIt == "" ? 20 : int.Parse(icpIt);
-            distanceThresh = distThresh == "" ? 0.00001 : double.Parse(distThresh);
+            voxelMult = distThresh == "" ? 0.00001 : double.Parse(distThresh);
             algo = alg == "" ? "icp" : alg;
             regOrder = order == "" ? GenDefaultRegOrder() : order;
             interMode = intMode == "" ? false : bool.Parse(intMode);

@@ -23,5 +23,32 @@ namespace C3PO.View
         {
             InitializeComponent();
         }
+
+        public void FindCategory_Click(object sender, RoutedEventArgs e)
+        {
+            if(sender == null)
+            {
+                return;
+            }
+
+            Button control = (Button)sender;
+
+            if(control.Name == "JumpToGen")
+            {
+                GenLabel.BringIntoView();
+            }
+            else if(control.Name == "JumpToScan")
+            {
+                ScanLabel.BringIntoView();
+            }
+            else if(control.Name == "JumpToHw")
+            {
+                HwLabel.BringIntoView();
+            }
+            else if(control.Name == "JumpToReg")
+            {
+                RegLabel.BringIntoView();
+            }
+        }
     }
 }
