@@ -1,7 +1,6 @@
 import open3d as o3d
 import numpy as np
 import os
-import sys
 from Editor import Editor
 from Structs import PointCloudStruct
 import open3d.visualization.gui as gui
@@ -181,6 +180,7 @@ def main():
                                  file_order, 
                                  is_user_scan)
 
+
     if run_interactive_mode:
         gui.Application.instance.initialize()
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
@@ -188,8 +188,10 @@ def main():
         gui.Application.instance.quit()
     else:
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
+        editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
+        write_to_json(output_directory_path + "/metadata.json", editor.metadata)
     
-    # write_to_json(output_directory_path + "/metadata.json", editor.metadata)
+    
     
 if __name__ == '__main__':
     main()

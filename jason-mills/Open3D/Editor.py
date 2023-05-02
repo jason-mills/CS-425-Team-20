@@ -2,7 +2,7 @@
 import open3d as o3d
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
-from time import sleep
+
 # Imports from local files
 from Structs import PointCloudStruct
 from Structs import MeshStruct
@@ -23,7 +23,7 @@ class Editor():
 
         # Metadata storage and parameters
         self.metadata = []
-        self.average_fitness=()
+        self.fitness_scores = []
 
         # Define output file directory and output base name
         self.output_directory_path = output_directory_path
@@ -165,6 +165,7 @@ class Editor():
         # END MESH GUI ELEMENTS
 
         # START PREVIOUS NEXT GEOMETRIES ELEMENTS
+        previous_next_label = gui.Label("Viewer Control: ")
         next_button = gui.Button("Next")
         next_button.set_on_clicked(self.view_next_cloud)
         
@@ -172,6 +173,7 @@ class Editor():
         previous_buttion.set_on_clicked(self.view_previous_cloud)
 
         previous_next_container = gui.Vert(0.5 * self.em, gui.Margins(0, 0, 0 ,0))
+        previous_next_container.add_child(previous_next_label)
         previous_next_container.add_child(previous_buttion)
         previous_next_container.add_child(next_button)
         # END PREVIOUS NEXT GEOMETRIES ELEMENTS
@@ -207,8 +209,10 @@ class Editor():
 
         # START OF DOWN SAMPLE GUI ELEMENTS
         down_sample_container = gui.Vert(self.em, gui.Margins(0, 0, 0, 0))
+
         voxel_grid_down_sample_button = gui.Button("Voxel Grid Downsample")
         voxel_grid_down_sample_button.set_on_clicked(self.voxel_grid_down_sample)
+
         voxel_down_sample_button = gui.Button("Voxel Downsample")
         voxel_down_sample_button.set_on_clicked(self.voxel_down_sample)
 
@@ -343,8 +347,11 @@ class Editor():
 
     # clear changes to the cloud
     def revert_changes(self):
+        self.metadata = []
+        self.fitness_scores = []
+
         self.cloud_structs = copy.deepcopy(self.backup_structs)
-        self.current_cloud_index = 1
+        self.current_cloud_index = 1        
 
         self.total_cloud.clear()
         self.down_sample_total.clear()
@@ -730,6 +737,8 @@ class Editor():
                                                                           distance,
                                                                           initial_transformation,
                                                                           o3d.pipelines.registration.TransformationEstimationPointToPlane())
+        
+        self.fitness_scores.append(registration_result.fitness)
 
         return registration_result.transformation
 
@@ -814,6 +823,7 @@ class Editor():
     # Make a mesh using alpha meshing method
     def make_alpha_mesh(self): 
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(self.total_cloud, self.calculate_voxel_size(self.total_cloud) * 3)
+
         self.mesh.compute_vertex_normals()
         
         if self.run_interactive_mode:
@@ -838,6 +848,7 @@ class Editor():
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
             self.total_cloud,
             o3d.utility.DoubleVector([radius, radius * 2]))
+        
 
         self.color_mesh([0.5, 0.5, 0.5])
         self.mesh.compute_vertex_normals()
@@ -877,6 +888,7 @@ class Editor():
         self.total_cloud.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=self.calculate_voxel_size(self.total_cloud) * 2, max_nn = 30))
         self.total_cloud.orient_normals_consistent_tangent_plane(100)
         self.mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(self.total_cloud, depth=8, width=0, scale=1.1, linear_fit=False)[0]
+
 
         self.color_mesh([0.5, 0.5, 0.5])
         self.mesh.compute_vertex_normals()
@@ -918,6 +930,14 @@ class Editor():
     # this calculated voxel size can be used for icp
     def calculate_voxel_size(self, cloud):
         return round(max(cloud.get_max_bound() - cloud.get_min_bound()) * 0.01, 4)
+    
+    # Calculate the average fitness score
+    def calculate_average_fitness(self):
+        total = 0
+        for score in self.fitness_scores:
+            total += score
+        
+        return total/len(self.fitness_scores)
 
     # get length of cloud struct
     # this is me being lazy because I don't want to tyle len(self.cloud_structs) - oh no I just did it
