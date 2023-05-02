@@ -47,7 +47,7 @@ namespace C3PO.ViewModel.Commands
                 {
                     FileName = pythonPath + "python.exe",
                     Arguments = exeDir + " " + fPath,
-                    UseShellExecute = true,
+                    UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
@@ -87,6 +87,11 @@ namespace C3PO.ViewModel.Commands
                 {
                     pyPath = p;
                 }
+            }
+
+            if (pyPath[pyPath.Length - 1] != '\\')
+            {
+                pyPath += "\\";
             }
 
             return pyPath;

@@ -29,7 +29,7 @@ namespace C3PO.ViewModel
                 return new ObservableCollection<string>((new USBDevices()).GetNames());
             }
         }
-        private ObservableCollection<string> _outputFormats = new ObservableCollection<string> { "stl", "obj", "ply" };
+        private ObservableCollection<string> _outputFormats = new ObservableCollection<string> { ".stl", ".obj", ".ply" };
         public ObservableCollection<string> OutputFormats
         {
             get
@@ -177,6 +177,26 @@ namespace C3PO.ViewModel
             {
                 settings.icpIters = value;
                 OnPropertyChanged(nameof(IcpIters));
+            }
+        }
+        private string[] _inputFormats = new string[] { ".xyz", ".ply" };
+        public string[] InputFormats
+        {
+            get
+            {
+                return _inputFormats;
+            }
+        }
+        public string InputFormat
+        {
+            get
+            {
+                return settings.inputFormat;
+            }
+            set
+            {
+                settings.inputFormat = value;
+                OnPropertyChanged(nameof(InputFormat));
             }
         }
 

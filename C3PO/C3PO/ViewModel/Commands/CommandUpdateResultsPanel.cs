@@ -35,8 +35,8 @@ namespace C3PO.ViewModel.Commands
             }
             else if (resultType == "back")
             {
-                vm.ResultsUC = previousPanel;
-                vm.LinkerState = previousState;
+                vm.ResultsUC = new C3PO.View.ScanResultsEmpty();
+                vm.LinkerState = ScanStates.Empty;
                 vm.LinkerUpdate();
 
                 previousState = 0;

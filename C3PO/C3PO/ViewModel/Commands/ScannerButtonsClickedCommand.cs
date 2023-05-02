@@ -43,6 +43,8 @@ namespace C3PO.ViewModel.Commands
 
         private void ScanBtnClicked()
         {
+            settings.ResetDir();
+            settings.UpdateDir();
             Task t1 = Task.Factory.StartNew(() =>
             {
                 vm.StartScan(cancelToken);
@@ -68,11 +70,12 @@ namespace C3PO.ViewModel.Commands
                 return;
             }
 
-            settings.dir = fbd.SelectedPath;
+            settings.dir = fbd.SelectedPath.Replace(" ", "");
+            settings.baseDir = fbd.SelectedPath.Replace(" ", "");
 
             Task t1 = Task.Factory.StartNew(() =>
             {
-                vm.FinishScan();
+                vm.FinishReconstruct();
             }, cancelToken);
 
         }

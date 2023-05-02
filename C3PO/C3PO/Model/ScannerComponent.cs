@@ -32,6 +32,12 @@ namespace C3PO.Model
 
         public bool StartOp()
         {
+            // Create output directory if doesn't exist
+            if(!System.IO.Directory.Exists(settings.dir))
+            {
+                System.IO.Directory.CreateDirectory(settings.dir);
+            }
+
             // Configure process for performing a scan
             string path = System.IO.Directory.GetCurrentDirectory();
             string args = $"{settings.scansPerAngle} {settings.turnRadius} {settings.dir} {settings.dir}";
@@ -89,7 +95,7 @@ namespace C3PO.Model
             foreach(string fpath in System.IO.Directory.GetFiles(dir)) {
                 string fname = fpath.Substring(fpath.LastIndexOf("\\") + 1);
 
-                if(Regex.IsMatch(fname, @$"^{prefix}[0-9]*.xyz"))
+                if(Regex.IsMatch(fname, @$"^{prefix}[0-9]*{settings.inputFormat}"))
                 {
                     scans.Add(fname);
                 }

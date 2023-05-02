@@ -178,6 +178,7 @@ namespace C3PO.ViewModel
         public ICommand GuiTutorialBtnCommand { get; }
         public ICommand BackResultsBtnCommand { get; }
         public ICommand HwTutorialBtnCommand { get; }
+        public ICommand ReconstructBtnCommand { get; }
 
         /*
          * Constructors
@@ -212,6 +213,7 @@ namespace C3PO.ViewModel
             GuiTutorialBtnCommand = new CommandUpdateResultsPanel(this);
             BackResultsBtnCommand = new CommandUpdateResultsPanel(this);
             HwTutorialBtnCommand = new CommandUpdateResultsPanel(this);
+            ReconstructBtnCommand = new CommandReconstruct(this, settingsVM.settings);
         }
 
         /*

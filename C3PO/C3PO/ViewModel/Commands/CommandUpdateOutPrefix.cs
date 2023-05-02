@@ -21,7 +21,7 @@ namespace C3PO.ViewModel.Commands
             if (parameter == null) return;
 
             string prefix = (string)parameter;
-            parser.inPrefix = prefix;
+            parser.outPrefix = prefix;
         }
     }
 }

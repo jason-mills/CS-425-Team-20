@@ -20,10 +20,12 @@ namespace C3PO.Model
         public double voxelMult;
         public string algo;
         public string dir;
+        public string baseDir;
         public string inPrefix;
         public string outPrefix;
         public string regOrder;
         public bool interMode;
+        public string inputFormat;
         public string outputFormat;
 
         public SettingsParser()
@@ -35,12 +37,14 @@ namespace C3PO.Model
             icpIters = 20;
             voxelMult = 1;
             algo = "point-to-plane";
-            dir = Directory.GetCurrentDirectory() + "\\output\\";
+            baseDir = Directory.GetCurrentDirectory() + "\\output\\";
+            dir = UpdateDir();
             inPrefix = "out";
             outPrefix = "final";
             regOrder = GenDefaultRegOrder();
             interMode = false;
-            outputFormat = "stl";
+            inputFormat = ".xyz";
+            outputFormat = ".stl";
         }
 
         public void ImportSettingsFile(string? fpath = null)
@@ -186,6 +190,20 @@ namespace C3PO.Model
             order += (360 / turnRadius - 1).ToString();
 
             return order;
+        }
+
+        public string UpdateDir()
+        {
+            string date = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+            dir = baseDir + "\\" + date;
+
+            return baseDir;
+        }
+
+        public void ResetDir()
+        {
+            baseDir = Directory.GetCurrentDirectory() + "\\output\\";
+            dir = UpdateDir();
         }
     }
 }

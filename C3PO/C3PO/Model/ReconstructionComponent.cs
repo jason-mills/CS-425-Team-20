@@ -28,6 +28,12 @@ namespace C3PO.Model
 
         public bool StartOp()
         {
+            // Create output directory if doesn't exist
+            if (!System.IO.Directory.Exists(settingsParser.dir))
+            {
+                System.IO.Directory.CreateDirectory(settingsParser.dir);
+            }
+
             // Declaring and configuring process-running object
             string path = System.IO.Directory.GetCurrentDirectory();
             string sourcePath = settingsParser.dir;
@@ -35,9 +41,12 @@ namespace C3PO.Model
             // string order = GetICPOrder();
             string order = settingsParser.regOrder;
             string interMode = settingsParser.interMode.ToString();
+            string pyPath = GetPythonPath();
+            // QUESTION FOR JASON: Can file extension be xyz or has to be .xyz?
             string args = $"--input_directory_path={sourcePath} " +
                 $"--input_file_base_name={sourcePrefix} " +
-                $"--input_file_extension=.xyz " +
+                $"--input_file_extension={settingsParser.inputFormat} " +
+                $"--output_file_extension={settingsParser.outputFormat} " +
                 $"--file_order={order} " +
                 $"--output_directory_path={settingsParser.dir} " +
                 $"--output_file_base_name={settingsParser.outPrefix} " +
@@ -47,8 +56,10 @@ namespace C3PO.Model
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "python",
-                    Arguments = ".\\bin\\EditorDriver.py " + args
+                    FileName = pyPath + "python.exe",
+                    Arguments = ".\\bin\\EditorDriver.py " + args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 }
             };
 
@@ -100,9 +111,10 @@ namespace C3PO.Model
         public bool PC2Image()
         {
             // Get path variables
+            string pyPath = GetPythonPath();
             string dir = settingsParser.dir;
             string prefixPath = dir + "\\" + settingsParser.outPrefix;
-            string iPath = prefixPath + ".xyz";
+            string iPath = prefixPath + settingsParser.outPrefix;
             string oPath = prefixPath + ".png";
             string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\pc2png.py";
 
@@ -111,8 +123,9 @@ namespace C3PO.Model
             {
                 StartInfo =
                 {
-                    FileName = "python",
-                    Arguments = $"{exeDir} --file {iPath} --out {oPath}"
+                    FileName = pyPath + "python.exe",
+                    Arguments = $"{exeDir} --file {iPath} --out {oPath}",
+                    UseShellExecute = false
                 }
             };
 
@@ -142,6 +155,28 @@ namespace C3PO.Model
         public bool CheckConnection()
         {
             return true;
+        }
+
+        public string GetPythonPath()
+        {
+            var paths = Environment.GetEnvironmentVariable("path")?.Split(';');
+            string pyPath = "";
+
+            foreach (string p in paths)
+            {
+                string[] pSplit = p.ToLower().Split('\\');
+                if (pSplit[pSplit.Length - 1].Contains("python"))
+                {
+                    pyPath = p;
+                }
+            }
+
+            if (pyPath[pyPath.Length - 1] != '\\')
+            {
+                pyPath += "\\";
+            }
+
+            return pyPath;
         }
     }
 }

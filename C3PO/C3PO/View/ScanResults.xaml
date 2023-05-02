@@ -104,14 +104,20 @@
             <!-- End: Separator -->
 
             <!--Raw data buttons-->
-            <Button Content="Save All" 
-                    MinWidth="50" MinHeight="30" FontSize="16"
-                    Margin="20,5,20,5" Padding="5"
-                    Command="{Binding SaveAllResultsBtnCommand}"/>
-            <Button Content="Save All To Drive"
-                    MinWidth="50" MinHeight="30" FontSize="16"
-                    Margin="20,5,20,5" Padding="5"
-                    Command="{Binding SaveAllFilesToCloudCommand}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Save All" 
+                        MinWidth="50" MinHeight="30" FontSize="16"
+                        Margin="20,5,20,5" Padding="5"
+                        Command="{Binding SaveAllResultsBtnCommand}"/>
+                <Button Content="Save All To Drive"
+                        MinWidth="50" MinHeight="30" FontSize="16"
+                        Margin="20,5,20,5" Padding="5"
+                        Command="{Binding SaveAllFilesToCloudCommand}"/>
+                <Button Content="Reconstruct"
+                        MinWidth="50" MinHeight="30" FontSize="16"
+                        Margin="20,5,20,5" Padding="5"
+                        Command="{Binding ReconstructBtnCommand}"/>
+            </StackPanel>
             <ItemsControl ItemsSource="{Binding RawResults}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

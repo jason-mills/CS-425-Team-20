@@ -122,14 +122,38 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <!--Select default export format-->
-                <Label Content="Default Export Format:"
+                <!--Set the source prefix name-->
+                <Label Content="Input file type:"
                    Height="30"
                    FontSize="18"
                    HorizontalAlignment="Left"
                    Foreground="White"
                    Margin="10,10,10,0"/>
                 <ComboBox Name="ExportFormat"
+                      Height="30"
+                      Width="400"
+                      FontSize="14"
+                      HorizontalAlignment="Left"
+                      SelectedItem="{Binding InputFormat}"
+                      Margin="10,0,10,10">
+                    <ComboBox.Resources>
+                        <CollectionViewSource x:Key="InputFormats" Source="{Binding InputFormats}"/>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <CollectionContainer Collection="{Binding Source={StaticResource InputFormats}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
+
+                <!--Select default export format-->
+                <Label Content="Output file type:"
+                   Height="30"
+                   FontSize="18"
+                   HorizontalAlignment="Left"
+                   Foreground="White"
+                   Margin="10,10,10,0"/>
+                <ComboBox Name="InputFormat"
                       Height="30"
                       Width="400"
                       FontSize="14"
