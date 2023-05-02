@@ -47,7 +47,9 @@ namespace C3PO.Model
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = path + "\\bin\\Scanning.exe",
-                    Arguments = args
+                    Arguments = args,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput= true
                 }
             };
 
@@ -71,6 +73,9 @@ namespace C3PO.Model
                     return false;
                 }
             }
+
+            string error = p.StandardError.ReadToEnd();
+            string output = p.StandardOutput.ReadToEnd();
 
             // Test if process didn't run correctly
             if (!result)
