@@ -1,7 +1,6 @@
 import open3d as o3d
 import numpy as np
 import os
-import sys
 from Editor import Editor
 from Structs import PointCloudStruct
 import open3d.visualization.gui as gui

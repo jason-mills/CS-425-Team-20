@@ -2,7 +2,7 @@
 import open3d as o3d
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
-from time import sleep
+
 # Imports from local files
 from Structs import PointCloudStruct
 from Structs import MeshStruct
