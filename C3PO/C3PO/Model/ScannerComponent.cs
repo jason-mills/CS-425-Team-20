@@ -41,7 +41,7 @@ namespace C3PO.Model
             // Configure process for performing a scan
             CopyJsonToSub();
             string path = System.IO.Directory.GetCurrentDirectory();
-            string args = $"{settings.scansPerAngle} {settings.turnRadius} {settings.dir} {settings.dir}";
+            string args = $"{settings.scansPerAngle} {settings.turnRadius} {settings.dir}\\ {settings.dir}\\";
             var p = new Process()
             {
                 StartInfo = new ProcessStartInfo()
