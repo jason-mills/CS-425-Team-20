@@ -117,7 +117,7 @@ namespace C3PO.Model
             string pyPath = GetPythonPath();
             string dir = settingsParser.dir;
             string prefixPath = dir + "\\" + settingsParser.outPrefix;
-            string iPath = prefixPath + settingsParser.outPrefix;
+            string iPath = prefixPath + settingsParser.outPrefix + settingsParser.inputFormat;
             string oPath = prefixPath + ".png";
             string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\pc2png.py";
 
