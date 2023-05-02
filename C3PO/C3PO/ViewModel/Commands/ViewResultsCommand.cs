@@ -35,7 +35,7 @@ namespace C3PO.ViewModel.Commands
             string fName = "final.xyz";
             if (parameter != null)
             {
-                fName = settings.inPrefix + (string)parameter + settings.inputFormat;
+                fName = (string)parameter + settings.inputFormat;
             }
             // Declaring and configuring process-running object
             string fPath = settings.dir + "\\" + fName;
@@ -47,8 +47,7 @@ namespace C3PO.ViewModel.Commands
                 {
                     FileName = pythonPath + "python.exe",
                     Arguments = exeDir + " " + fPath,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    UseShellExecute = true
                 }
             };
 
@@ -56,14 +55,14 @@ namespace C3PO.ViewModel.Commands
             p.Start();
 
             IntPtr hWnd= IntPtr.Zero;
-            while(!p.HasExited && hWnd.Equals(IntPtr.Zero))
-            {
-                hWnd = FindWindowByCaption(IntPtr.Zero, "Open3D");
-            }
+            //while(!p.HasExited && hWnd.Equals(IntPtr.Zero))
+            //{
+            //    hWnd = FindWindowByCaption(IntPtr.Zero, "Open3D");
+            //}
 
-            ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+            //ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 
-            p.WaitForExit();
+            //p.WaitForExit();
         }
 
         public string FileSelect(string sel)
