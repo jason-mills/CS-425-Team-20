@@ -23,7 +23,7 @@ class Editor():
 
         # Metadata storage and parameters
         self.metadata = []
-        self.average_fitness=()
+        self.fitness_scores = []
 
         # Define output file directory and output base name
         self.output_directory_path = output_directory_path
@@ -347,8 +347,11 @@ class Editor():
 
     # clear changes to the cloud
     def revert_changes(self):
+        self.metadata = []
+        self.fitness_scores = []
+
         self.cloud_structs = copy.deepcopy(self.backup_structs)
-        self.current_cloud_index = 1
+        self.current_cloud_index = 1        
 
         self.total_cloud.clear()
         self.down_sample_total.clear()
@@ -734,6 +737,8 @@ class Editor():
                                                                           distance,
                                                                           initial_transformation,
                                                                           o3d.pipelines.registration.TransformationEstimationPointToPlane())
+        
+        self.fitness_scores.append(registration_result.fitness)
 
         return registration_result.transformation
 
@@ -796,7 +801,7 @@ class Editor():
         if len(self.total_cloud.points) == 0:
             return
         
-        voxel_grid = self.total_cloud.create_surface_voxel_grid_from_point_cloud(self.calculate_voxel_size(self.total_cloud) * 3)
+        voxel_grid = o3d.geometry.VoxelGrid.create_from_point_cloud(self.total_cloud, self.calculate_voxel_size(self.total_cloud) * 3)
         all_voxels = voxel_grid.get_voxels()
         all_centers = []
         all_colors = []
@@ -925,6 +930,14 @@ class Editor():
     # this calculated voxel size can be used for icp
     def calculate_voxel_size(self, cloud):
         return round(max(cloud.get_max_bound() - cloud.get_min_bound()) * 0.01, 4)
+    
+    # Calculate the average fitness score
+    def calculate_average_fitness(self):
+        total = 0
+        for score in self.fitness_scores:
+            total += score
+        
+        return total/len(self.fitness_scores)
 
     # get length of cloud struct
     # this is me being lazy because I don't want to tyle len(self.cloud_structs) - oh no I just did it
