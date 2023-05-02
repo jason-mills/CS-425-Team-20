@@ -28,6 +28,7 @@ namespace C3PO.Model
         public bool interMode;
         public string inputFormat;
         public string outputFormat;
+        public bool isUserScan;
 
         public SettingsParser()
         {
@@ -46,6 +47,7 @@ namespace C3PO.Model
             interMode = false;
             inputFormat = ".xyz";
             outputFormat = ".stl";
+            isUserScan = true;
         }
 
         public void ImportSettingsFile(string? fpath = null)

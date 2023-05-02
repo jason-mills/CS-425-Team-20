@@ -45,6 +45,7 @@ namespace C3PO.ViewModel.Commands
         {
             settings.ResetDir();
             settings.UpdateDir();
+            settings.isUserScan = true;
             Task t1 = Task.Factory.StartNew(() =>
             {
                 vm.StartScan(cancelToken);
@@ -72,6 +73,7 @@ namespace C3PO.ViewModel.Commands
 
             settings.dir = fbd.SelectedPath.Replace(" ", "");
             settings.baseDir = fbd.SelectedPath.Replace(" ", "");
+            settings.isUserScan = false;
 
             Task t1 = Task.Factory.StartNew(() =>
             {

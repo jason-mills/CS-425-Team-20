@@ -50,7 +50,7 @@ namespace C3PO.Model
                 $"--file_order={order} " +
                 $"--output_directory_path={settingsParser.dir} " +
                 $"--output_file_base_name={settingsParser.outPrefix} " +
-                $"--is_user_scan=True " +
+                $"--is_user_scan={settingsParser.isUserScan} " +
                 $"--run_interactive_mode={interMode}";
             var p = new Process()
             {
