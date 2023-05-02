@@ -181,6 +181,7 @@ def main():
                                  file_order, 
                                  is_user_scan)
 
+
     if run_interactive_mode:
         gui.Application.instance.initialize()
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
