@@ -58,10 +58,8 @@ namespace C3PO.Model
                 {
                     FileName = pyPath + "python.exe",
                     Arguments = ".\\bin\\EditorDriver.py " + args,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
+                    UseShellExecute = true,
+                    CreateNoWindow = false
                 }
             };
 
@@ -86,8 +84,8 @@ namespace C3PO.Model
                 }
             }
 
-            string output = p.StandardOutput.ReadToEnd();
-            string error = p.StandardError.ReadToEnd();
+            //string output = p.StandardOutput.ReadToEnd();
+            //string error = p.StandardError.ReadToEnd();
 
             bool pc2ImageResult = PC2Image();
 
