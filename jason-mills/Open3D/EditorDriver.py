@@ -189,9 +189,10 @@ def main():
         gui.Application.instance.quit()
     else:
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
+        editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
+        write_to_json(output_directory_path + "/metadata.json", editor.metadata)
     
-    editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
-    write_to_json(output_directory_path + "/metadata.json", editor.metadata)
+    
     
 if __name__ == '__main__':
     main()
