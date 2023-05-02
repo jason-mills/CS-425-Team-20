@@ -89,7 +89,9 @@ namespace C3PO.ViewModel
                 _partitions = (int)value;
                 settings.turnRadius = (int)value;
                 UpdatePartitionIndex();
+                settings.GenDefaultRegOrder();
                 OnPropertyChanged(nameof(Partitions));
+                OnPropertyChanged(nameof(RegOrder));
             }
         }
         private int _selectionPartitionIndex;

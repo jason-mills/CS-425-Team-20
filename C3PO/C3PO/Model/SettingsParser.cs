@@ -97,7 +97,7 @@ namespace C3PO.Model
 
             if(reconst != null)
             {
-                SaveScanningSettings(reconst);
+                SaveReconstructionSettings(reconst);
             }
 
             root.Add(general);
@@ -232,7 +232,7 @@ namespace C3PO.Model
             subsystem.Element("interMode")?.SetValue(interMode);
         }
 
-        private string GenDefaultRegOrder()
+        public string GenDefaultRegOrder()
         {
             string order = "";
 

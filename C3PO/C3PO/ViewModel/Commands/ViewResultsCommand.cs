@@ -35,7 +35,7 @@ namespace C3PO.ViewModel.Commands
             string fName = "final.xyz";
             if (parameter != null)
             {
-                fName = (string)parameter + ".xyz";
+                fName = settings.inPrefix + (string)parameter + settings.inputFormat;
             }
             // Declaring and configuring process-running object
             string fPath = settings.dir + "\\" + fName;

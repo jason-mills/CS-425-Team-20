@@ -128,7 +128,8 @@ namespace C3PO.Model
                 {
                     FileName = pyPath + "python.exe",
                     Arguments = $"{exeDir} --file {iPath} --out {oPath}",
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 }
             };
 
