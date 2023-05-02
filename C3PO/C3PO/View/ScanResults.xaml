@@ -8,84 +8,16 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width=".5*"/>
-            <ColumnDefinition Width=".5*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <!-- Left panel for results -->
-        <StackPanel Orientation="Vertical"
-                    Grid.Column="0"
-                    Grid.Row="1">
-            <!--<Image Width="350"
-                   Source="pack://application:,,,/Resources/Images/cat_fixed.png"
-                   Margin="5"/>-->
-            <Image Width="350" Grid.Column="0" Grid.Row="1"
-                   Source="{Binding CloudImagePath}"/>
-            <Button HorizontalAlignment="Center"
-                    Content="Save Results"
-                    MinWidth="50"
-                    MinHeight="30"
-                    FontSize="16"
-                    Margin="5"
-                    Padding="5"
-                    Command="{Binding SaveBtnCommand}"/>
-            <Button HorizontalAlignment="Center"
-                    Content="View 3D"
-                    MinWidth="50"
-                    MinHeight="30"
-                    FontSize="16"
-                    Margin="5"
-                    Padding="5"
-                    Command="{Binding ViewResultsBtnCommand}"
-                    CommandParameter="0"/>
-            <Button HorizontalAlignment="Center"
-                    Content="Save to Drive"
-                    MinWidth="50"
-                    MinHeight="30"
-                    FontSize="16"
-                    Margin="5"
-                    Padding="5"
-                    Command="{Binding SaveFinalToCloudCommand}"/>
-        </StackPanel>
-
         
-        <!--Right panel for results-->
-        <ItemsControl Grid.Row ="1" Grid.Column="1"
-                      ItemsSource="{Binding Metadata}" AlternationCount="2">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <!--Metadata information to display-->
-                    <Grid x:Name="Metadata" Width="350">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width=".5*"/>
-                            <ColumnDefinition Width=".5*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" FontSize="18" Content="{Binding DataName}" HorizontalContentAlignment="Right"
-                               Margin="0,0,10,0"/>
-                        <Label Grid.Column="1" FontSize="18" Content="{Binding DataValue}"/>
-                    </Grid>
-                    <DataTemplate.Triggers>
-                        <!--Triggers for alternating the row colors-->
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                            <Setter Property="Background" Value="Gray" TargetName="Metadata"/>
-                        </Trigger>
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                            <Setter Property="Background" Value="DarkGray" TargetName="Metadata"/>
-                        </Trigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!--Final results section-->
+        <ContentControl x:Name="FinalResults" Grid.Row="0" Content="{Binding FinalResultsUC}"/>
 
         <!--Raw data header-->
-        <StackPanel Grid.Row="2"
-                    Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="1"
                     VerticalAlignment="Top">
             <!-- Separator -->
             <Rectangle Grid.ColumnSpan="2" HorizontalAlignment="Stretch"

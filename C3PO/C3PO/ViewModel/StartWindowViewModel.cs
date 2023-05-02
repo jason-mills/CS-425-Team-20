@@ -164,6 +164,14 @@ namespace C3PO.ViewModel
             }
         }
 
+        public UserControl FinalResultsUC
+        {
+            get
+            {
+                return UpdateFinalResults();
+            }
+        }
+
         /*
          * Commands
          */
@@ -204,8 +212,8 @@ namespace C3PO.ViewModel
             ScannerBtnCommand = new ScannerButtonsClickedCommand(this, settingsVM.settings);
             SettingsBtnCommand = new SettingsBtnClickedCommand(NavigateStore, settingsVM);
             NavigateStore.PreviousViewModel = this;
-            SaveBtnCommand = new SaveFileCommand();
-            SaveAllResultsBtnCommand = new CommandSaveAllResults();
+            SaveBtnCommand = new SaveFileCommand(settingsVM.settings);
+            SaveAllResultsBtnCommand = new CommandSaveAllResults(settingsVM.settings);
             ViewResultsBtnCommand = new ViewResultsCommand(settingsVM.settings);
             GoToHomePageCommand = new NavigateUriCommand("https://sites.google.com/nevada.unr.edu/team-20-c3po/home?authuser=1");
             SaveFinalToCloudCommand = new CommandUploadToCloud(settingsVM.settings, "final");
@@ -263,7 +271,7 @@ namespace C3PO.ViewModel
             {
                 LinkerState = ScanStates.Scan;
             }));
-            bool result = true; // _componentLinker.StartScan();
+            bool result = _componentLinker.StartScan();
             
             if (result)
             {
@@ -311,7 +319,9 @@ namespace C3PO.ViewModel
 
         public void UpdateMetadata()
         {
-            metadataParser = new MetadataParser(settingsVM.settings.dir);
+            SettingsParser settings = settingsVM.settings;
+            string metadataFilePath = $"{settings.dir}\\metadata.json";
+            metadataParser = new MetadataParser(metadataFilePath);
             Metadata = new ObservableCollection<ScanMetadata>();
             
             Metadata.Add(new ScanMetadata("Time Spanned", _componentLinker.TimeSpanned.ToString(@"hh\:mm\:ss")));
@@ -383,6 +393,18 @@ namespace C3PO.ViewModel
             }
 
             return "Red";
+        }
+
+        public UserControl UpdateFinalResults()
+        {
+            SettingsParser settings = settingsVM.settings;
+            string finalMesh = $"{settings.dir}\\{settings.outPrefix}{settings.outputFormat}";
+            if(System.IO.File.Exists(finalMesh))
+            {
+                return new C3PO.View.ScanFinals();
+            }
+
+            return new C3PO.View.ScanResultsEmpty();
         }
     }
 }

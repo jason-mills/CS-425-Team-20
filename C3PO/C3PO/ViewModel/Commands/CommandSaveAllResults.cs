@@ -6,15 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using C3PO.Model;
 
 namespace C3PO.ViewModel.Commands
 {
     public class CommandSaveAllResults : CommandBase
     {
-        private string _prefix;
-        public CommandSaveAllResults()
+        private SettingsParser settings;
+
+        public CommandSaveAllResults(SettingsParser settings)
         {
-            _prefix = "out";
+            this.settings = settings;
         }
 
         public override void Execute(object? parameter)
@@ -32,12 +34,19 @@ namespace C3PO.ViewModel.Commands
             }
 
             // Save all scans
-            string path = System.IO.Directory.GetCurrentDirectory();
+            string path = settings.dir;
             string destFolder = fbd.SelectedPath;
-            foreach (string pathFile in Directory.GetFiles(path + "\\output"))
+            foreach (string pathFile in Directory.GetFiles(path))
             {
                 string destFile = pathFile.Substring(pathFile.LastIndexOf("\\"));
-                File.Move(pathFile, destFolder + destFile);
+                try
+                {
+                    File.Move(pathFile, destFolder + destFile);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

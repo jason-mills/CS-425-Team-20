@@ -69,7 +69,7 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(SelectedAlgo));
             }
         }
-        private ObservableCollection<string> _noOfPartitionsOpt = new ObservableCollection<string> { "30", "45", "90" };
+        private ObservableCollection<string> _noOfPartitionsOpt = new ObservableCollection<string> { "15", "30", "45", "90" };
         public ObservableCollection<string> NoOfPartitionsOpt
         {
             get

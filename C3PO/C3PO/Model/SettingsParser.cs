@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Xml.Linq;
+using static System.Windows.Forms.DataFormats;
 
 namespace C3PO.Model
 {
@@ -30,7 +31,7 @@ namespace C3PO.Model
 
         public SettingsParser()
         {
-            settingsPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\resources\\settings.xml";
+            settingsPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\resources\\settings.xaml";
 
             turnRadius = 30;
             scansPerAngle = 1;
@@ -75,18 +76,41 @@ namespace C3PO.Model
             // Update children
             XElement settings = XElement.Load(source);
 
-            XElement? hardwareSettings = (from subsystem in settings?.Descendants("subsystem")
-                                          where subsystem?.Attribute("category")?.Value.ToString() == "hardware"
-                                          select subsystem)?.FirstOrDefault();
+            //XElement? hardwareSettings = (from subsystem in settings?.Descendants("subsystem")
+            //                              where subsystem?.Attribute("category")?.Value.ToString() == "hardware"
+            //                              select subsystem)?.FirstOrDefault();
+            XElement? general = LoadCategory(settings, "general");
+            XElement? scannin = LoadCategory(settings, "scanning");
+            XElement? reconst = LoadCategory(settings, "reconstruction");
 
-            string defRot = scansPerAngle.ToString();
-            string defPar = turnRadius.ToString();
+            if(general != null)
+            {
+                SaveGeneralSettings(general);
+            }
 
-            (hardwareSettings?.Element("scansPerAngle") ?? new XElement(defRot)).Value = defRot;
-            (hardwareSettings?.Element("turnRadius") ?? new XElement(defPar)).Value = defPar;
+            if(scannin != null)
+            {
+                SaveScanningSettings(scannin);
+            }
 
-            // Add children to root
-            root.Add(hardwareSettings);
+            if(reconst != null)
+            {
+                SaveScanningSettings(reconst);
+            }
+
+            root.Add(general);
+            root.Add(scannin);
+            root.Add(reconst);
+
+
+            //string defRot = scansPerAngle.ToString();
+            //string defPar = turnRadius.ToString();
+
+            //(hardwareSettings?.Element("scansPerAngle") ?? new XElement(defRot)).Value = defRot;
+            //(hardwareSettings?.Element("turnRadius") ?? new XElement(defPar)).Value = defPar;
+
+            //// Add children to root
+            //root.Add(hardwareSettings);
 
             // Save
             root.Save(dest);
@@ -144,11 +168,15 @@ namespace C3PO.Model
             string iPrefix = (subsystem.Element("inPrefix") ?? new XElement("")).Value.ToString();
             string oPrefix = (subsystem.Element("outPrefix") ?? new XElement("")).Value.ToString();
             string lDir = (subsystem.Element("loadDir") ?? new XElement("")).Value.ToString();
+            string iFormat = (subsystem.Element("inFormat") ?? new XElement("")).Value.ToString();
+            string oFormat = (subsystem.Element("outFormat") ?? new XElement("")).Value.ToString();
 
             // Set to proper values
             inPrefix = iPrefix == "" ? "out" : iPrefix;
             outPrefix = oPrefix == "" ? "final" : oPrefix;
             dir = lDir == "" ? ".\\output" : lDir;
+            inputFormat = iFormat == "" ? ".xyz" : iFormat;
+            outputFormat = oFormat == "" ? ".stl" : oFormat;
         }
 
         private void LoadScanningSettings(XElement subsystem)
@@ -177,6 +205,29 @@ namespace C3PO.Model
             algo = alg == "" ? "icp" : alg;
             regOrder = order == "" ? GenDefaultRegOrder() : order;
             interMode = intMode == "" ? false : bool.Parse(intMode);
+        }
+
+        private void SaveGeneralSettings(XElement subsystem)
+        {
+            subsystem.Element("inPrefix")?.SetValue(inPrefix);
+            subsystem.Element("outPrefix")?.SetValue(outPrefix);
+            subsystem.Element("dir")?.SetValue(dir);
+            subsystem.Element("inFormat")?.SetValue(inputFormat);
+            subsystem.Element("outFormat")?.SetValue(outputFormat);
+        }
+
+        private void SaveScanningSettings(XElement subsystem)
+        {
+            subsystem.Element("turnRadius")?.SetValue(turnRadius);
+            subsystem.Element("scansPerAngle")?.SetValue(scansPerAngle);
+        }
+
+        private void SaveReconstructionSettings(XElement subsystem)
+        {
+            subsystem.Element("icpIters")?.SetValue(icpIters);
+            subsystem.Element("algo")?.SetValue(algo);
+            subsystem.Element("regOrder")?.SetValue(regOrder.ToString());
+            subsystem.Element("interMode")?.SetValue(interMode);
         }
 
         private string GenDefaultRegOrder()

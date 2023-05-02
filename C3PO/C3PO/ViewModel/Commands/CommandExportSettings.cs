@@ -27,7 +27,7 @@ namespace C3PO.ViewModel.Commands
         {
             this.parser = parser;
             _importFPath = fpath is null ?
-                System.AppDomain.CurrentDomain.BaseDirectory + "\\resources\\settings.json"
+                System.AppDomain.CurrentDomain.BaseDirectory + "\\resources\\settings.xaml"
                 : fpath;
         }
         public override void Execute(object? parameter)
@@ -35,8 +35,8 @@ namespace C3PO.ViewModel.Commands
             // Configure save file dialogue for saving a file
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.FileName = "Settings";
-            saveFileDialog.DefaultExt = ".xml";
-            saveFileDialog.Filter = "Extensible Markup Language|*.xml";
+            saveFileDialog.DefaultExt = ".xaml";
+            saveFileDialog.Filter = "Extensible Markup Language|*.xaml";
 
             // Display file dialogue to user
             bool? result = saveFileDialog.ShowDialog();

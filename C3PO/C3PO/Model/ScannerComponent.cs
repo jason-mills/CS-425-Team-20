@@ -119,7 +119,8 @@ namespace C3PO.Model
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = binPath + "\\check_arduino.exe"
+                    FileName = binPath + "\\check_arduino.exe",
+                    UseShellExecute = false
                 }
             };
 

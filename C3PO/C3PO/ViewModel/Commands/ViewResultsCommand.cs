@@ -89,7 +89,7 @@ namespace C3PO.ViewModel.Commands
                 }
             }
 
-            if (pyPath[pyPath.Length - 1] != '\\')
+            if (pyPath.Length > 0 && pyPath[pyPath.Length - 1] != '\\')
             {
                 pyPath += "\\";
             }

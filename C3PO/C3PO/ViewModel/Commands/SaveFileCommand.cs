@@ -14,20 +14,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.IO;
+using C3PO.Model;
+using System.CodeDom;
 
 namespace C3PO.ViewModel.Commands
 {
     internal class SaveFileCommand : CommandBase
     {
-        public SaveFileCommand() { }
+        private SettingsParser settings;
+
+        public SaveFileCommand(SettingsParser settings)
+        {
+            this.settings = settings;
+        }
 
         public override void Execute(object? parameter)
         {
             // Configure save file dialogue for saving a file
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.FileName = "c3po_results";
-            saveFileDialog.DefaultExt = ".stl";
-            saveFileDialog.Filter = "Standard Tessellation Language|*.stl";
+            saveFileDialog.DefaultExt = $"{settings.outputFormat}";
+            saveFileDialog.Filter = $"Meshes|*{settings.outputFormat}";
 
             // Display file dialogue to user
             bool? result = saveFileDialog.ShowDialog();
@@ -36,7 +43,7 @@ namespace C3PO.ViewModel.Commands
             if(result == true)
             {
                 string filename = saveFileDialog.FileName;
-                string ogFilePath = AppContext.BaseDirectory + "\\input.stl";
+                string ogFilePath = $"{settings.dir}\\{settings.outPrefix}{settings.outputFormat}";
                 if (File.Exists(ogFilePath))
                 {
                     File.Move(ogFilePath, filename);
