@@ -126,7 +126,7 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
     else:
         files = os.listdir(input_directory_path)
         for file in files:
-            if file_path.endswith((".xyz", ".xyzn", ".xyzrgb", ".pts", ".ply", ".pcd")):
+            if file.endswith((".xyz", ".xyzn", ".xyzrgb", ".pts", ".ply", ".pcd")):
                 file_paths.append(input_directory_path + "/" + file)
 
     cloud_structs = []
@@ -191,8 +191,6 @@ def main():
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
         write_to_json(output_directory_path + "/metadata.json", editor.metadata)
-    
-    
-    
+
 if __name__ == '__main__':
     main()
