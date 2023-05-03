@@ -13,6 +13,7 @@ using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.Upload;
+using Google.Apis.Util;
 
 namespace C3PO.Model
 {
@@ -43,7 +44,7 @@ namespace C3PO.Model
                 CancellationToken.None,
                 new FileDataStore("MyAppsToken"));
 
-            if (reset == true && cred != null)
+            if (IsExpired() || reset == true && cred != null)
             {
                 Reset();
             }
@@ -113,6 +114,23 @@ namespace C3PO.Model
             }
 
             return true;
+        }
+
+        public bool IsExpired()
+        {
+            if(cred == null)
+            {
+                return true;
+            }
+
+            DateTime issuedUtc = this.cred.Token.IssuedUtc;
+            DateTime limitUtc = issuedUtc.AddMinutes(1);
+            if (cred.Token.IsExpired(SystemClock.Default) || limitUtc.CompareTo(DateTime.UtcNow) < 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

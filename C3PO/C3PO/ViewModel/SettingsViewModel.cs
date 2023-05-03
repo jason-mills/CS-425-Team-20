@@ -77,20 +77,17 @@ namespace C3PO.ViewModel
                 return _noOfPartitionsOpt;
             }
         }
-        private int _partitions;
-        public int Partitions
+        public int TurnRadius
         {
             get
             {
-                return _partitions;
+                return settings.turnRadius;
             }
             set
             {
-                _partitions = (int)value;
                 settings.turnRadius = (int)value;
                 UpdatePartitionIndex();
-                settings.GenDefaultRegOrder();
-                OnPropertyChanged(nameof(Partitions));
+                OnPropertyChanged(nameof(TurnRadius));
                 OnPropertyChanged(nameof(RegOrder));
             }
         }
@@ -149,6 +146,7 @@ namespace C3PO.ViewModel
         {
             get
             {
+                settings.regOrder = settings.GenDefaultRegOrder();
                 return settings.regOrder;
             }
             set
@@ -212,8 +210,6 @@ namespace C3PO.ViewModel
 
         public SettingsViewModel(NavigationStore ns)
         {
-            _partitions = Int32.Parse(_noOfPartitionsOpt[_selectionPartitionIndex]);
-
             settings = new SettingsParser();
             settings.ImportSettingsFile();
             UpdatePartitionIndex();
@@ -233,7 +229,7 @@ namespace C3PO.ViewModel
             int counter = 0;
             foreach(var par in NoOfPartitionsOpt)
             {
-                if (par.Equals(Partitions.ToString())) {
+                if (par.Equals(TurnRadius.ToString())) {
                     SelectionPartitionIndex = counter;
                     break;
                 }

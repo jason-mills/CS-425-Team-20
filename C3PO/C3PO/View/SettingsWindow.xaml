@@ -221,8 +221,8 @@
                       FontSize="14"
                       HorizontalAlignment="Left"
                       Margin="10,0,10,10"
-                      SelectedIndex="{Binding SelectionPartitionIndex}"
-                      SelectedItem="{Binding Partitions}">
+                      SelectedItem="{Binding TurnRadius}"
+                      SelectedIndex="{Binding SelectionPartitionIndex}">
                     <ComboBox.Resources>
                         <CollectionViewSource x:Key="NoOfPartitionsOpt" Source="{Binding NoOfPartitionsOpt}"/>
                     </ComboBox.Resources>
@@ -232,6 +232,7 @@
                         </CompositeCollection>
                     </ComboBox.ItemsSource>
                 </ComboBox>
+                <!--SelectedIndex="{Binding SelectionPartitionIndex}"-->
 
                 <Border Background="#1e2124"
                     Margin="5">

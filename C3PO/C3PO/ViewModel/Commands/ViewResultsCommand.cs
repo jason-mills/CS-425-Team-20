@@ -35,8 +35,9 @@ namespace C3PO.ViewModel.Commands
             string fName = "final.xyz";
             if (parameter != null)
             {
-                fName = (string)parameter + settings.inputFormat;
+                fName = FileSelect((string)parameter);
             }
+
             // Declaring and configuring process-running object
             string fPath = settings.dir + "\\" + fName;
             string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\RenderDriver.py";
@@ -47,7 +48,8 @@ namespace C3PO.ViewModel.Commands
                 {
                     FileName = pythonPath + "python.exe",
                     Arguments = exeDir + " " + fPath,
-                    UseShellExecute = true
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 }
             };
 
@@ -69,9 +71,9 @@ namespace C3PO.ViewModel.Commands
         {
             if(sel.Equals("0"))
             {
-                return "final.xyz";
+                return settings.outPrefix + settings.outputFormat;
             }
-            return settings.outPrefix + int.Parse(sel) + ".xyz";
+            return sel + settings.inputFormat;
         }
 
         public string GetPythonPath()

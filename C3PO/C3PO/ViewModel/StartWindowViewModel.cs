@@ -303,6 +303,10 @@ namespace C3PO.ViewModel
         public void FinishReconstruct()
         {
             _componentLinker.Finish();
+
+            ReconstructionComponent rc = new ReconstructionComponent(new CancellationToken(), settingsVM.settings);
+            rc.PC2Image();
+
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 LinkerState = ScanStates.Finish;
@@ -398,7 +402,7 @@ namespace C3PO.ViewModel
         public UserControl UpdateFinalResults()
         {
             SettingsParser settings = settingsVM.settings;
-            string finalMesh = $"{settings.dir}\\{settings.outPrefix}{settings.outputFormat}";
+            string finalMesh = $"{settings.dir}\\{settings.outPrefix}{settings.inputFormat}";
             if(System.IO.File.Exists(finalMesh))
             {
                 return new C3PO.View.ScanFinals();

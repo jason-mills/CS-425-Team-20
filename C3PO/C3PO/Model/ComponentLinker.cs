@@ -50,16 +50,17 @@ namespace C3PO.Model
                 _timeSpanned = value;
             }
         }
+        private bool passedRecon;
 
         /* Constructors */
         public ComponentLinker(SettingsParser settings)
         {
             _startTime = new DateTime();
             _endTime = new DateTime();
-            _timeSpanned = new TimeSpan();
+            _timeSpanned = TimeSpan.Zero;
             this.settings = settings;
             _ct = new CancellationToken();
-
+            passedRecon = false;
             _reconstructComp = new ReconstructionComponent(_ct, settings);
             _scanComp = new ScannerComponent(_ct, settings);
         }
@@ -73,13 +74,24 @@ namespace C3PO.Model
 
         public bool StartReconstruction()
         {
+            if(settings.isUserScan)
+            {
+                _startTime = DateTime.Now;
+            }
+
+            passedRecon = true;
+
             return _reconstructComp.StartOp();
         }
 
         public bool Finish()
         {
-            _endTime = DateTime.Now;
-            _timeSpanned = (_endTime - _startTime);
+            if (passedRecon)
+            {
+                _endTime = DateTime.Now;
+                _timeSpanned = (_endTime - _startTime);
+                passedRecon = false;
+            }
             return true;
         }
 

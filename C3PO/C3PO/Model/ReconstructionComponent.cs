@@ -60,10 +60,8 @@ namespace C3PO.Model
                 {
                     FileName = pyPath + "python.exe",
                     Arguments = ".\\bin\\EditorDriver.py " + args,
-                    UseShellExecute = false,
-                    CreateNoWindow = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
+                    UseShellExecute = true,
+                    CreateNoWindow = false
                 }
             };
 
@@ -88,12 +86,12 @@ namespace C3PO.Model
                 }
             }
 
-            string output = p.StandardOutput.ReadToEnd();
-            string error = p.StandardError.ReadToEnd();
+            //string output = p.StandardOutput.ReadToEnd();
+            //string error = p.StandardError.ReadToEnd();
 
-            bool pc2ImageResult = PC2Image();
+            PC2Image();
 
-            return result && pc2ImageResult;
+            return result;
         }
 
         public bool StopOp()
@@ -121,7 +119,7 @@ namespace C3PO.Model
             string pyPath = GetPythonPath();
             string dir = settingsParser.dir;
             string prefixPath = dir + "\\" + settingsParser.outPrefix;
-            string iPath = settingsParser.outPrefix + settingsParser.inputFormat;
+            string iPath = prefixPath + settingsParser.inputFormat;
             string oPath = prefixPath + ".png";
             string exeDir = System.IO.Directory.GetCurrentDirectory() + "\\bin\\pc2png.py";
 
@@ -132,7 +130,8 @@ namespace C3PO.Model
                 {
                     FileName = pyPath + "python.exe",
                     Arguments = $"{exeDir} --file {iPath} --out {oPath}",
-                    UseShellExecute = true
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 }
             };
 
@@ -155,6 +154,8 @@ namespace C3PO.Model
                     return false;
                 }
             }
+
+            string error = p.StandardError.ReadToEnd();
 
             return result;
         }
