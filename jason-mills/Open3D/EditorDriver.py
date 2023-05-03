@@ -126,7 +126,8 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
     else:
         files = os.listdir(input_directory_path)
         for file in files:
-            file_paths.append(input_directory_path + "/" + file)
+            if file_path.endswith((".xyz", ".xyzn", ".xyzrgb", ".pts", ".ply", ".pcd")):
+                file_paths.append(input_directory_path + "/" + file)
 
     cloud_structs = []
 
