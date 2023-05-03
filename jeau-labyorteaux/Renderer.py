@@ -4,15 +4,22 @@ import open3d as o3d
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
 import open3d.visualization as vis
+import tkinter
 from tkinter import filedialog
+from win32api import GetSystemMetrics
+import threading
 
-window_X = 800
-window_Y = 500
+window_X = int(GetSystemMetrics(0) * 0.75)
+window_Y = int(GetSystemMetrics(1) * 0.75)
 
+file_path = None
+directory = None
 
 class Renderer:
     def __init__(self, filename):
 
+        self.material = None
+        self.em = None
         self.scene_widget = None
         self.parent_widget_width = None
         self.parent_widget_height = None
@@ -41,20 +48,18 @@ class Renderer:
         self.scene_widget.enable_scene_caching(True)
 
         # Material Settings
-        material = rendering.MaterialRecord()
-        material.shader = "defaultLit"
+        self.material = rendering.MaterialRecord()
+        self.material.shader = "defaultLit"
 
         # Setting for size of scene widget
-        self.scene_widget.frame = gui.Rect(self.parent_widget_width, self.window.content_rect.y,
-                                           self.window.content_rect.width - self.parent_widget_width,
-                                           self.window.content_rect.height)
+        self.scene_widget.frame = gui.Rect(window_X*.25, 0, window_X*.75, window_Y)
 
         # Settings for size of parent widget
-        self.parent_widget.frame = gui.Rect(0, 0, self.parent_widget_width, self.parent_widget_height)
+        self.parent_widget.frame = gui.Rect(0, 0, window_X*.25, window_Y)
 
         # Loading the file into the widget scene
         cloud = self.load_geometry(filename)
-        self.scene_widget.scene.add_geometry(filename, cloud, material)
+        self.scene_widget.scene.add_geometry(filename, cloud, self.material)
 
         # Setting background color
         self.scene_widget.scene.set_background([0.5, 0.5, 0.5, 0.4])
@@ -64,7 +69,7 @@ class Renderer:
         # Create a button widget
         change_file = gui.Button("Change File")
         change_file.frame = gui.Rect(5, 100, self.parent_widget_width-10, 50)
-        change_file.set_on_clicked(lambda: self.change_file())
+        change_file.set_on_clicked(lambda: self.change_file(filename))
 
         # Getting specific file name
         split_up = filename.split("/")
@@ -149,7 +154,7 @@ class Renderer:
         # Create button widget for directory walkthrough
         exit_button = gui.Button("Exit")
         exit_button.frame = gui.Rect(half_window_width-50, 25, 100, 50)
-        exit_button.set_on_clicked(lambda: self.exit_walkthrough(window))
+        exit_button.set_on_clicked(lambda: self.exit_comparison(window))
 
         # Material Settings
         material = rendering.MaterialRecord()
@@ -182,7 +187,6 @@ class Renderer:
 
         # Run the appplication
         gui.Application.instance.run()
-
 
     def render_walkthrough(self):
         gui.Application.instance.initialize()
@@ -235,7 +239,7 @@ class Renderer:
         # Create an exit button widget
         exit_button = gui.Button("Exit")
         exit_button.frame = gui.Rect(5, 400, self.parent_widget_width-10, 50)
-        exit_button.set_on_clicked(lambda: self.exit_walkthrough(window))
+        exit_button.set_on_clicked(lambda: self.exit_walkthrough(window, scene_widget))
 
         # Temp cloud variable for temporarily storing geometry data and bounding box use
         cloud = None
@@ -291,7 +295,16 @@ class Renderer:
         split_data = filename.split("/")
         current_file_label.text = "Current File:\n" + split_data[-1]
 
-    def exit_walkthrough(self, window):
+        # Define how the layout should change when the window is resized
+
+    def exit_walkthrough(self, window, scene_widget):
+        for each in self.directory_walkthrough:
+            scene_widget.scene.remove_geometry(each)
+        self.directory_walkthrough = []
+        window.show(False)
+        self.render(self.cached_filename)
+
+    def exit_comparison(self, window):
         window.show(False)
         self.render(self.cached_filename)
 
@@ -308,7 +321,8 @@ class Renderer:
     def load_geometry(self, filename):
         # Determine File Type
         split = filename.split("/")
-        if (".xyz" or ".ply" or ".pcl") in split[-1]:
+       # if (".ply" or ".xyz" or ".pcl") in split[-1]:
+        if filename.endswith((".xyz",".ply",".pcl")):
             geometry = o3d.io.read_point_cloud(filename)
         elif ".stl" in split[-1]:
             geometry = o3d.io.read_triangle_mesh(filename)
@@ -317,25 +331,59 @@ class Renderer:
             sys.exit()
         return geometry
 
-    def change_file(self):
-        file_path = filedialog.askopenfilename(title="Select File")
-        filename = file_path
+    def change_file(self, filename):
+        thread = threading.Thread(target=self.ask_file)
+        thread.start()
+        thread.join()
+        del thread
+
+        global file_path
         if file_path == "":
             return
-        self.window.show(False)
-        self.render(filename)
+        else:
+            #self.scene_widget.scene.remove_geometry(filename)
+            self.window.show(False)
+            self.render(file_path)
+
+    def ask_file(self):
+        tk = tkinter.Tk()
+        tk.withdraw()
+        global file_path
+        file_path = filedialog.askopenfilename(title="Select File")
+        tk.destroy()
+
+    def ask_directory(self):
+        tk = tkinter.Tk()
+        tk.withdraw()
+        global directory
+        directory = filedialog.askdirectory(title="Select Directory")
+        print(directory)
+        tk.destroy()
 
     def exit_button(self):
+        gui.Application.instance.quit()
         self.window.close()
         sys.exit()
 
     def walkthrough(self, filename):
+        thread = threading.Thread(target=self.ask_directory)
+        thread.start()
+        thread.join()
+        del thread
+
+
         self.cached_filename = filename
-        directory = filedialog.askdirectory(title="Select Directory")
-        for file in sorted(os.listdir(directory), key=len):
-            temp_filename = (directory + "/" + file)
-            self.directory_walkthrough.append(temp_filename)
-        self.window.show(False)
-        self.render_walkthrough()
-        self.window.show(True)
-        return True
+        global directory
+        if directory == "":
+            return
+        else:
+            for file in sorted(os.listdir(directory), key=len):
+                temp_filename = (directory + "/" + file)
+                self.directory_walkthrough.append(temp_filename)
+            self.window.show(False)
+            thread = threading.Thread(target=self.render_walkthrough)
+            thread.start()
+            thread.join()
+            del thread
+            #self.render_walkthrough()
+            return True
