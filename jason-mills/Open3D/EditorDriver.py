@@ -7,6 +7,7 @@ import open3d.visualization.gui as gui
 import json
 import argparse
 
+# Parse the command line arguments given to the program
 def parseArgs():
     usage = '''python %(prog)s [-h] --dir DIR --prefix PREFIX --out OUT'''
     parser = argparse.ArgumentParser(usage=usage, add_help=False)
@@ -33,31 +34,34 @@ def parseArgs():
                           help="If the data is from user scan",
                           required=True)
     
-    optional = parser.add_argument_group("optional")
-    optional.add_argument("--input_file_base_name", 
+    # if you use anything in the conditinally optional group you have to have all of the others for it to function
+    conditionally_optional = parser.add_argument_group("Optional only if other arguments in this group are not used")
+
+    conditionally_optional.add_argument("--input_file_base_name", 
                           type=str,  
                           default="",
                           help="The base file name being read from",
                           required=False)
-    optional.add_argument("--file_order", 
+    conditionally_optional.add_argument("--input_file_extension", 
+                          type=str,  
+                          help="The extension being used, example: .xyz, .ply",
+                          default="",
+                          required=False)
+    conditionally_optional.add_argument("--file_order", 
                           type=str,
                           default=" ",
                           help="The base file name being read from",
                           required=False)
-    optional.add_argument("--merge_method", 
-                          type=str, 
-                          default="mutliway registration", 
-                          help="The registration algorithm to use",
-                          required=False)
+
+    # this will not have any big impact
+    optional = parser.add_argument_group("optional")
+    
     optional.add_argument("--output_file_extension", 
                           type=str, 
                           default=".stl", 
                           help="Object file type being created",
                           required=False)
-    optional.add_argument("--input_file_extension", 
-                          type=str,  
-                          help="The extension being used, example: .xyz, .ply",
-                          required=False)
+    
     optional.add_argument("--icp_iterations",
                           type=str,
                           default=100,
@@ -155,13 +159,13 @@ def process_scan(input_directory_path, input_file_base_name, input_file_extensio
 
     return cloud_structs
 
+# main function you idiot - I'm just kidding I love you
 def main():
     args = parseArgs()
 
     run_interactive_mode = args.run_interactive_mode.lower() == "true"
     input_directory_path = args.input_directory_path.replace("\\", "/")
     input_file_base_name = args.input_file_base_name
-    print("input file base name: " + input_file_base_name)
     input_file_extension = args.input_file_extension
     file_order = args.file_order.split(",")
     output_directory_path = args.output_directory_path.replace("\\", "/")
@@ -187,10 +191,12 @@ def main():
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         gui.Application.instance.run()
         gui.Application.instance.quit()
+        
     else:
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
         write_to_json(output_directory_path + "/metadata.json", editor.metadata)
 
+# Go Go Go
 if __name__ == '__main__':
     main()

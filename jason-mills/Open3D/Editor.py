@@ -453,6 +453,7 @@ class Editor():
     # add a cloud with the last calculated transformation
     def add_transformed_cloud(self):
         if not self.get_cloud_struct_len() > 0:
+            self.window.show_message_box("Dialog box", "No more point clouds to add")
             return
         
         print("Adding: " + self.cloud_structs[0].name)
@@ -647,6 +648,10 @@ class Editor():
             if not self.get_cloud_struct_len() > 0:
                 return
 
+            if not self.cloud_structs[0].cloud.has_colors():
+                self.window.show_message_box("Something", "This point cloud does not have color")
+                return
+
             source_down, sourceFpfh = self.preprocess_point_cloud(point_cloud=self.cloud_structs[0].downsampled_cloud, 
                                                                   voxel_size=self.cloud_structs[0].voxel_size)
             
@@ -753,9 +758,12 @@ class Editor():
 
         return registration_result.transformation
 
+    # Merge the next point cloud that is available
     def merge_next_cloud(self):
-        print("Merging: " + self.cloud_structs[0].name)
-
+        if(self.get_cloud_struct_len() == 0):
+            self.window.show_message_box("Something", "No more point clouds to merge")
+            return
+        
         if self.merging_method == "point to plane":
             self.point_to_plane_merge()
 
