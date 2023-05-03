@@ -191,7 +191,7 @@ def main():
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         gui.Application.instance.run()
         gui.Application.instance.quit()
-        
+
     else:
         editor = Editor(cloud_structs, output_directory_path, output_file_base_name, output_file_extension, run_interactive_mode)
         editor.metadata.append(("averageFitnessScore", editor.calculate_average_fitness()))
