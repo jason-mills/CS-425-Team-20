@@ -155,8 +155,6 @@ namespace C3PO.Model
                 }
             }
 
-            string error = p.StandardError.ReadToEnd();
-
             return result;
         }
 
