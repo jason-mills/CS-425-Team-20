@@ -275,53 +275,6 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <!--Registration Distance Threshold-->
-                <Label Content="Voxel Multiplier"
-                   Height="30"
-                   FontSize="18"
-                   HorizontalAlignment="Left"
-                   Foreground="White"
-                   Margin="10,10,10,0"/>
-                <TextBox Text="{Binding VoxelMult}"
-                     x:Name="DistanceThreshold"
-                     Height="30"
-                     Width="400"
-                     FontSize="14"
-                     HorizontalAlignment="Left"
-                     Foreground="Gray"
-                     Background="LightGray"
-                     Margin="10,0,10,10">
-                    <TextBox.InputBindings>
-                        <KeyBinding Key="Enter"
-                                Command="{Binding InputRotationsCommand}"
-                                CommandParameter="{Binding ElementName=RotationsTextBox, Path=Text}"/>
-                    </TextBox.InputBindings>
-                </TextBox>
-
-                <!--Registration algorithm-->
-                <Label Content="Registration Algorithm"
-                   Height="30"
-                   FontSize="18"
-                   HorizontalAlignment="Left"
-                   Margin="10,10,10,0"
-                   Foreground="White"/>
-                <ComboBox Name="ReconstructAlgo"
-                      Height="30"
-                      Width="400"
-                      FontSize="14"
-                      HorizontalAlignment="Left"
-                      Margin="10,0,10,10"
-                      SelectedItem="{Binding SelectedAlgo}">
-                    <ComboBox.Resources>
-                        <CollectionViewSource x:Key="AlgoOpts" Source="{Binding AlgoOpts, Mode=OneWay}"/>
-                    </ComboBox.Resources>
-                    <ComboBox.ItemsSource>
-                        <CompositeCollection>
-                            <CollectionContainer Collection="{Binding Source={StaticResource AlgoOpts}}"/>
-                        </CompositeCollection>
-                    </ComboBox.ItemsSource>
-                </ComboBox>
-
                 <!--Interactive mode switch-->
                 <Label Content="Interactive Mode"
                    Height="30"
