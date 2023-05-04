@@ -47,7 +47,7 @@ namespace C3PO.ViewModel.Commands
                 StartInfo = new ProcessStartInfo()
                 {
                     FileName = pythonPath + "python.exe",
-                    Arguments = exeDir + " " + fPath,
+                    Arguments = exeDir + " \"" + fPath + "\"",
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
@@ -65,6 +65,9 @@ namespace C3PO.ViewModel.Commands
             //ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 
             //p.WaitForExit();
+
+            string error = p.StandardError.ReadToEnd();
+            string output = p.StandardOutput.ReadToEnd();
         }
 
         public string FileSelect(string sel)

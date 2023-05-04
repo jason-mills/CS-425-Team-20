@@ -76,7 +76,7 @@ namespace C3PO.ViewModel.Commands
             settings.baseDir = fbd.SelectedPath.Trim();
             settings.isUserScan = false;
 
-            Task t1 = Task.Factory.StartNew(() =>
+            Task t1 = Task.Run(() =>
             {
                 vm.FinishReconstruct();
             }, cancelToken);
