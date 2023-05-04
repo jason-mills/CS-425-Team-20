@@ -14,10 +14,12 @@ window_Y = int(GetSystemMetrics(1) * 0.75)
 
 file_path = None
 directory = None
+file_paths = None
 
 class Renderer:
     def __init__(self, filename):
 
+        self.old_window = None
         self.material = None
         self.em = None
         self.scene_widget = None
@@ -112,7 +114,7 @@ class Renderer:
     def compare_mode(self, file_1, file_2):
         gui.Application.instance.initialize()
         # Create the window
-        window = gui.Application.instance.create_window("Directory Walkthrough", window_X, window_Y)
+        window = gui.Application.instance.create_window("Comparison", window_X, window_Y)
 
         half_window_width = window.content_rect.width/2
         window_height = window.content_rect.height
@@ -300,23 +302,39 @@ class Renderer:
     def exit_walkthrough(self, window, scene_widget):
         for each in self.directory_walkthrough:
             scene_widget.scene.remove_geometry(each)
+        self.directory_index = 0
         self.directory_walkthrough = []
         window.show(False)
-        self.render(self.cached_filename)
+        self.window.show(True)
+        #self.render(self.cached_filename)
 
     def exit_comparison(self, window):
         window.show(False)
         self.render(self.cached_filename)
 
     def initiate_comarison(self, filename):
+        thread = threading.Thread(target=self.ask_comparison_files)
+        thread.start()
+        thread.join()
+        del thread
+
         self.cached_filename = filename
-        file_paths = filedialog.askopenfilenames(title="Select Two Files")
+        global file_paths
         if len(file_paths) == 2:
             self.window.show(False)
             self.compare_mode(file_paths[0], file_paths[1])
+            return
         else:
-            self.window.show(False)
-            self.render(filename)
+            return
+
+
+    def ask_comparison_files(self):
+        tk = tkinter.Tk()
+        tk.withdraw()
+        global file_paths
+        file_paths = filedialog.askopenfilenames(title="Select Two Files")
+        tk.destroy()
+
 
     def load_geometry(self, filename):
         # Determine File Type
@@ -336,12 +354,10 @@ class Renderer:
         thread.start()
         thread.join()
         del thread
-
         global file_path
         if file_path == "":
             return
         else:
-            #self.scene_widget.scene.remove_geometry(filename)
             self.window.show(False)
             self.render(file_path)
 
@@ -357,7 +373,6 @@ class Renderer:
         tk.withdraw()
         global directory
         directory = filedialog.askdirectory(title="Select Directory")
-        print(directory)
         tk.destroy()
 
     def exit_button(self):
@@ -371,7 +386,6 @@ class Renderer:
         thread.join()
         del thread
 
-
         self.cached_filename = filename
         global directory
         if directory == "":
@@ -381,9 +395,6 @@ class Renderer:
                 temp_filename = (directory + "/" + file)
                 self.directory_walkthrough.append(temp_filename)
             self.window.show(False)
-            thread = threading.Thread(target=self.render_walkthrough)
-            thread.start()
-            thread.join()
-            del thread
-            #self.render_walkthrough()
+            self.render_walkthrough()
             return True
+
