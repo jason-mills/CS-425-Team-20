@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:C3PO.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:ui="http://schemas.modernwpf.com/2019">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -49,7 +50,16 @@
                         MinWidth="50" MinHeight="30" FontSize="16"
                         Margin="20,5,20,5" Padding="5"
                         Command="{Binding ReconstructBtnCommand}"/>
+                <Label HorizontalAlignment="Right" VerticalAlignment="Center"
+                   HorizontalContentAlignment="Right"
+                   Foreground="White"
+                   FontSize="18" Margin="20,5,0,5"
+                   Content="User Scan?"/>
+                <ui:ToggleSwitch Margin="20,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                 HorizontalContentAlignment="Left"
+                                 IsOn="{Binding IsUserScan}"/>
             </StackPanel>
+            
             <ItemsControl ItemsSource="{Binding RawResults}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

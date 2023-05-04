@@ -48,8 +48,7 @@ namespace C3PO.Model
                 $"--output_file_extension={settingsParser.outputFormat} " +
                 $"--output_directory_path={settingsParser.dir} " +
                 $"--output_file_base_name={settingsParser.outPrefix} " +
-                $"--is_user_scan=True " +
-                //$"--is_user_scan={settingsParser.isUserScan} " +
+                $"--is_user_scan={settingsParser.isUserScan} " +
                 $"--run_interactive_mode={interMode} ";
             if(settingsParser.isUserScan == true)
             {
@@ -87,8 +86,8 @@ namespace C3PO.Model
                 }
             }
 
-            string output = p.StandardOutput.ReadToEnd();
-            string error = p.StandardError.ReadToEnd();
+            //string output = p.StandardOutput.ReadToEnd();
+            //string error = p.StandardError.ReadToEnd();
 
             bool pc2ImageResult = PC2Image();
 
@@ -131,8 +130,8 @@ namespace C3PO.Model
                 {
                     FileName = pyPath + "python.exe",
                     Arguments = $"{exeDir} --file {iPath} --out {oPath}",
-                    UseShellExecute = true,
-                    CreateNoWindow = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 }
             };
 

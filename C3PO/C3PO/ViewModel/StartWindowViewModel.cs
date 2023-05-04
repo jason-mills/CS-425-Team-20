@@ -171,6 +171,18 @@ namespace C3PO.ViewModel
                 return UpdateFinalResults();
             }
         }
+        public bool IsUserScan
+        {
+            get
+            {
+                return settingsVM.settings.isUserScan;
+            }
+            set
+            {
+                settingsVM.settings.isUserScan = value;
+                OnPropertyChanged(nameof(IsUserScan));
+            }
+        }
 
         /*
          * Commands
