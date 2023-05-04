@@ -179,7 +179,7 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(IcpIters));
             }
         }
-        private string[] _inputFormats = new string[] { ".xyz", ".ply" };
+        private string[] _inputFormats = new string[] { ".xyz", ".ply", ".xyzn", ".xyzrgb", "pts", "pcd" };
         public string[] InputFormats
         {
             get

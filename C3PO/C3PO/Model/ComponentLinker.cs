@@ -51,6 +51,7 @@ namespace C3PO.Model
             }
         }
         private bool passedRecon;
+        private bool isRunning;
 
         /* Constructors */
         public ComponentLinker(SettingsParser settings)
@@ -61,6 +62,7 @@ namespace C3PO.Model
             this.settings = settings;
             _ct = new CancellationToken();
             passedRecon = false;
+            isRunning = false;
             _reconstructComp = new ReconstructionComponent(_ct, settings);
             _scanComp = new ScannerComponent(_ct, settings);
         }
@@ -68,6 +70,7 @@ namespace C3PO.Model
         public bool StartScan()
         {
             _startTime = DateTime.Now;
+            isRunning = true;
 
             return _scanComp.StartOp();
         }
@@ -80,6 +83,7 @@ namespace C3PO.Model
             }
 
             passedRecon = true;
+            isRunning = false;
 
             return _reconstructComp.StartOp();
         }
@@ -92,12 +96,16 @@ namespace C3PO.Model
                 _timeSpanned = (_endTime - _startTime);
                 passedRecon = false;
             }
+
             return true;
         }
 
         public bool CheckConnections()
         {
-            return _scanComp.CheckConnection() && _reconstructComp.CheckConnection();
+            bool scanConnection = isRunning || _scanComp.CheckConnection(); 
+
+            return scanConnection && _reconstructComp.CheckConnection();
         }
+
     }
 }
