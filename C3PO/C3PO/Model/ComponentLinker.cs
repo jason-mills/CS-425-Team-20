@@ -77,7 +77,7 @@ namespace C3PO.Model
 
         public bool StartReconstruction()
         {
-            if(settings.isUserScan)
+            if(!isRunning)
             {
                 _startTime = DateTime.Now;
             }
