@@ -57,7 +57,7 @@ namespace C3PO.ViewModel.Commands
             cts.Cancel();
         }
 
-        private void LoadBtnClicked()
+        private bool LoadBtnClicked()
         {
             // Configure file dialogue
             FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -68,11 +68,12 @@ namespace C3PO.ViewModel.Commands
             // Test for improper input
             if(result != DialogResult.OK)
             {
-                return;
+                Execute("Cancel");
+                return false;
             }
 
-            settings.dir = fbd.SelectedPath.Replace(" ", "");
-            settings.baseDir = fbd.SelectedPath.Replace(" ", "");
+            settings.dir = fbd.SelectedPath.Trim();
+            settings.baseDir = fbd.SelectedPath.Trim();
             settings.isUserScan = false;
 
             Task t1 = Task.Factory.StartNew(() =>
@@ -80,6 +81,7 @@ namespace C3PO.ViewModel.Commands
                 vm.FinishReconstruct();
             }, cancelToken);
 
+            return true;
         }
 
         public override void Execute(object? sender)
@@ -106,8 +108,16 @@ namespace C3PO.ViewModel.Commands
             }
             else if(sender.Equals("Load Scans"))
             {
-                newButtons.Add("Cancel");
-                LoadBtnClicked();
+                bool result = LoadBtnClicked();
+
+                if (result)
+                {
+                    newButtons.Add("Cancel");
+                }
+                else
+                {
+                    newButtons = vm.ScannerButtons;
+                }
             }
 
             vm.ScanButtonsSet(newButtons);

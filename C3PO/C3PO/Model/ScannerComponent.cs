@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -93,7 +94,9 @@ namespace C3PO.Model
             string prefix = settings.inPrefix;
             string postfix = settings.outPrefix;
 
-            foreach(string fpath in System.IO.Directory.GetFiles(dir)) {
+            DirectoryInfo directoryInfo = new DirectoryInfo(dir);
+            foreach(FileInfo file in directoryInfo.GetFiles()) {
+                string fpath = file.FullName;
                 string fname = fpath.Substring(fpath.LastIndexOf("\\") + 1);
 
                 if(Regex.IsMatch(fname, @$"^{prefix}[0-9]*{settings.inputFormat}"))
