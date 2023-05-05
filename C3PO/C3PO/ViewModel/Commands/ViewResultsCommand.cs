@@ -66,8 +66,8 @@ namespace C3PO.ViewModel.Commands
 
             //p.WaitForExit();
 
-            string error = p.StandardError.ReadToEnd();
-            string output = p.StandardOutput.ReadToEnd();
+            //string error = p.StandardError.ReadToEnd();
+            //string output = p.StandardOutput.ReadToEnd();
         }
 
         public string FileSelect(string sel)

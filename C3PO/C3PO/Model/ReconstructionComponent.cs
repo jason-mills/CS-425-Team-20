@@ -43,10 +43,10 @@ namespace C3PO.Model
             string interMode = settingsParser.interMode.ToString();
             string pyPath = GetPythonPath();
             // QUESTION FOR JASON: Can file extension be xyz or has to be .xyz?
-            string args = $"--input_directory_path={sourcePath} " +
+            string args = $"--input_directory_path=\"{sourcePath}\" " +
                 $"--input_file_extension={settingsParser.inputFormat} " +
                 $"--output_file_extension={settingsParser.outputFormat} " +
-                $"--output_directory_path={settingsParser.dir} " +
+                $"--output_directory_path=\"{settingsParser.dir}\" " +
                 $"--output_file_base_name={settingsParser.outPrefix} " +
                 $"--is_user_scan={settingsParser.isUserScan} " +
                 $"--run_interactive_mode={interMode} ";
@@ -129,7 +129,7 @@ namespace C3PO.Model
                 StartInfo =
                 {
                     FileName = pyPath + "python.exe",
-                    Arguments = $"{exeDir} --file {iPath} --out {oPath}",
+                    Arguments = $"{exeDir} --file \"{iPath}\" --out \"{oPath}\"",
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
