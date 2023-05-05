@@ -29,11 +29,6 @@ int main(int argc, char *argv[])
 		bigPointCloud.addPointCloud(aPointCloud.getPoints());
 	}
 
-	/*for (int i = 0; i < numberOfFiles; i++) 
-	{
-		bigPointCloud.readXYZFile("temp" + std::to_string(i) + (std::string)".xyz");
-	}*/
-
 	bigPointCloud.writeXYZFile(newFilename);
 
 	return 0;
