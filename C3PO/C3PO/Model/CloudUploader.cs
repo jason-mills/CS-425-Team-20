@@ -14,6 +14,7 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.Upload;
 using Google.Apis.Util;
+using Google.Apis.Drive.v3;
 
 namespace C3PO.Model
 {
@@ -24,6 +25,8 @@ namespace C3PO.Model
         string clientSecret;
         UserCredential? cred;
         gd.DriveService service;
+        string uploadedURL;
+        static bool isRunning;
 
         // Constructor
         public CloudUploader()
@@ -32,11 +35,14 @@ namespace C3PO.Model
             clientId = "124258515310-msjeupun26bvk08h76mlagi8loekcaeq.apps.googleusercontent.com";
             clientSecret = "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";
             service = new gd.DriveService();
+            uploadedURL = "";
+            isRunning = false;
         }
 
         // Methods
         public async Task UploadAsync(string fPath, bool reset = false)
         {
+            isRunning = true;
             cred = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                 new ClientSecrets { ClientId = clientId, ClientSecret = clientSecret },
                 scopes,
@@ -77,7 +83,8 @@ namespace C3PO.Model
             // Create file metadata
             var fileMetadata = new gd.Data.File()
             {
-                Name = fPath.Substring(fPath.LastIndexOf('\\') + 1)
+                Name = fPath.Substring(fPath.LastIndexOf('\\') + 1),
+                WritersCanShare = true,
             };
 
             // Stream file to drive
@@ -96,9 +103,26 @@ namespace C3PO.Model
                 if (request.ResponseBody != null)
                 {
                     fileId = request.ResponseBody.Id;
+
+                    Permission newPermission = new Permission();
+                    newPermission.Type = "anyone";
+                    newPermission.Role = "reader";
+                    newPermission.AllowFileDiscovery = true;
+
+                    var p = await service.Permissions.Create(newPermission, fileId).ExecuteAsync();
+
+                    gd.FilesResource.GetRequest r = service.Files.Get(fileId);
+
+                    r.IncludeLabels = "webViewLink";
+                    r.Fields= "*";
+
+                    gd.Data.File uploadedFile = await r.ExecuteAsync();
+
+                    uploadedURL = uploadedFile.WebContentLink;
                 }
             }
 
+            isRunning = false;
             return fileId;
         }
 
@@ -131,6 +155,12 @@ namespace C3PO.Model
             }
 
             return false;
+        }
+
+        public string GetFileLink()
+        {
+            while (isRunning) ;
+            return uploadedURL;
         }
     }
 }

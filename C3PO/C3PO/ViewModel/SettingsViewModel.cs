@@ -128,6 +128,20 @@ namespace C3PO.ViewModel
                 settings.interMode = value;
             }
         }
+        private bool _autoOut;
+        public bool AutoOut
+        {
+            get
+            {
+                return _autoOut;
+            }
+            set
+            {
+                _autoOut = value;
+                UpdateOutputName();
+                OnPropertyChanged(nameof(AutoOut));
+            }
+        }
         public string SPrefix
         {
             get
@@ -140,6 +154,11 @@ namespace C3PO.ViewModel
             get
             {
                 return settings.outPrefix;
+            }
+            set
+            {
+                settings.outPrefix = value;
+                OnPropertyChanged(nameof(OPrefix));
             }
         }
         public string RegOrder
@@ -199,6 +218,19 @@ namespace C3PO.ViewModel
                 OnPropertyChanged(nameof(InputFormat));
             }
         }
+        private bool _genQR;
+        public bool GenQR
+        {
+            get
+            {
+                return settings.genQr;
+            }
+            set
+            {
+                settings.genQr = value;
+                OnPropertyChanged(nameof(GenQR));
+            }
+        }
 
         public ICommand BackBtnCommand { get; }
         public ICommand ImportSettingsCommand { get; }
@@ -210,6 +242,7 @@ namespace C3PO.ViewModel
 
         public SettingsViewModel(NavigationStore ns)
         {
+            _autoOut = false;
             settings = new SettingsParser();
             settings.ImportSettingsFile();
             UpdatePartitionIndex();
@@ -234,6 +267,19 @@ namespace C3PO.ViewModel
                     break;
                 }
                 counter++;
+            }
+        }
+
+        public void UpdateOutputName()
+        {
+            if(_autoOut == false)
+            {
+                OPrefix = "final";
+            }
+            else
+            {
+                string date = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+                OPrefix = date;
             }
         }
     }

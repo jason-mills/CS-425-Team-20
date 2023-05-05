@@ -29,6 +29,7 @@ namespace C3PO.Model
         public string inputFormat;
         public string outputFormat;
         public bool isUserScan;
+        public bool genQr;
 
         public SettingsParser()
         {
@@ -48,6 +49,7 @@ namespace C3PO.Model
             inputFormat = ".xyz";
             outputFormat = ".stl";
             isUserScan = true;
+            genQr = false;
         }
 
         public void ImportSettingsFile(string? fpath = null)

@@ -99,7 +99,7 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <!--Set the source prefix name-->
+                <!--Set the output prefix name-->
                 <Label Content="Output prefix name:"
                    Height="30"
                    FontSize="18"
@@ -122,7 +122,16 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <!--Set the source prefix name-->
+                <Label Content="Use unique output names:"
+                   Height="30"
+                   FontSize="18"
+                   HorizontalAlignment="Left"
+                   Foreground="White"
+                   Margin="10,10,10,0"/>
+                <ui:ToggleSwitch Margin="10,0,10,10"
+                                 IsOn="{Binding AutoOut}"/>
+
+                <!--Set the source type-->
                 <Label Content="Input file type:"
                    Height="30"
                    FontSize="18"
@@ -169,6 +178,15 @@
                         </CompositeCollection>
                     </ComboBox.ItemsSource>
                 </ComboBox>
+
+                <Label Content="Generate QR code:"
+                   Height="30"
+                   FontSize="18"
+                   HorizontalAlignment="Left"
+                   Foreground="White"
+                   Margin="10,10,10,0"/>
+                <ui:ToggleSwitch Margin="10,0,10,10"
+                                 IsOn="{Binding GenQR}"/>
 
                 <Border Background="#1e2124"
                     Margin="5">

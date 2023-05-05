@@ -1,6 +1,7 @@
 ﻿using C3PO.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,14 +21,18 @@ namespace C3PO.ViewModel.Commands
             this.saveType = saveType;
         }
 
-        public async Task SaveFileAsync(string fPath, bool reset = false)
+        public async Task SaveFileAsync(string fPath, bool reset = false, bool single = false)
         {
             var uploader = new CloudUploader();
 
-            //Task t1 = new Task(() => uploader.UploadAsync(fPath, reset).Wait());
-
-            //t1.Start();
             await uploader.UploadAsync(fPath, reset);
+
+            if (single && settings.genQr)
+            {
+                string url = uploader.GetFileLink();
+                QRCodeGen qr = new QRCodeGen(settings);
+                qr.GenQR(url);
+            }
         }
 
         public void SaveAllFiles(string fPath)
@@ -51,7 +56,9 @@ namespace C3PO.ViewModel.Commands
             string fPath = settings.dir;
             if(saveType.Equals("final"))
             {
-                _ = SaveFileAsync(fPath + "\\final.xyz");
+                Task t1 = Task.Run(() =>
+                    _ = SaveFileAsync(fPath + "\\final.xyz", false, true)
+                );
             }
             else if(saveType.Equals("all"))
             {
