@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* IComponent.cs:
+ *  Interface class for describing the functionality that all
+ *  components of the C3PO system must implement.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

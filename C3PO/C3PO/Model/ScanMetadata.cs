@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* ScanMetadata.cs:
+ *  Model class responsible for storing and updating the metadata values obtained
+ *  for the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;

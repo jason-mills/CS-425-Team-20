@@ -1,4 +1,13 @@
-﻿using C3PO.ViewModel;
+﻿/* NavigationStore.cs:
+ *  The store class responsible for storing and updating the global page that is
+ *  in view for the user.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

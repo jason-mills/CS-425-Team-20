@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* CommandUpdateResultsPanel.cs:
+ *  The command class used when the user tells the UI to change the content
+ *  displayed on the results panel in the main page.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation.Language;

@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* USBDevices.cs:
+ *  The model class responsible for obtaining the USB devices on the host computer.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ * CURRENTLY NOT USED.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

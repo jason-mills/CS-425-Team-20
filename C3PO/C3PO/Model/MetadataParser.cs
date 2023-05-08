@@ -1,4 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿/* MetadataParser.cs:
+ *  Model class responsible for parsing metadata obtained from the
+ *  different components of the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

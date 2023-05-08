@@ -1,4 +1,15 @@
-﻿using System;
+﻿/* CloudUploader.cs:
+ *  Model class responsible for handling interations for uploading files
+ *  to the Google Drive cloud.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
+using Google.Apis.Drive.v3.Data;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +20,6 @@ using System.Windows.Forms;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Requests;
 using gd = Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Apis.Upload;

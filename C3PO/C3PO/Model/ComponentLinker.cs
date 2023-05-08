@@ -1,4 +1,13 @@
-﻿using C3PO.Stores;
+﻿/* ComponentLinker.cs:
+ *  Model class responsible for handling the interactions between the
+ *  different components of the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Stores;
 using C3PO.ViewModel;
 using System;
 using System.Collections.Generic;

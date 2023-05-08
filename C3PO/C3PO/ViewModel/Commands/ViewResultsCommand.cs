@@ -1,4 +1,13 @@
-﻿using C3PO.Model;
+﻿/* ViewResultsCommand.cs:
+ *  The command class used when the user tells the UI to open a 3D viewer
+ *  to view a 3D model.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

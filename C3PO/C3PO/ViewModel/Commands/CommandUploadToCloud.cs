@@ -1,4 +1,13 @@
-﻿using C3PO.Model;
+﻿/* CommandUploadToCloud.cs:
+ *  The command class called when the user tells the UI to upload a scan
+ *  to the Google Drive.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

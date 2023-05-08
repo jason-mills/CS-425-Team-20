@@ -1,4 +1,12 @@
-﻿using C3PO.Model;
+﻿/* CommandImportSettings.cs:
+ *  The command class used when the user tells the UI to import settings.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

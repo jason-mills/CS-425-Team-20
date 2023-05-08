@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* ReconstructionComponent.cs:
+ *  The model class responsible for handling interactions with the
+ *  reconstruction component of the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

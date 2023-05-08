@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* SettingsParser.cs:
+ *  The model class responsible for handling the settings of the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;

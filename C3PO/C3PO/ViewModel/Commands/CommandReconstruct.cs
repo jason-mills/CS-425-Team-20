@@ -1,4 +1,13 @@
-﻿using C3PO.Model;
+﻿/* CommandReconstruct.cs:
+ *  The command class used when the user tells the UI to reconstruct a set of
+ *  partition scans.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

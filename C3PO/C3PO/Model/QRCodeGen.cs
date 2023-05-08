@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* QRCodeGen.cs:
+ *  Model class responsible for generating QR codes for URL links.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

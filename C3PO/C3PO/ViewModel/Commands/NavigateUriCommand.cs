@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* NaviateUriCommand.cs:
+ *  The command class used when the user tells the UI to switch to a new page.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

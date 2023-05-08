@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* ScannerComponent.cs:
+ *  The model class responsible for handling interactions with the
+ *  scanning component of the C3PO system.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Text;

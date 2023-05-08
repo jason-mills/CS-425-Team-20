@@ -1,7 +1,4 @@
-﻿using C3PO.Stores;
-using System;
-using System.Collections.Generic;
-/* MainViewViewModel.cs:
+﻿/* MainViewViewModel.cs:
  *  ViewModel for parent window of application.
  *  Holds functionality for application-wide processes.
  * authors:
@@ -10,6 +7,9 @@ using System.Collections.Generic;
  * date: February 02, 2023
  */
 
+using C3PO.Stores;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

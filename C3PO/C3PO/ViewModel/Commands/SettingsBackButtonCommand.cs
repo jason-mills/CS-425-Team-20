@@ -1,4 +1,13 @@
-﻿using C3PO.Stores;
+﻿/* SettingsBackButtonCommand.cs:
+ *  The command class for returning to the main page from the settings page
+ *  when the user tells the UI to go back.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;

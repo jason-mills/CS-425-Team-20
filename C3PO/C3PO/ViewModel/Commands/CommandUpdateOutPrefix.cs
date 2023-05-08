@@ -1,4 +1,12 @@
-﻿using C3PO.Model;
+﻿/* CommandUpdateOutPrefix.cs:
+ *  The command class used to update the output prefix setting variable.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using C3PO.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

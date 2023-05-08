@@ -1,4 +1,13 @@
-﻿using Microsoft.PowerShell.Commands;
+﻿/* CommandSaveAllResults.cs:
+ *  The command class used when the user tells the UI to save the final
+ *  results and the set of partition scans to their computer.
+ * authors:
+ *  Froilan Luna-Lopez
+ *      University of Nevada, Reno
+ *      CS426, 2023
+ */
+
+using Microsoft.PowerShell.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
